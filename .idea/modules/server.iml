@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="server" external.linked.project.path="$MODULE_DIR$/../../server" external.root.project.path="$MODULE_DIR$/../../server" external.system.id="GRADLE" external.system.module.group="org.example" external.system.module.version="1.0-SNAPSHOT" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
-    <exclude-output />
-    <content url="file://$MODULE_DIR$/../../server">
-      <excludeFolder url="file://$MODULE_DIR$/../../server/.gradle" />
-      <excludeFolder url="file://$MODULE_DIR$/../../server/build" />
-    </content>
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
-  </component>
+<module version="4">
   <component name="SonarLintModuleSettings">
-    <option name="uniqueId" value="c3570a19-846f-4389-83f1-c5c36b463b37" />
+    <option name="uniqueId" value="e177b08c-1721-4eea-a388-5d735f7c9149" />
   </component>
 </module>

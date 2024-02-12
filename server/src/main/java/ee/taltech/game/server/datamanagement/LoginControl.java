@@ -1,4 +1,4 @@
-package ee.taltech.game.server.DataManagement;
+package ee.taltech.game.server.datamanagement;
 
 public class LoginControl {
     private static final int MAX_PLAYERS = 10;
