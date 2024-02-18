@@ -1,7 +1,6 @@
 package ee.taltech.game.server.datamanagement;
 
 import com.esotericsoftware.kryonet.Server;
-import ee.taltech.game.server.messages.Position;
 import ee.taltech.game.server.player.PlayerCharacter;
 
 import java.util.HashMap;
@@ -12,12 +11,19 @@ public class TickRateLoop implements Runnable {
     private Server server;
     public Map<Integer, PlayerCharacter> players = new HashMap<>();
 
+    /**
+     * @param server The whole gameServer instance to access the servers contents.
+     */
     public TickRateLoop(Server server, Map<Integer, PlayerCharacter> players) {
         this.server = server;
         // Whole list for the players in the list.
         this.players = players;
     }
 
+    /**
+     * The main loop of the TPS method.
+     * This loop is run TPS/s.
+     */
     public void run() {
         // TPS means ticks per second.
         double tps = 60;
@@ -38,6 +44,10 @@ public class TickRateLoop implements Runnable {
         }
     }
 
+    /**
+     * Method is called out every tick (in run() method).
+     * Contains logic, that needs to be updated every tick.
+     */
     public void tick() {
         // This function activates according to ticks per second.
         // If 1 TPS, then every second.
@@ -45,12 +55,14 @@ public class TickRateLoop implements Runnable {
             // Every existing player position is being updated.
             player.updatePosition();
             // Send out a Position for the given player.
-            server.sendToAllUDP(new Position(player.playerID, player.xPosition, player.yPosition));
+            // server.sendToAllUDP(new Position(player.playerID, player.xPosition, player.yPosition));
         }
     }
 
+    /**
+     * Stop the thread and TPS from running.
+     */
     public void stop() {
-        // To stop the thread and TPS from running.
         running = false;
     }
 }

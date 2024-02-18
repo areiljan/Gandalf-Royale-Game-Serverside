@@ -55,6 +55,12 @@ public class PlayerCharacter {
     }
 
 
+    /**
+     * Method sets the heading direction for the player, but doesn't update the position coordinates.
+     * Only use if's, because multiple buttons can, be pressed simultaneously.
+     *
+     * @param keyPress Incoming from client. Contains if and what button is pressed.
+     */
     public void setMovement(KeyPress keyPress) {
         // Set a direction where player should be headed.
         if (keyPress.direction == KeyPress.Direction.LEFT) {
