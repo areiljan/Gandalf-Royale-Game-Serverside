@@ -1,6 +1,7 @@
 package ee.taltech.game.server.datamanagement;
 
 import com.esotericsoftware.kryonet.Server;
+import ee.taltech.game.server.messages.Position;
 import ee.taltech.game.server.player.PlayerCharacter;
 
 import java.util.HashMap;
@@ -55,7 +56,7 @@ public class TickRateLoop implements Runnable {
             // Every existing player position is being updated.
             player.updatePosition();
             // Send out a Position for the given player.
-            // server.sendToAllUDP(new Position(player.playerID, player.xPosition, player.yPosition));
+            server.sendToAllUDP(new Position(player.playerID, player.xPosition, player.yPosition));
         }
     }
 

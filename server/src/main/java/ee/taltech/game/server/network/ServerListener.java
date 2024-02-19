@@ -42,6 +42,7 @@ public class ServerListener extends Listener {
         switch (incomingData) {
             case KeyPress key:
                 PlayerCharacter player = game.players.get(connection.getID()); // Get the player who sent out the Data.
+
                 if (player != null) {
                     // Set the direction player should be moving.
                     player.setMovement(key);
@@ -80,6 +81,15 @@ public class ServerListener extends Listener {
                     GetLobbies requestedLobby = new GetLobbies(existingLobby.lobbyName, existingLobby.lobbyId, existingLobby.players);
                     game.server.sendToTCP(connection.getID(), requestedLobby);
                 }
+                break;
+            case StartGame startGame:
+                lobby = game.lobbies.get(startGame.gameId);
+                if (lobby.players.size() > 1) {
+                    for (Integer playerId : lobby.players) {
+                        game.server.sendToTCP(playerId, startGame);
+                    }
+                }
+                game.server.sendToAllTCP(new LobbyDismantle(startGame.gameId));
                 break;
             case FrameworkMessage.KeepAlive ignored:
                 break;
