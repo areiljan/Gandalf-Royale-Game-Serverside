@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Server;
 import ee.taltech.game.server.messages.*;
 import ee.taltech.game.server.network.ServerListener;
 import ee.taltech.game.server.player.PlayerCharacter;
+import ee.taltech.game.server.utilities.Game;
 import ee.taltech.game.server.utilities.Lobby;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class GameServer {
     public Map<Integer, PlayerCharacter> players;
 
     public Map<Integer, Lobby> lobbies;
+    public Map<Integer, Game> games;
 
 
     /**
@@ -26,6 +28,7 @@ public class GameServer {
     public GameServer() {
         this.lobbies = new HashMap<>(); // Contains gameIds: lobby
         this.players = new HashMap<>(); // Contains playerId: player
+        this.games = new HashMap<>(); // Contains gameIds: game
         this.server = new Server();
         server.start();
         try { // Establishes a connection with ports
@@ -34,7 +37,7 @@ public class GameServer {
             throw new NoSuchElementException(e);
         }
 
-        TickRateLoop tickRateLoop = new TickRateLoop(server, players); // Create a running TPS loop.
+        TickRateLoop tickRateLoop = new TickRateLoop(server, this); // Create a running TPS loop.
         Thread tickRateThread = new Thread(tickRateLoop); // Run TPS parallel to other processes.
         tickRateThread.start();
 

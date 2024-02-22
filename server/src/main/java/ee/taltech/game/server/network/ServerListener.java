@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.game.server.datamanagement.GameServer;
 import ee.taltech.game.server.messages.*;
 import ee.taltech.game.server.player.PlayerCharacter;
+import ee.taltech.game.server.utilities.Game;
 import ee.taltech.game.server.utilities.Lobby;
 
 public class ServerListener extends Listener {
@@ -84,12 +85,16 @@ public class ServerListener extends Listener {
                 break;
             case StartGame startGame:
                 lobby = game.lobbies.get(startGame.gameId);
-                if (lobby.players.size() > 1) {
+                if (lobby.players.size() > 1) { // If there are more than 1 player in lobby
                     for (Integer playerId : lobby.players) {
-                        game.server.sendToTCP(playerId, startGame);
+                        game.server.sendToTCP(playerId, startGame); // Start game for players
                     }
+
+                    // Create new game instance and add it to games list in GameServer
+                    game.games.put(lobby.lobbyId, new Game(game, lobby));
+                    game.lobbies.remove(startGame.gameId); // Remove lobby from gameServer lobby's list
+                    game.server.sendToAllTCP(new LobbyDismantle(startGame.gameId)); // Remove lobby for clients
                 }
-                game.server.sendToAllTCP(new LobbyDismantle(startGame.gameId));
                 break;
             case FrameworkMessage.KeepAlive ignored:
                 break;
