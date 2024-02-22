@@ -3,22 +3,19 @@ package ee.taltech.game.server.datamanagement;
 import com.esotericsoftware.kryonet.Server;
 import ee.taltech.game.server.messages.Position;
 import ee.taltech.game.server.player.PlayerCharacter;
-
-import java.util.HashMap;
-import java.util.Map;
+import ee.taltech.game.server.utilities.Game;
 
 public class TickRateLoop implements Runnable {
     private volatile boolean running = true;
     private Server server;
-    public Map<Integer, PlayerCharacter> players = new HashMap<>();
+    private GameServer gameServer;
 
     /**
      * @param server The whole gameServer instance to access the servers contents.
      */
-    public TickRateLoop(Server server, Map<Integer, PlayerCharacter> players) {
+    public TickRateLoop(Server server, GameServer gameServer) {
         this.server = server;
-        // Whole list for the players in the list.
-        this.players = players;
+        this.gameServer = gameServer;
     }
 
     /**
@@ -52,11 +49,15 @@ public class TickRateLoop implements Runnable {
     public void tick() {
         // This function activates according to ticks per second.
         // If 1 TPS, then every second.
-        for (PlayerCharacter player : this.players.values()) {
-            // Every existing player position is being updated.
-            player.updatePosition();
-            // Send out a Position for the given player.
-            server.sendToAllUDP(new Position(player.playerID, player.xPosition, player.yPosition));
+
+        // Update player positions for clients that are in the same game with player
+        for (Game game : this.gameServer.games.values()) {
+            for (PlayerCharacter player : game.players.values()) {
+                player.updatePosition();
+                for (Integer playerId : game.players.keySet()) {
+                    server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
+                }
+            }
         }
     }
 
