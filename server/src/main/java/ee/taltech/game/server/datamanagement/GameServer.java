@@ -28,8 +28,9 @@ public class GameServer {
     public GameServer() {
         this.lobbies = new HashMap<>(); // Contains gameIds: lobby
         this.players = new HashMap<>(); // Contains playerId: player
-            this.games = new HashMap<>(); // Contains gameIds: game
+        this.games = new HashMap<>(); // Contains gameIds: game
         this.server = new Server();
+
         server.start();
         try { // Establishes a connection with ports
             server.bind(8080, 8081);
