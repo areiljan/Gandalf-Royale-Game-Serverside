@@ -53,8 +53,7 @@ public class PlayerCharacter {
      * @param newMana new mana value
      */
     public void setMana(Integer newMana) {
-        health = newMana;
-        this.mouseLeftClick = false;
+        mana = newMana;
     }
 
     public int getxPosition() {
@@ -169,7 +168,6 @@ public class PlayerCharacter {
         this.mouseYPosition = mouseclicks.mouseYPosition;
         this.mouseLeftClick = mouseclicks.leftMouse;
         this.spell = mouseclicks.spell;
-        System.out.println("MouseX is " + this.mouseXPosition + " MouseY is " + this.mouseYPosition + this.mouseLeftClick);
     }
 
 }

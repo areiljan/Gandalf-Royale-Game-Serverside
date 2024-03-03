@@ -10,13 +10,13 @@ import ee.taltech.game.server.utilities.Game;
 import ee.taltech.game.server.utilities.Lobby;
 
 public class ServerListener extends Listener {
-    private GameServer game;
+    private GameServer server;
 
     /**
-     * @param game GameServer, that holds the main data.
+     * @param server GameServer, that holds the main data.
      */
-    public ServerListener(GameServer game) {
-        this.game = game;
+    public ServerListener(GameServer server) {
+        this.server = server;
     }
 
     /**
@@ -26,7 +26,7 @@ public class ServerListener extends Listener {
     @Override
     public void connected(Connection connection) {
         PlayerCharacter player = new PlayerCharacter(connection.getID());
-        game.players.put(connection.getID(), player);
+        server.players.put(connection.getID(), player);
     }
 
     /**
@@ -42,7 +42,7 @@ public class ServerListener extends Listener {
         // Triggers every time data is sent from client to server
         switch (incomingData) {
             case KeyPress key:
-                PlayerCharacter player = game.players.get(connection.getID()); // Get the player who sent out the Data.
+                PlayerCharacter player = server.players.get(connection.getID()); // Get the player who sent out the Data.
 
                 if (player != null) {
                     // Set the direction player should be moving.
@@ -50,7 +50,7 @@ public class ServerListener extends Listener {
                 }
                 break;
             case MouseClicks mouse:
-                player = game.players.get(connection.getID());
+                player = server.players.get(connection.getID());
                 if (player != null) {
                     // Set the direction player should be moving.
                     player.setMouseControl(mouse);
@@ -58,49 +58,50 @@ public class ServerListener extends Listener {
                 break;
             case LobbyCreation createLobby:
                 Lobby newLobby = new Lobby(createLobby.gameName, createLobby.hostId); // A new lobby is made
-                game.lobbies.put(newLobby.lobbyId, newLobby); // Lobby is added to the whole lobbies list.
-                game.server.sendToAllTCP(new LobbyCreation(createLobby.gameName, createLobby.hostId, newLobby.lobbyId));
+                server.lobbies.put(newLobby.lobbyId, newLobby); // Lobby is added to the whole lobbies list.
+                server.server.sendToAllTCP(new LobbyCreation(createLobby.gameName, createLobby.hostId, newLobby.lobbyId));
                 break;
             case Join joinMessage:
                 // If a player joins a specific lobby shown on the screen.
-                lobby = game.lobbies.get(joinMessage.gameId); // Get the lobby specified in the message.
+                lobby = server.lobbies.get(joinMessage.gameId); // Get the lobby specified in the message.
                 // Don't add more than 10 players to the lobby.
                 if (lobby.players.size() < 10) {
                     lobby.addPlayer(joinMessage.playerId); // Player is added to the lobby.
-                    game.server.sendToAllTCP(joinMessage);
+                    server.server.sendToAllTCP(joinMessage);
                 }
                 break;
             case Leave leaveMessage:
                 // If a player leaves the lobby.
-                lobby = game.lobbies.get(leaveMessage.gameId); // Get the lobby specified in the message.
+                lobby = server.lobbies.get(leaveMessage.gameId); // Get the lobby specified in the message.
                 lobby.removePlayer(leaveMessage.playerId); // Removes the player from the lobby's players list
                 // Check if there are no players left in the lobby.
                 if (lobby.players.isEmpty()) {
                     // Dismantle the lobby
-                    game.lobbies.remove(leaveMessage.gameId); // Removes lobby from the lobbies HashMap.
-                    game.server.sendToAllTCP(new LobbyDismantle(leaveMessage.gameId)); // Send out the removal of a lobby.
+                    server.lobbies.remove(leaveMessage.gameId); // Removes lobby from the lobbies HashMap.
+                    server.server.sendToAllTCP(new LobbyDismantle(leaveMessage.gameId)); // Send out the removal of a lobby.
                 } else {
-                    game.server.sendToAllTCP(leaveMessage); // Send leave message to everyone connected
+                    server.server.sendToAllTCP(leaveMessage); // Send leave message to everyone connected
                 }
                 break;
             case GetLobbies ignored:
                 //For every lobby in the HashMap, send out a GetLobbies message.
-                for (Lobby existingLobby : game.lobbies.values()) {
-                    GetLobbies requestedLobby = new GetLobbies(existingLobby.lobbyName, existingLobby.lobbyId, existingLobby.players);
-                    game.server.sendToTCP(connection.getID(), requestedLobby);
+                for (Lobby existingLobby : server.lobbies.values()) {
+                    GetLobbies requestedLobby = new GetLobbies(existingLobby.lobbyName,
+                            existingLobby.lobbyId, existingLobby.players);
+                    server.server.sendToTCP(connection.getID(), requestedLobby);
                 }
                 break;
             case StartGame startGame:
-                lobby = game.lobbies.get(startGame.gameId);
+                lobby = server.lobbies.get(startGame.gameId);
                 if (lobby.players.size() > 1) { // If there are more than 1 player in lobby
                     for (Integer playerId : lobby.players) {
-                        game.server.sendToTCP(playerId, startGame); // Start game for players
+                        server.server.sendToTCP(playerId, startGame); // Start game for players
                     }
 
                     // Create new game instance and add it to games list in GameServer
-                    game.games.put(lobby.lobbyId, new Game(game, lobby));
-                    game.lobbies.remove(startGame.gameId); // Remove lobby from gameServer lobby's list
-                    game.server.sendToAllTCP(new LobbyDismantle(startGame.gameId)); // Remove lobby for clients
+                    server.games.put(lobby.lobbyId, new Game(server, lobby));
+                    server.lobbies.remove(startGame.gameId); // Remove lobby from gameServer lobby's list
+                    server.server.sendToAllTCP(new LobbyDismantle(startGame.gameId)); // Remove lobby for clients
                 }
                 break;
             case FrameworkMessage.KeepAlive ignored:
@@ -118,7 +119,7 @@ public class ServerListener extends Listener {
     @Override
     public void disconnected(Connection connection) {
         // Triggers when client disconnects from the server.
-        game.players.remove(connection.getID()); // Remove player from the HashMap.
+        server.players.remove(connection.getID()); // Remove player from the HashMap.
         super.disconnected(connection);
     }
 }

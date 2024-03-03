@@ -1,12 +1,9 @@
-package ee.taltech.game.server.GameLogic;
+package ee.taltech.game.server.logic;
 
 import ee.taltech.game.server.player.PlayerCharacter;
 
 public class Fireball {
-    private String quartile;
     private double angle;
-    int characterXPosition;
-    int characterYPosition;
     int playerID;
     int fireballID = 0;
     double fireballXPosition;

@@ -1,12 +1,11 @@
 package ee.taltech.game.server.datamanagement;
 
 import com.esotericsoftware.kryonet.Server;
+import ee.taltech.game.server.logic.Fireball;
 import ee.taltech.game.server.messages.FireballPosition;
-import ee.taltech.game.server.messages.Position;
 import ee.taltech.game.server.messages.Position;
 import ee.taltech.game.server.messages.UpdateMana;
 import ee.taltech.game.server.player.PlayerCharacter;
-import ee.taltech.game.server.GameLogic.Fireball;
 import ee.taltech.game.server.messages.MouseClicks;
 
 
@@ -68,8 +67,10 @@ public class TickRateLoop implements Runnable {
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
+
             for (PlayerCharacter player : game.players.values()) {
                 player.updatePosition();
+
                 if (player.getSpell() == MouseClicks.Spell.FIREBALL && player.isMouseLeftClick()) {
                     Fireball fireball = new Fireball(player, player.getMouseXPosition(), player.getMouseYPosition());
                     fireballs.add(fireball);
@@ -84,13 +85,13 @@ public class TickRateLoop implements Runnable {
                     if (fireballs != null && !fireballs.isEmpty()) {
                         for (Fireball fireball : fireballs) {
                             fireball.updatePosition();
-                            server.sendToUDP(playerId, new FireballPosition(fireball.getPlayerID(), fireball.getFireballID(), fireball.getFireballXPosition(), fireball.getFireballYPosition()));
+                            server.sendToUDP(playerId,new FireballPosition(fireball.getPlayerID(),
+                                    fireball.getFireballID(), fireball.getFireballXPosition(),
+                                    fireball.getFireballYPosition()));
                         }
                     }
                 }
             }
         }
     }
-
-}
 }
