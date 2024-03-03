@@ -49,6 +49,13 @@ public class ServerListener extends Listener {
                     player.setMovement(key);
                 }
                 break;
+            case MouseClicks mouse:
+                player = game.players.get(connection.getID());
+                if (player != null) {
+                    // Set the direction player should be moving.
+                    player.setMouseControl(mouse);
+                }
+                break;
             case LobbyCreation createLobby:
                 Lobby newLobby = new Lobby(createLobby.gameName, createLobby.hostId); // A new lobby is made
                 game.lobbies.put(newLobby.lobbyId, newLobby); // Lobby is added to the whole lobbies list.

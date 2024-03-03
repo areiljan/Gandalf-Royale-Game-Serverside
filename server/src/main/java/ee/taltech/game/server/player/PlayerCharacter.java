@@ -1,17 +1,28 @@
 package ee.taltech.game.server.player;
 
 import ee.taltech.game.server.messages.KeyPress;
+import ee.taltech.game.server.messages.MouseClicks;
+import ee.taltech.game.server.messages.MouseClicks.Spell;
+
 
 public class PlayerCharacter {
     public int xPosition;
     public int yPosition;
+    public double mouseXPosition;
+    public double mouseYPosition;
+    public boolean mouseLeftClick;
     public int playerID;
+    public Spell spell;
     boolean moveLeft;
     boolean moveRight;
     boolean moveDown;
     boolean moveUp;
     public Integer health;
     public Integer mana;
+
+    public int getPlayerID() {
+        return playerID;
+    }
 
     /**
      * Construct PlayerCharacter.
@@ -43,6 +54,15 @@ public class PlayerCharacter {
      */
     public void setMana(Integer newMana) {
         health = newMana;
+        this.mouseLeftClick = false;
+    }
+
+    public int getxPosition() {
+        return this.xPosition;
+    }
+
+    public int getyPosition() {
+        return this.yPosition;
     }
 
     /**
@@ -127,4 +147,29 @@ public class PlayerCharacter {
             this.moveDown = keyPress.pressed;
         }
     }
+
+    public double getMouseXPosition() {
+        return mouseXPosition;
+    }
+
+    public double getMouseYPosition() {
+        return mouseYPosition;
+    }
+
+    public boolean isMouseLeftClick() {
+        return this.mouseLeftClick;
+    }
+
+    public Spell getSpell() {
+        return spell;
+    }
+
+    public void setMouseControl(MouseClicks mouseclicks){
+        this.mouseXPosition = mouseclicks.mouseXPosition;
+        this.mouseYPosition = mouseclicks.mouseYPosition;
+        this.mouseLeftClick = mouseclicks.leftMouse;
+        this.spell = mouseclicks.spell;
+        System.out.println("MouseX is " + this.mouseXPosition + " MouseY is " + this.mouseYPosition + this.mouseLeftClick);
+    }
+
 }
