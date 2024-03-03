@@ -61,10 +61,15 @@ public class GameServer {
         kryo.register(GetLobbies.class);
         kryo.register(StartGame.class);
         kryo.register(KeyPress.class);
+        kryo.register(MouseClicks.class);
+        kryo.register(MouseClicks.Spell.class);
         kryo.register(KeyPress.Direction.class);
+        kryo.register(Position.class);
+        kryo.register(FireballPosition.class);
         kryo.register(UpdateHealth.class);
         kryo.register(UpdateMana.class);
         kryo.addDefaultSerializer(KeyPress.Direction.class, DefaultSerializers.EnumSerializer.class);
+        kryo.addDefaultSerializer(MouseClicks.Spell.class, DefaultSerializers.EnumSerializer.class);
     }
 
     /**
