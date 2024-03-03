@@ -2,6 +2,7 @@ package ee.taltech.game.server.datamanagement;
 
 import com.esotericsoftware.kryonet.Server;
 import ee.taltech.game.server.messages.Position;
+import ee.taltech.game.server.messages.UpdateMana;
 import ee.taltech.game.server.player.PlayerCharacter;
 import ee.taltech.game.server.utilities.Game;
 
@@ -56,6 +57,9 @@ public class TickRateLoop implements Runnable {
                 player.updatePosition();
                 for (Integer playerId : game.players.keySet()) {
                     server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
+                    if (player.regenerateMana()) {
+                        server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
+                    }
                 }
             }
         }

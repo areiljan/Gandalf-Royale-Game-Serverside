@@ -23,15 +23,15 @@ public class Game {
         this.gameServer = gameServer;
         this.lobby = lobby;
         this.gameId = lobby.lobbyId;
-        this.players = createPlayersMaps();
+        this.players = createPlayersMap();
     }
 
     /**
-     * Create players Map.
+     * Create Map where all the player objects are in by their ID.
      *
      * @return players Map
      */
-    private Map<Integer, PlayerCharacter> createPlayersMaps(){
+    private Map<Integer, PlayerCharacter> createPlayersMap(){
         Map<Integer, PlayerCharacter> result = new HashMap<>(); // New Map
 
         for (PlayerCharacter player : gameServer.players.values()) {

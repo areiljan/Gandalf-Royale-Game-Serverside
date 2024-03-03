@@ -10,14 +10,57 @@ public class PlayerCharacter {
     boolean moveRight;
     boolean moveDown;
     boolean moveUp;
+    public Integer health;
+    public Integer mana;
 
+    /**
+     * Construct PlayerCharacter.
+     *
+     * @param playerID player's ID
+     */
     public PlayerCharacter(Integer playerID) {
         // Here should be the random spawn points for a PlayerCharacter
         this.xPosition = 0;
         this.yPosition = 0;
         this.playerID = playerID;
+        health = 100;
+        mana = 100;
     }
 
+    /**
+     * Set health value.
+     *
+     * @param newHealth new health value
+     */
+    public void setHealth(Integer newHealth) {
+        health = newHealth;
+    }
+
+    /**
+     * Set mana value.
+     *
+     * @param newMana new mana value
+     */
+    public void setMana(Integer newMana) {
+        health = newMana;
+    }
+
+    /**
+     * Regenerate mana.
+     *
+     * @return true, if regenerate else false
+     */
+    public boolean regenerateMana() {
+        if (mana < 100){
+            mana++;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Update players position.
+     */
     public void updatePosition() {
         // updatePosition is activated every TPS.
 
@@ -39,21 +82,29 @@ public class PlayerCharacter {
             this.xPosition += diagonal;
             this.yPosition -= diagonal;
         } else {
-            if (moveLeft) {
-                this.xPosition -= distance;
-            }
-            if (moveRight) {
-                this.xPosition += distance;
-            }
-            if (moveUp) {
-                this.yPosition += distance;
-            }
-            if (moveDown) {
-                this.yPosition -= distance;
-            }
+            oneWayMovement(distance);
         }
     }
 
+    /**
+     * Move player only in one direction.
+     *
+     * @param distance how much to change player coordinates
+     */
+    private void oneWayMovement(int distance) {
+        if (moveLeft) {
+            this.xPosition -= distance;
+        }
+        if (moveRight) {
+            this.xPosition += distance;
+        }
+        if (moveUp) {
+            this.yPosition += distance;
+        }
+        if (moveDown) {
+            this.yPosition -= distance;
+        }
+    }
 
     /**
      * Method sets the heading direction for the player, but doesn't update the position coordinates.
@@ -75,7 +126,5 @@ public class PlayerCharacter {
         if (keyPress.direction == KeyPress.Direction.DOWN) {
             this.moveDown = keyPress.pressed;
         }
-        System.out.println("xPosition is " + this.xPosition + " yPosition is " + this.yPosition);
     }
 }
-

@@ -28,7 +28,7 @@ public class GameServer {
     public GameServer() {
         this.lobbies = new HashMap<>(); // Contains gameIds: lobby
         this.players = new HashMap<>(); // Contains playerId: player
-        this.games = new HashMap<>(); // Contains gameIds: game
+            this.games = new HashMap<>(); // Contains gameIds: game
         this.server = new Server();
         server.start();
         try { // Establishes a connection with ports
@@ -62,9 +62,16 @@ public class GameServer {
         kryo.register(StartGame.class);
         kryo.register(KeyPress.class);
         kryo.register(KeyPress.Direction.class);
+        kryo.register(UpdateHealth.class);
+        kryo.register(UpdateMana.class);
         kryo.addDefaultSerializer(KeyPress.Direction.class, DefaultSerializers.EnumSerializer.class);
     }
 
+    /**
+     * Start server.
+     *
+     * @param args empty
+     */
     public static void main(String[] args) {
         new GameServer();
     }
