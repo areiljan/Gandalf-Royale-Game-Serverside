@@ -10,8 +10,6 @@ import ee.taltech.game.server.player.PlayerCharacter;
 import ee.taltech.game.server.utilities.Game;
 import ee.taltech.game.server.utilities.Lobby;
 
-import java.util.stream.Collectors;
-
 public class ServerListener extends Listener {
     private GameServer server;
 
@@ -59,9 +57,13 @@ public class ServerListener extends Listener {
                     player.setMouseControl(mouse.leftMouse, mouse.mouseXPosition, mouse.mouseYPosition, mouse.spell);
                     // Add new fireball
                     if (mouse.leftMouse) {
+                        // Get the right game where player is in
                         Game playersGame = server.games.values().stream()
                                 .filter(game -> game.players.containsKey(player.playerID)).toList().getFirst();
-                        playersGame.addFireball( new Fireball(player, mouse.mouseXPosition, mouse.mouseYPosition));
+                        // Add new fireball to the game
+                        playersGame.addFireball(
+                                new Fireball(player, mouse.mouseXPosition, mouse.mouseYPosition, playersGame.getWorld()
+                                ));
                     }
                 }
                 break;

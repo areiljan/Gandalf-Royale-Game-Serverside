@@ -1,9 +1,8 @@
 package ee.taltech.game.server.utilities;
 
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.*;
+import ee.taltech.game.server.logic.Fireball;
+import ee.taltech.game.server.player.PlayerCharacter;
 
 public class CollisionListener implements ContactListener {
 
@@ -14,14 +13,18 @@ public class CollisionListener implements ContactListener {
      */
     @Override
     public void beginContact(Contact contact) {
-        System.out.println("COLLISION!!!!!!!!!!");
-//        Fixture fixtureA = contact.getFixtureA();
-//        Fixture fixtureB = contact.getFixtureB();
-//
-//        if (fixtureA.getUserData().equals("player") && fixtureB.getUserData().equals("fireball")
-//                || fixtureA.getUserData().equals("fireball") && fixtureB.getUserData().equals("player")) {
-//            System.out.println("CORRECT");
-//        }
+        // Fixtures that are in contact
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
+
+        // Fixtures data aka objects that collide
+        Object dataA = fixtureA.getUserData();
+        Object dataB = fixtureB.getUserData();
+
+        if (dataA instanceof PlayerCharacter && dataB instanceof Fireball
+                || dataA instanceof Fireball && dataB instanceof  PlayerCharacter) {
+            System.out.println("Player and fireball collision!");
+        }
     }
 
     /**

@@ -2,7 +2,6 @@ package ee.taltech.game.server.player;
 
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.game.server.messages.KeyPress;
-import ee.taltech.game.server.messages.MouseClicks;
 import ee.taltech.game.server.messages.MouseClicks.Spell;
 
 
@@ -45,26 +44,56 @@ public class PlayerCharacter {
         mana = 100;
     }
 
+    /**
+     * Get x position.
+     *
+     * @return xPosition
+     */
     public int getxPosition() {
         return this.xPosition;
     }
 
+    /**
+     * Get y position.
+     *
+     * @return yPosition
+     */
     public int getyPosition() {
         return this.yPosition;
     }
 
+    /**
+     * Get mouse x position.
+     *
+     * @return mouseXPosition
+     */
     public double getMouseXPosition() {
         return mouseXPosition;
     }
 
+    /**
+     * Get mouse y position.
+     *
+     * @return mouseYPosition
+     */
     public double getMouseYPosition() {
         return mouseYPosition;
     }
 
+    /**
+     * Check if mouse left click is pressed.
+     *
+     * @return true is clicked else false
+     */
     public boolean isMouseLeftClick() {
         return this.mouseLeftClick;
     }
 
+    /**
+     * Get players current spell.
+     *
+     * @return spell
+     */
     public Spell getSpell() {
         return spell;
     }
@@ -108,6 +137,14 @@ public class PlayerCharacter {
         }
     }
 
+    /**
+     * Set new values for mouse.
+     *
+     * @param leftMouse is left mouse clicked
+     * @param mouseXPosition mouse x coordinate
+     * @param mouseYPosition mouse y coordinate
+     * @param spell spell that is chosen
+     */
     public void setMouseControl(boolean leftMouse, double mouseXPosition, double mouseYPosition, Spell spell){
         this.mouseXPosition = mouseXPosition;
         this.mouseYPosition = mouseYPosition;
@@ -140,8 +177,9 @@ public class PlayerCharacter {
         // Clean up
         hitBoxShape.dispose();
 
-        hitBoxBody.setUserData(this);
-        this.body = hitBoxBody;
+        // Add this object as data
+        hitBoxBody.getFixtureList().get(0).setUserData(this);
+        body = hitBoxBody;
     }
 
     /**
@@ -170,6 +208,8 @@ public class PlayerCharacter {
         } else {
             oneWayMovement(distance);
         }
+        // Set the position of the Box2D body to match the player's coordinates
+        body.setTransform( (float) xPosition + 91, (float) yPosition + 70, body.getAngle());
     }
 
     /**

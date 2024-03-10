@@ -6,13 +6,7 @@ import ee.taltech.game.server.messages.FireballPosition;
 import ee.taltech.game.server.messages.Position;
 import ee.taltech.game.server.messages.UpdateMana;
 import ee.taltech.game.server.player.PlayerCharacter;
-import ee.taltech.game.server.messages.MouseClicks;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import ee.taltech.game.server.utilities.Game;
 
 public class TickRateLoop implements Runnable {
@@ -63,6 +57,7 @@ public class TickRateLoop implements Runnable {
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
+            game.getWorld().step(1 / 60f, 6, 2); // Stepping world to update bodies
 
             for (PlayerCharacter player : game.players.values()) {
                 player.updatePosition();
