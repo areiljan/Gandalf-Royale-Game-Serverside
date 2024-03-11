@@ -56,14 +56,16 @@ public class ServerListener extends Listener {
                     // Set the direction player should be moving.
                     player.setMouseControl(mouse.leftMouse, mouse.mouseXPosition, mouse.mouseYPosition, mouse.spell);
                     // Add new fireball
-                    if (mouse.leftMouse) {
+                    if (mouse.leftMouse && player.mana >= 20) {
                         // Get the right game where player is in
                         Game playersGame = server.games.values().stream()
-                                .filter(game -> game.players.containsKey(player.playerID)).toList().getFirst();
+                                .filter(game -> game.alivePlayers.containsKey(player.playerID)).toList().getFirst();
                         // Add new fireball to the game
                         playersGame.addFireball(
                                 new Fireball(player, mouse.mouseXPosition, mouse.mouseYPosition, playersGame.getWorld()
                                 ));
+                        // Spell cost
+                        player.setMana(player.mana - 20);
                     }
                 }
                 break;
