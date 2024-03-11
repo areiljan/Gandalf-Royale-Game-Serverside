@@ -24,7 +24,7 @@ public class PlayerCharacter {
     boolean moveDown;
     boolean moveUp;
     public Integer health;
-    public Integer mana;
+    public double mana;
 
     public int getPlayerID() {
         return playerID;
@@ -111,7 +111,7 @@ public class PlayerCharacter {
      *
      * @param newMana new mana value
      */
-    public void setMana(Integer newMana) {
+    public void setMana(double newMana) {
         mana = newMana;
     }
 
@@ -239,7 +239,8 @@ public class PlayerCharacter {
      */
     public boolean regenerateMana() {
         if (mana < 100){
-            mana++;
+            // Add mana every tick so that one second regenerates around 5 mana
+            mana = Math.min(mana + 0.1, 100); // Mana can not be over 100
             return true;
         }
         return false;

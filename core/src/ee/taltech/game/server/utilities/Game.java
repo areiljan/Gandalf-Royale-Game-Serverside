@@ -14,7 +14,8 @@ public class Game {
     public final Lobby lobby;
     public final GameServer gameServer;
     public final Integer gameId;
-    public final Map<Integer, PlayerCharacter> players;
+    public final Map<Integer, PlayerCharacter> alivePlayers;
+    public final Map<Integer, PlayerCharacter> deadPlayers;
     public final Map<Integer, Fireball> fireballs;
 
     private final World world;
@@ -27,13 +28,14 @@ public class Game {
      */
     public Game(GameServer gameServer, Lobby lobby) {
         world = new World(new Vector2(0, 0), true); // Create a new Box2D world
-        CollisionListener collisionListener = new CollisionListener();
+        CollisionListener collisionListener = new CollisionListener(this);
         world.setContactListener(collisionListener); // Set collision listener that detects collision
 
         this.gameServer = gameServer;
         this.lobby = lobby;
         this.gameId = lobby.lobbyId;
-        this.players = createPlayersMap();
+        this.alivePlayers = createPlayersMap();
+        this.deadPlayers = new HashMap<>();
         this.fireballs = new HashMap<>();
     }
 
@@ -71,5 +73,23 @@ public class Game {
      */
     public void addFireball(Fireball fireball) {
         fireballs.put(fireball.getFireballID(), fireball);
+    }
+
+    /**
+     * Damage player and put them into deadPlayers if they have 0 hp
+     *
+     * @param id player ID
+     * @param amount amount of damage done to player
+     */
+    public void damagePlayer(Integer id, Integer amount) {
+        PlayerCharacter player = alivePlayers.get(id); // Get player
+
+        int newHealth = Math.max(player.health - amount, 0); // Health can not be less than 0
+        player.setHealth(newHealth); // 10 damage per hit
+
+        // If player has 0 health move them to dead players
+        if (player.health == 0) {
+            deadPlayers.put(id, player);
+        }
     }
 }

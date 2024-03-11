@@ -6,6 +6,12 @@ import ee.taltech.game.server.player.PlayerCharacter;
 
 public class CollisionListener implements ContactListener {
 
+    private Game game;
+
+    public CollisionListener(Game game) {
+        this.game = game;
+    }
+
     /**
      * Detect collision beginning.
      *
@@ -23,7 +29,25 @@ public class CollisionListener implements ContactListener {
 
         if (dataA instanceof PlayerCharacter && dataB instanceof Fireball
                 || dataA instanceof Fireball && dataB instanceof  PlayerCharacter) {
-            System.out.println("Player and fireball collision!");
+            spellAndPlayerCollision(dataA, dataB);
+        }
+    }
+
+    /**
+     * Apply logic that happens when spell and player collide
+     *
+     * @param dataA one collision body
+     * @param dataB second collision body
+     */
+    private void spellAndPlayerCollision(Object dataA, Object dataB) {
+        // Get player
+        PlayerCharacter player = dataA instanceof PlayerCharacter ? (PlayerCharacter) dataA : (PlayerCharacter) dataB;
+        // Get spell
+        Fireball fireball = dataA instanceof Fireball ? (Fireball) dataA : (Fireball) dataB;
+
+        // If player is not the person who cast the spell then damage the player
+        if (fireball.getPlayerID() != player.getPlayerID()) {
+            game.damagePlayer(player.playerID, 10);
         }
     }
 

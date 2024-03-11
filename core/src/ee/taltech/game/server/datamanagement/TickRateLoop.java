@@ -4,6 +4,7 @@ import com.esotericsoftware.kryonet.Server;
 import ee.taltech.game.server.logic.Fireball;
 import ee.taltech.game.server.messages.FireballPosition;
 import ee.taltech.game.server.messages.Position;
+import ee.taltech.game.server.messages.UpdateHealth;
 import ee.taltech.game.server.messages.UpdateMana;
 import ee.taltech.game.server.player.PlayerCharacter;
 
@@ -59,14 +60,14 @@ public class TickRateLoop implements Runnable {
         for (Game game : this.gameServer.games.values()) {
             game.getWorld().step(1 / 60f, 6, 2); // Stepping world to update bodies
 
-            for (PlayerCharacter player : game.players.values()) {
+            for (PlayerCharacter player : game.alivePlayers.values()) {
                 player.updatePosition();
+                player.regenerateMana();
 
-                for (Integer playerId : game.players.keySet()) {
+                for (Integer playerId : game.alivePlayers.keySet()) {
                     server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
-                    if (player.regenerateMana()) {
-                        server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
-                    }
+                    server.sendToUDP(playerId, new UpdateHealth(player.playerID, player.health));
+                    server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
                     // Update the fireballs position
                     if (!game.fireballs.isEmpty()) {
                         for (Fireball fireball : game.fireballs.values()) {
