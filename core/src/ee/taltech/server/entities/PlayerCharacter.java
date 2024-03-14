@@ -1,8 +1,8 @@
-package ee.taltech.game.server.player;
+package ee.taltech.server.entities;
 
 import com.badlogic.gdx.physics.box2d.*;
-import ee.taltech.game.server.messages.KeyPress;
-import ee.taltech.game.server.messages.MouseClicks.Spell;
+import ee.taltech.server.network.messages.game.KeyPress;
+import ee.taltech.server.components.SpellTypes;
 
 
 public class PlayerCharacter {
@@ -17,8 +17,8 @@ public class PlayerCharacter {
     public double mouseYPosition;
     public boolean mouseLeftClick;
 
-    public int playerID;
-    public Spell spell;
+    public final int playerID;
+    public SpellTypes type;
     boolean moveLeft;
     boolean moveRight;
     boolean moveDown;
@@ -49,7 +49,7 @@ public class PlayerCharacter {
      *
      * @return xPosition
      */
-    public int getxPosition() {
+    public int getXPosition() {
         return this.xPosition;
     }
 
@@ -58,7 +58,7 @@ public class PlayerCharacter {
      *
      * @return yPosition
      */
-    public int getyPosition() {
+    public int getYPosition() {
         return this.yPosition;
     }
 
@@ -90,12 +90,12 @@ public class PlayerCharacter {
     }
 
     /**
-     * Get players current spell.
+     * Get players current action.
      *
-     * @return spell
+     * @return action
      */
-    public Spell getSpell() {
-        return spell;
+    public SpellTypes getSpell() {
+        return type;
     }
     /**
      * Set health value.
@@ -143,13 +143,13 @@ public class PlayerCharacter {
      * @param leftMouse is left mouse clicked
      * @param mouseXPosition mouse x coordinate
      * @param mouseYPosition mouse y coordinate
-     * @param spell spell that is chosen
+     * @param type action that is chosen
      */
-    public void setMouseControl(boolean leftMouse, double mouseXPosition, double mouseYPosition, Spell spell){
+    public void setMouseControl(boolean leftMouse, double mouseXPosition, double mouseYPosition, SpellTypes type){
         this.mouseXPosition = mouseXPosition;
         this.mouseYPosition = mouseYPosition;
         this.mouseLeftClick = leftMouse;
-        this.spell = spell;
+        this.type = type;
     }
 
     /**
@@ -234,15 +234,11 @@ public class PlayerCharacter {
 
     /**
      * Regenerate mana.
-     *
-     * @return true, if regenerate else false
      */
-    public boolean regenerateMana() {
+    public void regenerateMana() {
         if (mana < 100){
             // Add mana every tick so that one second regenerates around 5 mana
             mana = Math.min(mana + 0.1, 100); // Mana can not be over 100
-            return true;
         }
-        return false;
     }
 }

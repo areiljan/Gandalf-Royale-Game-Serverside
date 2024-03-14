@@ -1,8 +1,9 @@
-package ee.taltech.game.server.utilities;
+package ee.taltech.server.entities.collision;
 
 import com.badlogic.gdx.physics.box2d.*;
-import ee.taltech.game.server.logic.Fireball;
-import ee.taltech.game.server.player.PlayerCharacter;
+import ee.taltech.server.entities.Spell;
+import ee.taltech.server.entities.PlayerCharacter;
+import ee.taltech.server.components.Game;
 
 public class CollisionListener implements ContactListener {
 
@@ -27,14 +28,14 @@ public class CollisionListener implements ContactListener {
         Object dataA = fixtureA.getUserData();
         Object dataB = fixtureB.getUserData();
 
-        if (dataA instanceof PlayerCharacter && dataB instanceof Fireball
-                || dataA instanceof Fireball && dataB instanceof  PlayerCharacter) {
+        if (dataA instanceof PlayerCharacter && dataB instanceof Spell
+                || dataA instanceof Spell && dataB instanceof  PlayerCharacter) {
             spellAndPlayerCollision(dataA, dataB);
         }
     }
 
     /**
-     * Apply logic that happens when spell and player collide
+     * Apply logic that happens when spell and player collide.
      *
      * @param dataA one collision body
      * @param dataB second collision body
@@ -42,11 +43,11 @@ public class CollisionListener implements ContactListener {
     private void spellAndPlayerCollision(Object dataA, Object dataB) {
         // Get player
         PlayerCharacter player = dataA instanceof PlayerCharacter ? (PlayerCharacter) dataA : (PlayerCharacter) dataB;
-        // Get spell
-        Fireball fireball = dataA instanceof Fireball ? (Fireball) dataA : (Fireball) dataB;
+        // Get action
+        Spell spell = dataA instanceof Spell ? (Spell) dataA : (Spell) dataB;
 
-        // If player is not the person who cast the spell then damage the player
-        if (fireball.getPlayerID() != player.getPlayerID()) {
+        // If player is not the person who cast the action then damage the player
+        if (spell.getPlayerId() != player.getPlayerID()) {
             game.damagePlayer(player.playerID, 10);
         }
     }

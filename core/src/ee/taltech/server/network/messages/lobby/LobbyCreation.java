@@ -1,10 +1,13 @@
-package ee.taltech.game.server.messages;
+package ee.taltech.server.network.messages.lobby;
 
 public class LobbyCreation {
     public String gameName; // Game name that is displayed in lobby screen
     public Integer gameId; // Game ID
     public Integer hostId; // Lobby creator aka Lobby host ID
 
+    /**
+     * Empty constructor for server to fill.
+     */
     public LobbyCreation() {
     }
 

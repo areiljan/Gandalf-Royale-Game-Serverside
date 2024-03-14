@@ -1,4 +1,4 @@
-package ee.taltech.game.server.utilities;
+package ee.taltech.server;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;

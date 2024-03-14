@@ -1,9 +1,15 @@
-package ee.taltech.game.server.messages;
+package ee.taltech.server.network.messages.lobby;
 
 public class LobbyDismantle {
     public Integer gameId; // Game ID that will be dismantled
 
-    public LobbyDismantle(){}
+    /**
+     * Empty constructor for server to fill.
+     */
+    public LobbyDismantle() {
+
+    }
+
     /**
      * Construct lobby dismantle message.
      *

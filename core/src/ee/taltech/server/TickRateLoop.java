@@ -1,14 +1,14 @@
-package ee.taltech.game.server.datamanagement;
+package ee.taltech.server;
 
 import com.esotericsoftware.kryonet.Server;
-import ee.taltech.game.server.logic.Fireball;
-import ee.taltech.game.server.messages.FireballPosition;
-import ee.taltech.game.server.messages.Position;
-import ee.taltech.game.server.messages.UpdateHealth;
-import ee.taltech.game.server.messages.UpdateMana;
-import ee.taltech.game.server.player.PlayerCharacter;
+import ee.taltech.server.entities.Spell;
+import ee.taltech.server.network.messages.game.SpellPosition;
+import ee.taltech.server.network.messages.game.Position;
+import ee.taltech.server.network.messages.game.UpdateHealth;
+import ee.taltech.server.network.messages.game.UpdateMana;
+import ee.taltech.server.entities.PlayerCharacter;
 
-import ee.taltech.game.server.utilities.Game;
+import ee.taltech.server.components.Game;
 
 public class TickRateLoop implements Runnable {
     private volatile boolean running = true;
@@ -58,27 +58,25 @@ public class TickRateLoop implements Runnable {
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
-            game.getWorld().step(1 / 60f, 6, 2); // Stepping world to update bodies
-
             for (PlayerCharacter player : game.alivePlayers.values()) {
                 player.updatePosition();
-                player.regenerateMana();
-
+                if (player.mana != 100) {
+                    player.regenerateMana();
+                }
                 for (Integer playerId : game.alivePlayers.keySet()) {
                     server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
                     server.sendToUDP(playerId, new UpdateHealth(player.playerID, player.health));
                     server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
-                    // Update the fireballs position
-                    if (!game.fireballs.isEmpty()) {
-                        for (Fireball fireball : game.fireballs.values()) {
-                            fireball.updatePosition();
-                            server.sendToUDP(playerId,new FireballPosition(fireball.getPlayerID(),
-                                    fireball.getFireballID(), fireball.getFireballXPosition(),
-                                    fireball.getFireballYPosition()));
-                        }
-                    }
                 }
             }
+            for (Spell spell : game.spells.values()) {
+                spell.updatePosition();
+                for (Integer playerId : game.alivePlayers.keySet()) {
+                    server.sendToUDP(playerId, new SpellPosition(spell.getPlayerId(), spell.getSpellId(),
+                        spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
+                }
+            }
+            game.getWorld().step(1 / 60f, 6, 2); // Stepping world to update bodies
         }
     }
 }

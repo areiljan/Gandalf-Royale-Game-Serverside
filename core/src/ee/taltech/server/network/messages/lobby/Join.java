@@ -1,10 +1,16 @@
-package ee.taltech.game.server.messages;
+package ee.taltech.server.network.messages.lobby;
 
 public class Join {
     public Integer gameId; // Game ID that the player wants to join
     public Integer playerId; // Players ID who wants to join
 
-    public Join(){}
+    /**
+     * Empty constructor for server to fill.
+     */
+    public Join() {
+
+    }
+
     /**
      * Construct join message.
      *

@@ -1,51 +1,53 @@
-package ee.taltech.game.server.logic;
+package ee.taltech.server.entities;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
-import ee.taltech.game.server.player.PlayerCharacter;
+import ee.taltech.server.components.SpellTypes;
 
-public class Fireball {
-    int playerID;
-    int fireballID;
-    private final Body fireballBody;
-    double fireballXPosition;
-    double fireballYPosition;
+public class Spell {
+    int playerId;
+    int spellId;
+    private final SpellTypes type;
+    private final Body spellBody;
+    double spellXPosition;
+    double spellYPosition;
     double mouseXPosition;
     double mouseYPosition;
-    private double angle;
+    private final double angle;
     private static int nextId = 1;
-    private final int velocity;
+    private static final int VELOCITY = 7;
 
     /**
-     * Construct Fireball.
+     * Construct Spell.
      *
-     * @param playerCharacter player that cast fireball
+     * @param playerCharacter player that casts spell
      * @param mouseXPosition mouse x coordinate
      * @param mouseYPosition mouse y coordinate
-     * @param world world where fireball body will be put in
+     * @param world world where spell's body will be put in
      */
-    public Fireball(PlayerCharacter playerCharacter, double mouseXPosition, double mouseYPosition, World world) {
-        playerID = playerCharacter.getPlayerID();
-        fireballID = nextId++;
-        fireballBody = createBody(world);
+    public Spell(PlayerCharacter playerCharacter, double mouseXPosition, double mouseYPosition,
+                 World world, SpellTypes type) {
+        playerId = playerCharacter.getPlayerID();
+        spellId = nextId++;
+        this.type = type;
+        spellBody = createBody(world);
 
-        fireballXPosition = playerCharacter.getxPosition();
-        fireballYPosition = playerCharacter.getyPosition();
+        spellXPosition = playerCharacter.getXPosition();
+        spellYPosition = playerCharacter.getYPosition();
 
         // These mousepositions are already relative to the player.
         this.mouseXPosition = mouseXPosition;
         this.mouseYPosition = mouseYPosition;
 
-        // Adjust the velocity of the fireball.
-        velocity = 3;
+        // Adjust the velocity of the spell.
         angle = Math.atan2(mouseYPosition, mouseXPosition);
     }
 
     /**
-     * Get fireball angle.
+     * Get spell's angle.
      *
      * @return angle
      */
@@ -54,36 +56,45 @@ public class Fireball {
     }
 
     /**
-     * Get fireball ID.
+     * Get spell's type.
+     *
+     * @return type
+     */
+    public SpellTypes getType() {
+        return type;
+    }
+
+    /**
+     * Get spell's ID.
      *
      * @return fireballID
      */
-    public int getFireballID() {
-        return fireballID;
+    public int getSpellId() {
+        return spellId;
     }
 
     /**
-     * Get fireball caster ID.
+     * Get spell's caster ID.
      *
      * @return playerID
      */
-    public int getPlayerID() {
-        return playerID;
+    public int getPlayerId() {
+        return playerId;
     }
 
     /**
-     * Get fireball x position.
+     * Get spell's x position.
      *
      * @return fireballXPosition
      */
-    public double getFireballXPosition() {return this.fireballXPosition;}
+    public double getSpellXPosition() {return this.spellXPosition;}
 
     /**
-     * Get fireball y position.
+     * Get spell's y position.
      *
      * @return fireballYPosition
      */
-    public double getFireballYPosition() {return this.fireballYPosition;}
+    public double getSpellYPosition() {return this.spellYPosition;}
 
     /**
      * Set hit box position.
@@ -92,7 +103,7 @@ public class Fireball {
      * @param y y coordinate
      */
     public void setHitBoxPosition(double x, double y) {
-        fireballBody.setTransform((float) x, (float) y, fireballBody.getAngle());
+        spellBody.setTransform((float) x, (float) y, spellBody.getAngle());
     }
 
     /**
@@ -100,9 +111,9 @@ public class Fireball {
      */
     public void updatePosition() {
         // Update fireball position based on angle and velocity
-        this.fireballXPosition += velocity * Math.cos(angle);
-        this.fireballYPosition -= velocity * Math.sin(angle);
-        setHitBoxPosition(fireballXPosition, fireballYPosition);
+        this.spellXPosition += VELOCITY * Math.cos(angle);
+        this.spellYPosition -= VELOCITY * Math.sin(angle);
+        setHitBoxPosition(spellXPosition, spellYPosition);
     }
 
     /**
@@ -115,7 +126,7 @@ public class Fireball {
         // Create fireball body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set((float) fireballXPosition, (float) fireballYPosition); // Initial position
+        bodyDef.position.set((float) spellXPosition, (float) spellYPosition); // Initial position
         Body body = world.createBody(bodyDef);
 
         // Create fixture for fireball hit box

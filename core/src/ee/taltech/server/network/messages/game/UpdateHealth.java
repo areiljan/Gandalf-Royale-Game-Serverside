@@ -1,4 +1,4 @@
-package ee.taltech.game.server.messages;
+package ee.taltech.server.network.messages.game;
 
 public class UpdateHealth {
 
