@@ -1,23 +1,21 @@
-package ee.taltech.game.server.datamanagement;
+package ee.taltech.server;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers;
 import com.esotericsoftware.kryonet.Server;
-import ee.taltech.game.server.messages.*;
-import ee.taltech.game.server.network.ServerListener;
-import ee.taltech.game.server.player.PlayerCharacter;
-import ee.taltech.game.server.utilities.Game;
-import ee.taltech.game.server.utilities.Lobby;
+import ee.taltech.server.network.ServerListener;
+import ee.taltech.server.network.messages.game.*;
+import ee.taltech.server.network.messages.lobby.*;
+import ee.taltech.server.components.Game;
+import ee.taltech.server.components.Lobby;
+import ee.taltech.server.components.SpellTypes;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class GameServer {
     public final Server server;
-    public Map<Integer, PlayerCharacter> players;
-
+    public Map<Integer, Integer> connections;
     public Map<Integer, Lobby> lobbies;
     public Map<Integer, Game> games;
 
@@ -27,7 +25,7 @@ public class GameServer {
      */
     public GameServer() {
         this.lobbies = new HashMap<>(); // Contains gameIds: lobby
-        this.players = new HashMap<>(); // Contains playerId: player
+        this.connections = new HashMap<>(); // Contains playerId: gameId
         this.games = new HashMap<>(); // Contains gameIds: game
         this.server = new Server();
 
@@ -62,15 +60,15 @@ public class GameServer {
         kryo.register(GetLobbies.class);
         kryo.register(StartGame.class);
         kryo.register(KeyPress.class);
+        kryo.register(SpellTypes.class);
         kryo.register(MouseClicks.class);
-        kryo.register(MouseClicks.Spell.class);
         kryo.register(KeyPress.Direction.class);
         kryo.register(Position.class);
-        kryo.register(FireballPosition.class);
+        kryo.register(SpellPosition.class);
         kryo.register(UpdateHealth.class);
         kryo.register(UpdateMana.class);
         kryo.addDefaultSerializer(KeyPress.Direction.class, DefaultSerializers.EnumSerializer.class);
-        kryo.addDefaultSerializer(MouseClicks.Spell.class, DefaultSerializers.EnumSerializer.class);
+        kryo.addDefaultSerializer(SpellTypes.class, DefaultSerializers.EnumSerializer.class);
     }
 
     /**

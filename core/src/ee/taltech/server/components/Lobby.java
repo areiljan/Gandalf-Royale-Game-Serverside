@@ -1,13 +1,13 @@
-package ee.taltech.game.server.utilities;
+package ee.taltech.server.components;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Lobby {
-    public String lobbyName;
-    public List<Integer> players;
-    public Integer lobbyId;
-    private static int lastGivenId = -1;
+    public final String lobbyName;
+    public final List<Integer> players;
+    public final Integer lobbyId;
+    private static int lastGivenId = 0;
 
     public Lobby(String lobbyName, Integer hostId) {
         this.lobbyName = lobbyName;
@@ -34,6 +34,6 @@ public class Lobby {
      * @return gameID, that will be in ascending order. Every game/lobby gets its new ID.
      */
     private static int getAndIncrementNextId() {
-        return ++lastGivenId;
+        return lastGivenId++;
     }
 }

@@ -1,10 +1,11 @@
-package ee.taltech.game.server.utilities;
+package ee.taltech.server.components;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-import ee.taltech.game.server.datamanagement.GameServer;
-import ee.taltech.game.server.logic.Fireball;
-import ee.taltech.game.server.player.PlayerCharacter;
+import ee.taltech.server.GameServer;
+import ee.taltech.server.entities.Spell;
+import ee.taltech.server.entities.PlayerCharacter;
+import ee.taltech.server.entities.collision.CollisionListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,31 +13,31 @@ import java.util.Map;
 public class Game {
 
     public final Lobby lobby;
-    public final GameServer gameServer;
+    public final GameServer server;
     public final Integer gameId;
     public final Map<Integer, PlayerCharacter> alivePlayers;
     public final Map<Integer, PlayerCharacter> deadPlayers;
-    public final Map<Integer, Fireball> fireballs;
+    public final Map<Integer, Spell> spells;
 
     private final World world;
 
     /**
      * Construct Game.
      *
-     * @param gameServer main GameServer
+     * @param server main GameServer
      * @param lobby given players that will be playing in this game
      */
-    public Game(GameServer gameServer, Lobby lobby) {
+    public Game(GameServer server, Lobby lobby) {
         world = new World(new Vector2(0, 0), true); // Create a new Box2D world
         CollisionListener collisionListener = new CollisionListener(this);
         world.setContactListener(collisionListener); // Set collision listener that detects collision
 
-        this.gameServer = gameServer;
+        this.server = server;
         this.lobby = lobby;
         this.gameId = lobby.lobbyId;
         this.alivePlayers = createPlayersMap();
         this.deadPlayers = new HashMap<>();
-        this.fireballs = new HashMap<>();
+        this.spells = new HashMap<>();
     }
 
     /**
@@ -57,8 +58,10 @@ public class Game {
     private Map<Integer, PlayerCharacter> createPlayersMap(){
         Map<Integer, PlayerCharacter> result = new HashMap<>(); // New Map
 
-        for (PlayerCharacter player : gameServer.players.values()) {
-            if (lobby.players.contains(player.playerID)) { // If player ID is in lobby's players list
+        for (Integer playerID : server.connections.keySet()) {
+            if (lobby.players.contains(playerID)) { // If player ID is in lobby's players list
+                server.connections.put(playerID, gameId);
+                PlayerCharacter player = new PlayerCharacter(playerID); // Create character for player
                 player.createHitBox(world); // Create hit box for player
                 result.put(player.playerID, player);
             }
@@ -67,12 +70,12 @@ public class Game {
     }
 
     /**
-     * Add new fireball to game.
+     * Add new spell to game.
      *
-     * @param fireball new fireball
+     * @param spell new spell
      */
-    public void addFireball(Fireball fireball) {
-        fireballs.put(fireball.getFireballID(), fireball);
+    public void addSpell(Spell spell) {
+        spells.put(spell.getSpellId(), spell);
     }
 
     /**

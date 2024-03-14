@@ -1,4 +1,4 @@
-package ee.taltech.game.server.messages;
+package ee.taltech.server.network.messages.lobby;
 
 import java.util.List;
 
@@ -13,6 +13,13 @@ public class GetLobbies {
     public GetLobbies() {
     }
 
+    /**
+     * Construct GetLobbies message.
+     *
+     * @param name lobby's name
+     * @param gameId lobby's ID
+     * @param players player IDs that are in lobby
+     */
     public GetLobbies(String name, Integer gameId, List<Integer> players) {
         this.name = name;
         this.gameId = gameId;

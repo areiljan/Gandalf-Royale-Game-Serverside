@@ -1,14 +1,15 @@
-package ee.taltech.game.server.network;
+package ee.taltech.server.network;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
-import ee.taltech.game.server.datamanagement.GameServer;
-import ee.taltech.game.server.logic.Fireball;
-import ee.taltech.game.server.messages.*;
-import ee.taltech.game.server.player.PlayerCharacter;
-import ee.taltech.game.server.utilities.Game;
-import ee.taltech.game.server.utilities.Lobby;
+import ee.taltech.server.GameServer;
+import ee.taltech.server.entities.Spell;
+import ee.taltech.server.network.messages.game.KeyPress;
+import ee.taltech.server.network.messages.game.MouseClicks;
+import ee.taltech.server.network.messages.lobby.*;
+import ee.taltech.server.entities.PlayerCharacter;
+import ee.taltech.server.components.Game;
+import ee.taltech.server.components.Lobby;
 
 public class ServerListener extends Listener {
     private GameServer server;
@@ -26,8 +27,7 @@ public class ServerListener extends Listener {
      */
     @Override
     public void connected(Connection connection) {
-        PlayerCharacter player = new PlayerCharacter(connection.getID());
-        server.players.put(connection.getID(), player);
+        server.connections.put(connection.getID(), -1); // When player connects they have no game ID yet so -1
     }
 
     /**
@@ -39,36 +39,62 @@ public class ServerListener extends Listener {
      */
     @Override
     public void received(Connection connection, Object incomingData) {
-        Lobby lobby;
-        // Triggers every time data is sent from client to server
-        switch (incomingData) {
-            case KeyPress key:
-                PlayerCharacter player = server.players.get(connection.getID()); // Get the player who sent out the Data.
+        Class<?> dataClass = incomingData.getClass();
+        if (dataClass == KeyPress.class || dataClass == MouseClicks.class) {
+            gameMessagesListener(connection, incomingData); // If message is associated with game
+        } else if (dataClass == LobbyCreation.class || dataClass == Join.class || dataClass == Leave.class
+                || dataClass == GetLobbies.class || dataClass == StartGame.class) {
+            lobbyMessagesListener(connection, incomingData); // If message is associated with lobby
+        }
+    }
 
+    /**
+     * Listen and react to game messages.
+     *
+     * @param connection connection that sent the message
+     * @param incomingData message that was sent
+     */
+    private void gameMessagesListener(Connection connection, Object incomingData) {
+        Integer gameId = server.connections.get(connection.getID());
+        Game game = server.games.get(gameId);
+        PlayerCharacter player = game.alivePlayers.get(connection.getID());
+        switch (incomingData) {
+            case KeyPress key: // On KeyPress message
                 if (player != null) {
                     // Set the direction player should be moving.
                     player.setMovement(key);
                 }
                 break;
-            case MouseClicks mouse:
-                player = server.players.get(connection.getID());
+            case MouseClicks mouse: // On MouseClicks message
                 if (player != null) {
                     // Set the direction player should be moving.
-                    player.setMouseControl(mouse.leftMouse, mouse.mouseXPosition, mouse.mouseYPosition, mouse.spell);
+                    player.setMouseControl(mouse.leftMouse, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
                     // Add new fireball
                     if (mouse.leftMouse && player.mana >= 20) {
-                        // Get the right game where player is in
-                        Game playersGame = server.games.values().stream()
-                                .filter(game -> game.alivePlayers.containsKey(player.playerID)).toList().getFirst();
                         // Add new fireball to the game
-                        playersGame.addFireball(
-                                new Fireball(player, mouse.mouseXPosition, mouse.mouseYPosition, playersGame.getWorld()
-                                ));
-                        // Spell cost
+                        Spell spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, game.getWorld(),
+                                mouse.type);
+                        game.addSpell(spell);
+                        // Action cost
                         player.setMana(player.mana - 20);
                     }
                 }
                 break;
+            default: // Ignore everything else
+                break;
+        }
+    }
+
+    /**
+     * Listen and react to lobby messages.
+     *
+     * @param connection connection that sent the message
+     * @param incomingData message that was sent
+     */
+    private void lobbyMessagesListener(Connection connection, Object incomingData) {
+        Lobby lobby;
+        // Triggers every time data is sent from client to server
+        switch (incomingData) {
             case LobbyCreation createLobby:
                 Lobby newLobby = new Lobby(createLobby.gameName, createLobby.hostId); // A new lobby is made
                 server.lobbies.put(newLobby.lobbyId, newLobby); // Lobby is added to the whole lobbies list.
@@ -117,10 +143,8 @@ public class ServerListener extends Listener {
                     server.server.sendToAllTCP(new LobbyDismantle(startGame.gameId)); // Remove lobby for clients
                 }
                 break;
-            case FrameworkMessage.KeepAlive ignored:
-                break;
             default:
-                throw new IllegalStateException("Unexpected value: " + incomingData);
+                break;
         }
     }
 
@@ -132,7 +156,7 @@ public class ServerListener extends Listener {
     @Override
     public void disconnected(Connection connection) {
         // Triggers when client disconnects from the server.
-        server.players.remove(connection.getID()); // Remove player from the HashMap.
+        server.connections.remove(connection.getID()); // Remove player from the HashMap.
         super.disconnected(connection);
     }
 }
