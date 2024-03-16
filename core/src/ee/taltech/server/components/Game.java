@@ -3,9 +3,13 @@ package ee.taltech.server.components;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import ee.taltech.server.GameServer;
+import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.collision.CollisionListener;
+import ee.taltech.server.network.messages.game.ItemDropped;
+import ee.taltech.server.network.messages.game.ItemPickedUp;
+import ee.taltech.server.network.messages.game.KeyPress;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +22,7 @@ public class Game {
     public final Map<Integer, PlayerCharacter> alivePlayers;
     public final Map<Integer, PlayerCharacter> deadPlayers;
     public final Map<Integer, Spell> spells;
-
+    public final Map<Integer, Item> items;
     private final World world;
 
     /**
@@ -38,6 +42,13 @@ public class Game {
         this.alivePlayers = createPlayersMap();
         this.deadPlayers = new HashMap<>();
         this.spells = new HashMap<>();
+        this.items = new HashMap<>();
+
+        Item item1 = new Item(SpellTypes.FIREBALL, 20F, 20F);
+        Item item2 = new Item(SpellTypes.FIREBALL, 30F, 20F);
+
+        addItem(item1, null);
+        addItem(item2, null);
     }
 
     /**
@@ -47,6 +58,27 @@ public class Game {
      */
     public World getWorld() {
         return world;
+    }
+
+    /**
+     * Set player's action based on what key they pressed.
+     *
+     * @param keyPress keyPress message
+     * @param player player who pressed the key
+     */
+    public void setPlayerAction(KeyPress keyPress, PlayerCharacter player) {
+        if (keyPress.action.equals(KeyPress.Action.DROP) && keyPress.extraField != null) {
+                Item droppedItem = player.dropItem(keyPress.extraField);
+                addItem(droppedItem, player);
+        }
+        if (keyPress.action.equals(KeyPress.Action.INTERACT)) {
+            for (Item item : items.values()) {
+                if (item.getCollidingWith().equals(player)) {
+                    player.pickUpItem(item);
+                    removeItem(item, player);
+                }
+            }
+        }
     }
 
     /**
@@ -93,6 +125,54 @@ public class Game {
         // If player has 0 health move them to dead players
         if (player.health == 0) {
             deadPlayers.put(id, player);
+        }
+    }
+
+    /**
+     * Add item to game aka add dropped item.
+     *
+     * @param item item that is added
+     * @param playerCharacter player character that dropped item if player dropped else null
+     */
+    public void addItem(Item item, PlayerCharacter playerCharacter) {
+        if (playerCharacter != null) {
+            item.setXPosition((float) playerCharacter.getXPosition());
+            item.setYPosition((float) playerCharacter.getYPosition());
+        }
+        item.createBody(world);
+        items.put(item.getId(), item);
+
+        for (Integer playerId : alivePlayers.keySet()) {
+            ItemDropped message;
+            if (playerCharacter != null) {
+                message = new ItemDropped(playerCharacter.getPlayerID(), item.getId(), item.getType(),
+                        (float) playerCharacter.getXPosition(), (float) playerCharacter.getYPosition());
+            } else {
+                message = new ItemDropped(null, item.getId(), item.getType(),
+                        item.getXPosition(), item.getYPosition());
+            }
+            server.server.sendToUDP(playerId, message);
+        }
+    }
+
+    /**
+     * Remove item from the game aka pick it up from the ground.
+     *
+     * @param item item that is removed
+     * @param playerCharacter player character that picked item up if player picked up else null
+     */
+    public void removeItem(Item item, PlayerCharacter playerCharacter) {
+        item.removeBody();
+        items.remove(item.getId());
+
+        for (Integer playerId : alivePlayers.keySet()) {
+            ItemPickedUp message;
+            if (playerCharacter != null) {
+                message = new ItemPickedUp(playerCharacter.getPlayerID(), item.getId(), item.getType());
+            } else {
+                message = new ItemPickedUp(null, item.getId(), item.getType());
+            }
+            server.server.sendToUDP(playerId, message);
         }
     }
 }

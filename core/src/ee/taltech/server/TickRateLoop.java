@@ -1,6 +1,7 @@
 package ee.taltech.server;
 
 import com.esotericsoftware.kryonet.Server;
+import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.network.messages.game.SpellPosition;
 import ee.taltech.server.network.messages.game.Position;

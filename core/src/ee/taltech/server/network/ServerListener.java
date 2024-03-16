@@ -62,7 +62,12 @@ public class ServerListener extends Listener {
             case KeyPress key: // On KeyPress message
                 if (player != null) {
                     // Set the direction player should be moving.
-                    player.setMovement(key);
+                    if (key.action.equals(KeyPress.Action.UP) || key.action.equals(KeyPress.Action.DOWN)
+                            || key.action.equals(KeyPress.Action.LEFT) ||  key.action.equals(KeyPress.Action.RIGHT)) {
+                        player.setMovement(key);
+                    } else {
+                        game.setPlayerAction(key, player);
+                    }
                 }
                 break;
             case MouseClicks mouse: // On MouseClicks message

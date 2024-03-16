@@ -1,26 +1,17 @@
 package ee.taltech.server.network.messages.game;
 
 public class KeyPress {
-    public enum Direction {
-        UP, DOWN, LEFT, RIGHT
+    public enum Action {
+        UP, DOWN, LEFT, RIGHT, INTERACT, DROP
     }
-    public Direction direction;
+    public Action action;
     public boolean pressed;
+    public Integer extraField;
 
     /**
      * Empty constructor for Kryonet.
      */
     public KeyPress() {
-    }
-
-    /**
-     * Construct key press message.
-     *
-     * @param direction where player wants to move
-     * @param pressed if key was pressed or realised
-     */
-    public KeyPress(Direction direction, boolean pressed) {
-        this.direction = direction;
-        this.pressed = pressed;
+        // Empty constructor for client to fill.
     }
 }

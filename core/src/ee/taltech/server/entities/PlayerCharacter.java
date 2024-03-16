@@ -4,19 +4,20 @@ import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.network.messages.game.KeyPress;
 import ee.taltech.server.components.SpellTypes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class PlayerCharacter {
 
     public static final Integer WIDTH = 55;
     public static final Integer HEIGHT = 70;
     private Body body;
-
     public int xPosition;
     public int yPosition;
     public double mouseXPosition;
     public double mouseYPosition;
     public boolean mouseLeftClick;
-
     public final int playerID;
     public SpellTypes type;
     boolean moveLeft;
@@ -25,10 +26,7 @@ public class PlayerCharacter {
     boolean moveUp;
     public Integer health;
     public double mana;
-
-    public int getPlayerID() {
-        return playerID;
-    }
+    private Map<Integer, Item> inventory;
 
     /**
      * Construct PlayerCharacter.
@@ -42,6 +40,16 @@ public class PlayerCharacter {
         this.playerID = playerID;
         health = 100;
         mana = 100;
+        inventory = new HashMap<>();
+    }
+
+    /**
+     * Get player's ID.
+     *
+     * @return playerID
+     */
+    public int getPlayerID() {
+        return playerID;
     }
 
     /**
@@ -116,23 +124,23 @@ public class PlayerCharacter {
     }
 
     /**
-     * Method sets the heading direction for the player, but doesn't update the position coordinates.
+     * Method sets the heading action for the player, but doesn't update the position coordinates.
      * Only use if's, because multiple buttons can, be pressed simultaneously.
      *
      * @param keyPress Incoming from client. Contains if and what button is pressed.
      */
     public void setMovement(KeyPress keyPress) {
-        // Set a direction where player should be headed.
-        if (keyPress.direction == KeyPress.Direction.LEFT) {
+        // Set a action where player should be headed.
+        if (keyPress.action == KeyPress.Action.LEFT) {
             this.moveLeft = keyPress.pressed;
         }
-        if (keyPress.direction == KeyPress.Direction.RIGHT) {
+        if (keyPress.action == KeyPress.Action.RIGHT) {
             this.moveRight = keyPress.pressed;
         }
-        if (keyPress.direction == KeyPress.Direction.UP) {
+        if (keyPress.action == KeyPress.Action.UP) {
             this.moveUp = keyPress.pressed;
         }
-        if (keyPress.direction == KeyPress.Direction.DOWN) {
+        if (keyPress.action == KeyPress.Action.DOWN) {
             this.moveDown = keyPress.pressed;
         }
     }
@@ -150,6 +158,16 @@ public class PlayerCharacter {
         this.mouseYPosition = mouseYPosition;
         this.mouseLeftClick = leftMouse;
         this.type = type;
+    }
+
+    public void pickUpItem(Item item) {
+        inventory.put(item.getId(), item);
+    }
+
+    public Item dropItem(Integer itemId) {
+        Item droppedItem = inventory.get(itemId);
+        inventory.remove(itemId);
+        return droppedItem;
     }
 
     /**
@@ -213,7 +231,7 @@ public class PlayerCharacter {
     }
 
     /**
-     * Move player only in one direction.
+     * Move player only in one action.
      *
      * @param distance how much to change player coordinates
      */
