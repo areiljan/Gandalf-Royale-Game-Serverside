@@ -160,10 +160,21 @@ public class PlayerCharacter {
         this.type = type;
     }
 
+    /**
+     * Pick up item to inventory.
+     *
+     * @param item item that is picked up
+     */
     public void pickUpItem(Item item) {
         inventory.put(item.getId(), item);
     }
 
+    /**
+     * Drop item from inventory.
+     *
+     * @param itemId item's id that is dropped
+     * @return item that is dropped
+     */
     public Item dropItem(Integer itemId) {
         Item droppedItem = inventory.get(itemId);
         inventory.remove(itemId);

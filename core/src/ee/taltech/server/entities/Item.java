@@ -6,8 +6,8 @@ import ee.taltech.server.components.SpellTypes;
 public class Item {
     private final Integer id;
     private final SpellTypes type;
-    private Float xPosition;
-    private Float yPosition;
+    private float xPosition;
+    private float yPosition;
     private Body body;
     private PlayerCharacter collidingWith;
     private static int currentId = 1;
@@ -19,7 +19,7 @@ public class Item {
      * @param xPosition item's x coordinate
      * @param yPosition item's y coordinate
      */
-    public Item(SpellTypes type, Float xPosition, Float yPosition) {
+    public Item(SpellTypes type, float xPosition, float yPosition) {
         this.id = currentId++;
         this.type = type;
         this.xPosition = xPosition;
@@ -50,7 +50,7 @@ public class Item {
      *
      * @return xPosition
      */
-    public Float getXPosition() {
+    public float getXPosition() {
         return xPosition;
     }
 
@@ -59,7 +59,7 @@ public class Item {
      *
      * @return yPosition
      */
-    public Float getYPosition() {
+    public float getYPosition() {
         return yPosition;
     }
 
@@ -77,7 +77,7 @@ public class Item {
      *
      * @param xPosition new x coordinate
      */
-    public void setXPosition(Float xPosition) {
+    public void setXPosition(float xPosition) {
         this.xPosition = xPosition;
     }
 
@@ -86,7 +86,7 @@ public class Item {
      *
      * @param yPosition new y coordinate
      */
-    public void setYPosition(Float yPosition) {
+    public void setYPosition(float yPosition) {
         this.yPosition = yPosition;
     }
 
@@ -99,6 +99,11 @@ public class Item {
         this.collidingWith = collidingWith;
     }
 
+    /**
+     * Create body for item.
+     *
+     * @param world world that the body is put into
+     */
     public void createBody(World world) {
         // Create a dynamic body for item
         BodyDef bodyDef = new BodyDef();
@@ -108,7 +113,7 @@ public class Item {
 
         // Create a fixture defining the hit box shape
         PolygonShape hitBoxShape = new PolygonShape();
-        hitBoxShape.setAsBox(25, 25);
+        hitBoxShape.setAsBox(5, 5); // This size is chosen randomly, SHOULD NOT BE FINAL
 
         // Attach the fixture to the body
         FixtureDef fixtureDef = new FixtureDef();
@@ -120,10 +125,20 @@ public class Item {
 
         hitBoxBody.getFixtureList().get(0).setUserData(this);
         this.body = hitBoxBody;
+    }
+
+    /**
+     * Update item's body.
+     */
+    public void updateBody() {
         body.setTransform(xPosition, yPosition, body.getAngle());
     }
 
-    public void removeBody() {
+    /**
+     * Remove item's body.
+     */
+    public void removeBody(World world) {
+        world.destroyBody(body); // Destroy the items body
         body = null;
     }
 }

@@ -13,6 +13,7 @@ import ee.taltech.server.network.messages.game.KeyPress;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Game {
 
@@ -43,12 +44,6 @@ public class Game {
         this.deadPlayers = new HashMap<>();
         this.spells = new HashMap<>();
         this.items = new HashMap<>();
-
-        Item item1 = new Item(SpellTypes.FIREBALL, 20F, 20F);
-        Item item2 = new Item(SpellTypes.FIREBALL, 30F, 20F);
-
-        addItem(item1, null);
-        addItem(item2, null);
     }
 
     /**
@@ -68,14 +63,15 @@ public class Game {
      */
     public void setPlayerAction(KeyPress keyPress, PlayerCharacter player) {
         if (keyPress.action.equals(KeyPress.Action.DROP) && keyPress.extraField != null) {
-                Item droppedItem = player.dropItem(keyPress.extraField);
-                addItem(droppedItem, player);
+            Item droppedItem = player.dropItem(keyPress.extraField);
+            addItem(droppedItem, player);
         }
         if (keyPress.action.equals(KeyPress.Action.INTERACT)) {
             for (Item item : items.values()) {
-                if (item.getCollidingWith().equals(player)) {
+                if (Objects.equals(item.getCollidingWith(), player)) {
                     player.pickUpItem(item);
                     removeItem(item, player);
+                    break;
                 }
             }
         }
@@ -135,24 +131,38 @@ public class Game {
      * @param playerCharacter player character that dropped item if player dropped else null
      */
     public void addItem(Item item, PlayerCharacter playerCharacter) {
-        if (playerCharacter != null) {
-            item.setXPosition((float) playerCharacter.getXPosition());
-            item.setYPosition((float) playerCharacter.getYPosition());
+        if (playerCharacter != null) { // If player is not null aka player dropped item, then update items position
+            item.setXPosition(playerCharacter.getXPosition());
+            item.setYPosition(playerCharacter.getYPosition());
         }
-        item.createBody(world);
-        items.put(item.getId(), item);
+        item.createBody(world); // Create body for item
+        item.updateBody(); // Update item's body
+        items.put(item.getId(), item); // Put it in the items map
 
-        for (Integer playerId : alivePlayers.keySet()) {
-            ItemDropped message;
-            if (playerCharacter != null) {
-                message = new ItemDropped(playerCharacter.getPlayerID(), item.getId(), item.getType(),
-                        (float) playerCharacter.getXPosition(), (float) playerCharacter.getYPosition());
-            } else {
-                message = new ItemDropped(null, item.getId(), item.getType(),
-                        item.getXPosition(), item.getYPosition());
-            }
+        for (Integer playerId : alivePlayers.keySet()) { // Send message for every player in the lobby
+            ItemDropped message = createItemDropped(item, playerCharacter);
             server.server.sendToUDP(playerId, message);
         }
+    }
+
+    /**
+     * Create item dropped message.
+     *
+     * @param item item, that is dropped
+     * @param playerCharacter player character that dropped item if player dropped else null
+     * @return ItemDropped message
+     */
+    private ItemDropped createItemDropped(Item item, PlayerCharacter playerCharacter) {
+        ItemDropped message;
+        // If player in not null aka player dropped item send message with player's ID
+        if (playerCharacter != null) {
+            message = new ItemDropped(playerCharacter.getPlayerID(), item.getId(), item.getType(),
+                    playerCharacter.getXPosition(), playerCharacter.getYPosition());
+        } else { // If player is null aka game dropped item then send message without player's ID
+            message = new ItemDropped(null, item.getId(), item.getType(),
+                    item.getXPosition(), item.getYPosition());
+        }
+        return message;
     }
 
     /**
@@ -162,14 +172,15 @@ public class Game {
      * @param playerCharacter player character that picked item up if player picked up else null
      */
     public void removeItem(Item item, PlayerCharacter playerCharacter) {
-        item.removeBody();
-        items.remove(item.getId());
+        item.removeBody(world); // Remove items body
+        items.remove(item.getId()); // Remove item form items map
 
         for (Integer playerId : alivePlayers.keySet()) {
             ItemPickedUp message;
+            // If player is not null aka player picked up item send message with player's ID
             if (playerCharacter != null) {
                 message = new ItemPickedUp(playerCharacter.getPlayerID(), item.getId(), item.getType());
-            } else {
+            } else { // If player is null aka game removed item send message without player's ID
                 message = new ItemPickedUp(null, item.getId(), item.getType());
             }
             server.server.sendToUDP(playerId, message);

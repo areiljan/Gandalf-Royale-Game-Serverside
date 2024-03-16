@@ -1,6 +1,7 @@
 package ee.taltech.server;
 
 import com.esotericsoftware.kryonet.Server;
+import ee.taltech.server.components.SpellTypes;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.network.messages.game.SpellPosition;
@@ -15,6 +16,7 @@ public class TickRateLoop implements Runnable {
     private volatile boolean running = true;
     private Server server;
     private GameServer gameServer;
+    Integer test = 0;
 
 
     /**
@@ -59,6 +61,15 @@ public class TickRateLoop implements Runnable {
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
+            if (test < 61) test++; // Used only to demonstrate item generation by server
+            if (test == 60) { // Trigger only once after 1 second
+                Item item1 = new Item(SpellTypes.FIREBALL, 300, 300);
+                Item item2 = new Item(SpellTypes.FIREBALL, 400, 300);
+
+                game.addItem(item1, null);
+                game.addItem(item2, null);
+            }
+
             for (PlayerCharacter player : game.alivePlayers.values()) {
                 player.updatePosition();
                 if (player.mana != 100) {

@@ -29,11 +29,13 @@ public class CollisionListener implements ContactListener {
         Object dataA = fixtureA.getUserData();
         Object dataB = fixtureB.getUserData();
 
+        // If player and spell collide
         if (dataA instanceof PlayerCharacter && dataB instanceof Spell
                 || dataA instanceof Spell && dataB instanceof PlayerCharacter) {
             spellAndPlayerCollision(dataA, dataB);
         }
 
+        // If player and item collide
         if (dataA instanceof PlayerCharacter && dataB instanceof Item
                 || dataA instanceof Item && dataB instanceof PlayerCharacter) {
             beginItemAndPlayerCollision(dataA, dataB);
@@ -89,6 +91,7 @@ public class CollisionListener implements ContactListener {
         Object dataA = fixtureA.getUserData();
         Object dataB = fixtureB.getUserData();
 
+        // If player and item ends colliding
         if (dataA instanceof PlayerCharacter && dataB instanceof Item
                 || dataA instanceof Item && dataB instanceof PlayerCharacter) {
             endItemAndPlayerCollision(dataA, dataB);

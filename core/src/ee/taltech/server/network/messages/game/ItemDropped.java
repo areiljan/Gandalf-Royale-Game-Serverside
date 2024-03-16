@@ -7,8 +7,8 @@ public class ItemDropped {
     public Integer playerId;
     public Integer itemId;
     public SpellTypes type;
-    public Float xPosition;
-    public Float yPosition;
+    public float xPosition;
+    public float yPosition;
 
     /**
      * Empty constructor for Kryonet.
@@ -25,7 +25,7 @@ public class ItemDropped {
      * @param xPosition item's x coordinate
      * @param yPosition item's y coordinate
      */
-    public ItemDropped(Integer playerId, Integer itemId, SpellTypes type, Float xPosition, Float yPosition) {
+    public ItemDropped(Integer playerId, Integer itemId, SpellTypes type, float xPosition, float yPosition) {
         this.playerId = playerId;
         this.itemId = itemId;
         this.type = type;
