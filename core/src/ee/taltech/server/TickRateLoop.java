@@ -4,10 +4,7 @@ import com.esotericsoftware.kryonet.Server;
 import ee.taltech.server.components.SpellTypes;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
-import ee.taltech.server.network.messages.game.SpellPosition;
-import ee.taltech.server.network.messages.game.Position;
-import ee.taltech.server.network.messages.game.UpdateHealth;
-import ee.taltech.server.network.messages.game.UpdateMana;
+import ee.taltech.server.network.messages.game.*;
 import ee.taltech.server.entities.PlayerCharacter;
 
 import ee.taltech.server.components.Game;
@@ -79,6 +76,9 @@ public class TickRateLoop implements Runnable {
                     server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
                     server.sendToUDP(playerId, new UpdateHealth(player.playerID, player.health));
                     server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
+                    server.sendToUDP(playerId, new ActionTaken(player.playerID, player.isMouseLeftClick(),
+                            game.alivePlayers.get(player.playerID).mouseXPosition,
+                            game.alivePlayers.get(player.playerID).mouseYPosition));
                 }
             }
             for (Spell spell : game.spells.values()) {

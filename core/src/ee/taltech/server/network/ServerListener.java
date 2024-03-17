@@ -74,7 +74,7 @@ public class ServerListener extends Listener {
             case MouseClicks mouse: // On MouseClicks message
                 if (player != null) {
                     // Set the direction player should be moving.
-                    player.setMouseControl(mouse.leftMouse, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
+                    player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition, mouse.type);
                     // Add new fireball
                     if (mouse.type != SpellTypes.NOTHING && mouse.leftMouse && player.mana >= 20) {
                         // Add new fireball to the game

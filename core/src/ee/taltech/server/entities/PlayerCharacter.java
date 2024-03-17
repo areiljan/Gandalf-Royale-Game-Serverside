@@ -10,13 +10,13 @@ import java.util.Map;
 
 public class PlayerCharacter {
 
-    public static final Integer WIDTH = 55;
-    public static final Integer HEIGHT = 70;
+    public static final Integer WIDTH = 40;
+    public static final Integer HEIGHT = 80;
     private Body body;
     public int xPosition;
     public int yPosition;
-    public double mouseXPosition;
-    public double mouseYPosition;
+    public int mouseXPosition;
+    public int mouseYPosition;
     public boolean mouseLeftClick;
     public final int playerID;
     public SpellTypes type;
@@ -105,6 +105,7 @@ public class PlayerCharacter {
     public SpellTypes getSpell() {
         return type;
     }
+
     /**
      * Set health value.
      *
@@ -153,7 +154,7 @@ public class PlayerCharacter {
      * @param mouseYPosition mouse y coordinate
      * @param type action that is chosen
      */
-    public void setMouseControl(boolean leftMouse, double mouseXPosition, double mouseYPosition, SpellTypes type){
+    public void setMouseControl(boolean leftMouse, int mouseXPosition, int mouseYPosition, SpellTypes type){
         this.mouseXPosition = mouseXPosition;
         this.mouseYPosition = mouseYPosition;
         this.mouseLeftClick = leftMouse;
@@ -238,7 +239,7 @@ public class PlayerCharacter {
             oneWayMovement(distance);
         }
         // Set the position of the Box2D body to match the player's coordinates
-        body.setTransform( (float) xPosition + 91, (float) yPosition + 70, body.getAngle());
+        body.setTransform( (float) xPosition + 5, (float) yPosition + 25, body.getAngle());
     }
 
     /**
