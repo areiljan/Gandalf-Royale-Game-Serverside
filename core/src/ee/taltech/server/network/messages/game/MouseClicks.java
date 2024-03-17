@@ -12,6 +12,6 @@ public class MouseClicks {
      * Empty constructor for Kryonet.
      */
     public MouseClicks() {
-        // Empty constructor for server to fill.
+        // Empty constructor for client to fill.
     }
 }

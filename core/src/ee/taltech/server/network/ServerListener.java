@@ -3,6 +3,7 @@ package ee.taltech.server.network;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.server.GameServer;
+import ee.taltech.server.components.SpellTypes;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.network.messages.game.KeyPress;
 import ee.taltech.server.network.messages.game.MouseClicks;
@@ -62,7 +63,12 @@ public class ServerListener extends Listener {
             case KeyPress key: // On KeyPress message
                 if (player != null) {
                     // Set the direction player should be moving.
-                    player.setMovement(key);
+                    if (key.action.equals(KeyPress.Action.UP) || key.action.equals(KeyPress.Action.DOWN)
+                            || key.action.equals(KeyPress.Action.LEFT) ||  key.action.equals(KeyPress.Action.RIGHT)) {
+                        player.setMovement(key);
+                    } else {
+                        game.setPlayerAction(key, player);
+                    }
                 }
                 break;
             case MouseClicks mouse: // On MouseClicks message
@@ -70,7 +76,7 @@ public class ServerListener extends Listener {
                     // Set the direction player should be moving.
                     player.setMouseControl(mouse.leftMouse, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
                     // Add new fireball
-                    if (mouse.leftMouse && player.mana >= 20) {
+                    if (mouse.type != SpellTypes.NOTHING && mouse.leftMouse && player.mana >= 20) {
                         // Add new fireball to the game
                         Spell spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, game.getWorld(),
                                 mouse.type);
