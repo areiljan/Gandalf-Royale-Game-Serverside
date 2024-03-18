@@ -36,7 +36,7 @@ public class Spell {
         spellBody = createBody(world);
 
         spellXPosition = playerCharacter.getXPosition();
-        spellYPosition = playerCharacter.getYPosition();
+        spellYPosition = playerCharacter.getYPosition() + 50;
 
         // These mousepositions are already relative to the player.
         this.mouseXPosition = mouseXPosition;

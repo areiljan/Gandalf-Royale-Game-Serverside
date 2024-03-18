@@ -7,6 +7,7 @@ import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.collision.CollisionListener;
+import ee.taltech.server.network.messages.game.ActionTaken;
 import ee.taltech.server.network.messages.game.ItemDropped;
 import ee.taltech.server.network.messages.game.ItemPickedUp;
 import ee.taltech.server.network.messages.game.KeyPress;
@@ -102,8 +103,9 @@ public class Game {
      *
      * @param spell new spell
      */
-    public void addSpell(Spell spell) {
+    public boolean addSpell(Spell spell) {
         spells.put(spell.getSpellId(), spell);
+        return true;
     }
 
     /**

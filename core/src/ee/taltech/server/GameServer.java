@@ -53,6 +53,7 @@ public class GameServer {
         Kryo kryo = server.getKryo();
         kryo.register(java.util.ArrayList.class);
         kryo.register(Position.class);
+        kryo.register(ActionTaken.class);
         kryo.register(Join.class);
         kryo.register(Leave.class);
         kryo.register(LobbyCreation.class);
