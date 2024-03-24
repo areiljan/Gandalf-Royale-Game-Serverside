@@ -7,14 +7,13 @@ import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.collision.CollisionListener;
-import ee.taltech.server.network.messages.game.ActionTaken;
-import ee.taltech.server.network.messages.game.ItemDropped;
-import ee.taltech.server.network.messages.game.ItemPickedUp;
-import ee.taltech.server.network.messages.game.KeyPress;
+import ee.taltech.server.network.messages.game.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Game {
 
@@ -22,8 +21,10 @@ public class Game {
     public final GameServer server;
     public final Integer gameId;
     public final Map<Integer, PlayerCharacter> alivePlayers;
-    public final Map<Integer, PlayerCharacter> deadPlayers;
-    public final Map<Integer, Spell> spells;
+    public Map<Integer, PlayerCharacter> deadPlayers;
+    private ArrayList<Spell> spellsToAdd;
+    private ArrayList<Integer> spellsToDispel;
+    public Map<Integer, Spell> spells;
     public final Map<Integer, Item> items;
     private final World world;
 
@@ -45,6 +46,55 @@ public class Game {
         this.deadPlayers = new HashMap<>();
         this.spells = new HashMap<>();
         this.items = new HashMap<>();
+        this.spellsToDispel = new ArrayList<>();
+        this.spellsToAdd = new ArrayList<>();
+    }
+
+    /**
+     * Basically.
+     */
+    public void update() {
+        world.step(1 / 60f, 6, 2); // Stepping world to update bodies
+        for (Integer spellToDispel : spellsToDispel) {
+            if (spells.containsKey(spellToDispel)) {
+                spells.get(spellToDispel).removeSpellBody(world);
+                for (Integer playerId : alivePlayers.keySet()) {
+                    server.server.sendToUDP(playerId, new SpellDispel(spells.get(spellToDispel).getSpellId()));
+                }
+                spells.remove(spellToDispel);
+            }
+        }
+        for (Spell spellToAdd : spellsToAdd) {
+            System.out.println(spellToAdd.getSpellId() + "x:" + spellToAdd.getSpellXPosition() + "y: " + spellToAdd.getSpellYPosition() + " ID:" + spellToAdd.getPlayerId());
+            if(!spells.containsValue(spellToAdd)) {
+                spells.put(spellToAdd.getSpellId(), spellToAdd);
+            }
+        }
+        for (PlayerCharacter deadPlayer : deadPlayers.values()) {
+            deadPlayer.removeBody(world);
+            if (alivePlayers.containsValue(deadPlayer)) {
+                alivePlayers.remove(deadPlayer.getPlayerID());
+            }
+        }
+        spellsToDispel.clear();
+        spellsToAdd.clear();
+        deadPlayers.clear();
+    }
+
+    /**
+     * Add a spell to dispel.
+     */
+    public void removeSpell(Integer spellId) {
+        spellsToDispel.add(spellId);
+    }
+
+    /**
+     * Add new spell to game.
+     *
+     * @param spellToAdd new spells Id.
+     */
+    public void addSpell(Spell spellToAdd) {
+        spellsToAdd.add(spellToAdd);
     }
 
     /**
@@ -98,15 +148,6 @@ public class Game {
         return result;
     }
 
-    /**
-     * Add new spell to game.
-     *
-     * @param spell new spell
-     */
-    public boolean addSpell(Spell spell) {
-        spells.put(spell.getSpellId(), spell);
-        return true;
-    }
 
     /**
      * Damage player and put them into deadPlayers if they have 0 hp

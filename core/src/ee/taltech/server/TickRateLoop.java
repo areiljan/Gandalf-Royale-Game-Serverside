@@ -4,10 +4,14 @@ import com.esotericsoftware.kryonet.Server;
 import ee.taltech.server.components.SpellTypes;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
+import ee.taltech.server.entities.collision.CollisionListener;
 import ee.taltech.server.network.messages.game.*;
 import ee.taltech.server.entities.PlayerCharacter;
 
 import ee.taltech.server.components.Game;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TickRateLoop implements Runnable {
     private volatile boolean running = true;
@@ -58,10 +62,10 @@ public class TickRateLoop implements Runnable {
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
-            if (test < 61) test++; // Used only to demonstrate item generation by server
-            if (test == 60) { // Trigger only once after 1 second
-                Item item1 = new Item(SpellTypes.FIREBALL, 300, 300);
-                Item item2 = new Item(SpellTypes.FIREBALL, 400, 300);
+            if (test < 481) test++; // Used only to demonstrate item generation by server
+            if (test == 480) { // Trigger only once after 8 seconds
+                Item item1 = new Item(SpellTypes.FIREBALL, -100, -200);
+                Item item2 = new Item(SpellTypes.FIREBALL, 100, -200);
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
@@ -85,10 +89,10 @@ public class TickRateLoop implements Runnable {
                 spell.updatePosition();
                 for (Integer playerId : game.alivePlayers.keySet()) {
                     server.sendToUDP(playerId, new SpellPosition(spell.getPlayerId(), spell.getSpellId(),
-                        spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
+                                spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
                 }
             }
-            game.getWorld().step(1 / 60f, 6, 2); // Stepping world to update bodies
+            game.update();
         }
     }
 }

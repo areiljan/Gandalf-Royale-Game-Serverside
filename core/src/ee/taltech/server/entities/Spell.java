@@ -103,7 +103,9 @@ public class Spell {
      * @param y y coordinate
      */
     public void setHitBoxPosition(double x, double y) {
-        spellBody.setTransform((float) x, (float) y, spellBody.getAngle());
+        if (spellBody != null) {
+            spellBody.setTransform((float) x, (float) y, spellBody.getAngle());
+        }
     }
 
     /**
@@ -142,5 +144,12 @@ public class Spell {
         // Set user data to identify fireball
         body.getFixtureList().get(0).setUserData(this);
         return body;
+    }
+
+    /**
+     * Remove spells body.
+     */
+    public void removeSpellBody(World world) {
+        world.destroyBody(spellBody); // Destroy the spells body
     }
 }

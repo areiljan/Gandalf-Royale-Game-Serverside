@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class PlayerCharacter {
 
-    public static final Integer WIDTH = 40;
-    public static final Integer HEIGHT = 80;
+    public static final Integer WIDTH = 20;
+    public static final Integer HEIGHT = 40;
     private Body body;
     public int xPosition;
     public int yPosition;
@@ -210,6 +210,14 @@ public class PlayerCharacter {
         // Add this object as data
         hitBoxBody.getFixtureList().get(0).setUserData(this);
         body = hitBoxBody;
+    }
+
+    /**
+     * Remove body.
+     */
+    public void removeBody(World world) {
+        world.destroyBody(body); // Destroy the spells body
+        body = null;
     }
 
     /**
