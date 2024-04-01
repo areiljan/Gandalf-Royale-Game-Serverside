@@ -58,7 +58,7 @@ public class ServerListener extends Listener {
     private void gameMessagesListener(Connection connection, Object incomingData) {
         Integer gameId = server.connections.get(connection.getID());
         Game game = server.games.get(gameId);
-        PlayerCharacter player = game.alivePlayers.get(connection.getID());
+        PlayerCharacter player = game.gamePlayers.get(connection.getID());
         switch (incomingData) {
             case KeyPress key: // On KeyPress message
                 if (player != null) {

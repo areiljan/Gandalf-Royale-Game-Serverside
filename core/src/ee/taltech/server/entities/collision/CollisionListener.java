@@ -1,15 +1,17 @@
 package ee.taltech.server.entities.collision;
 
+import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.components.Game;
 
+import java.util.HashMap;
+import java.util.Optional;
+
 public class CollisionListener implements ContactListener {
-
     private Game game;
-
     public CollisionListener(Game game) {
         this.game = game;
     }
@@ -48,7 +50,7 @@ public class CollisionListener implements ContactListener {
      * @param dataA one collision body
      * @param dataB second collision body
      */
-    private void spellAndPlayerCollision(Object dataA, Object dataB) {
+    public void spellAndPlayerCollision(Object dataA, Object dataB) {
         // Get player
         PlayerCharacter player = dataA instanceof PlayerCharacter ? (PlayerCharacter) dataA : (PlayerCharacter) dataB;
         // Get spell
@@ -57,6 +59,7 @@ public class CollisionListener implements ContactListener {
         // If player is not the person who cast the action then damage the player
         if (spell.getPlayerId() != player.getPlayerID()) {
             game.damagePlayer(player.playerID, 10);
+            game.removeSpell(spell.getSpellId());
         }
     }
 

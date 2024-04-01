@@ -18,7 +18,7 @@ public class Spell {
     double mouseYPosition;
     private final double angle;
     private static int nextId = 1;
-    private static final int VELOCITY = 7;
+    private static final int FIREBALLVELOCITY = 3;
 
     /**
      * Construct Spell.
@@ -103,17 +103,23 @@ public class Spell {
      * @param y y coordinate
      */
     public void setHitBoxPosition(double x, double y) {
-        spellBody.setTransform((float) x, (float) y, spellBody.getAngle());
+        if (spellBody != null) {
+            spellBody.setTransform((float) x, (float) y, spellBody.getAngle());
+        }
     }
 
     /**
-     * Update fireball position.
+     * Update spell position.
      */
     public void updatePosition() {
         // Update fireball position based on angle and velocity
-        this.spellXPosition += VELOCITY * Math.cos(angle);
-        this.spellYPosition -= VELOCITY * Math.sin(angle);
-        setHitBoxPosition(spellXPosition, spellYPosition);
+        if (type.equals(SpellTypes.FIREBALL)) {
+            this.spellXPosition += FIREBALLVELOCITY * Math.cos(angle);
+            this.spellYPosition -= FIREBALLVELOCITY * Math.sin(angle);
+            setHitBoxPosition(spellXPosition, spellYPosition - 30);
+        } else if (type.equals(SpellTypes.ICESHARD)) {
+
+        }
     }
 
     /**
@@ -131,7 +137,7 @@ public class Spell {
 
         // Create fixture for fireball hit box
         CircleShape shape = new CircleShape();
-        shape.setRadius(20.0f); // Example hit box size
+        shape.setRadius(5.0f); // Example hit box size
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         body.createFixture(fixtureDef);
@@ -142,5 +148,12 @@ public class Spell {
         // Set user data to identify fireball
         body.getFixtureList().get(0).setUserData(this);
         return body;
+    }
+
+    /**
+     * Remove spells body.
+     */
+    public void removeSpellBody(World world) {
+        world.destroyBody(spellBody); // Destroy the spells body
     }
 }
