@@ -13,20 +13,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Game {
 
     public final Lobby lobby;
     public final GameServer server;
     public final Integer gameId;
-    public final Map<Integer, PlayerCharacter> alivePlayers;
+    public final Map<Integer, PlayerCharacter> gamePlayers; // Previous alivePlayers
+    private int killedPlayerId;
     public Map<Integer, PlayerCharacter> deadPlayers;
     private ArrayList<Spell> spellsToAdd;
     private ArrayList<Integer> spellsToDispel;
     public Map<Integer, Spell> spells;
     public final Map<Integer, Item> items;
     private final World world;
+
+    /**
+     * Get the killed player id.
+     * Zero if no killed players this tick.
+     * @return - 0 or an id.
+     */
+    public int getKilledPlayerId() {
+        return killedPlayerId;
+    }
 
     /**
      * Construct Game.
@@ -42,12 +51,13 @@ public class Game {
         this.server = server;
         this.lobby = lobby;
         this.gameId = lobby.lobbyId;
-        this.alivePlayers = createPlayersMap();
+        this.gamePlayers = createPlayersMap();
         this.deadPlayers = new HashMap<>();
         this.spells = new HashMap<>();
         this.items = new HashMap<>();
         this.spellsToDispel = new ArrayList<>();
         this.spellsToAdd = new ArrayList<>();
+        this.killedPlayerId = 0;
     }
 
     /**
@@ -58,7 +68,7 @@ public class Game {
         for (Integer spellToDispel : spellsToDispel) {
             if (spells.containsKey(spellToDispel)) {
                 spells.get(spellToDispel).removeSpellBody(world);
-                for (Integer playerId : alivePlayers.keySet()) {
+                for (Integer playerId : gamePlayers.keySet()) {
                     server.server.sendToUDP(playerId, new SpellDispel(spells.get(spellToDispel).getSpellId()));
                 }
                 spells.remove(spellToDispel);
@@ -70,11 +80,12 @@ public class Game {
                 spells.put(spellToAdd.getSpellId(), spellToAdd);
             }
         }
+        // resets the id to 0 each iteration.
+        killedPlayerId = 0;
         for (PlayerCharacter deadPlayer : deadPlayers.values()) {
             deadPlayer.removeBody(world);
-            if (alivePlayers.containsValue(deadPlayer)) {
-                alivePlayers.remove(deadPlayer.getPlayerID());
-            }
+            // this class integer id will be used to send a one-time message to the client.
+            killedPlayerId = deadPlayer.getPlayerID();
         }
         spellsToDispel.clear();
         spellsToAdd.clear();
@@ -156,7 +167,7 @@ public class Game {
      * @param amount amount of damage done to player
      */
     public void damagePlayer(Integer id, Integer amount) {
-        PlayerCharacter player = alivePlayers.get(id); // Get player
+        PlayerCharacter player = gamePlayers.get(id); // Get player
 
         int newHealth = Math.max(player.health - amount, 0); // Health can not be less than 0
         player.setHealth(newHealth); // 10 damage per hit
@@ -182,7 +193,7 @@ public class Game {
         item.updateBody(); // Update item's body
         items.put(item.getId(), item); // Put it in the items map
 
-        for (Integer playerId : alivePlayers.keySet()) { // Send message for every player in the lobby
+        for (Integer playerId : gamePlayers.keySet()) { // Send message for every player in the lobby
             ItemDropped message = createItemDropped(item, playerCharacter);
             server.server.sendToUDP(playerId, message);
         }
@@ -218,7 +229,7 @@ public class Game {
         item.removeBody(world); // Remove items body
         items.remove(item.getId()); // Remove item form items map
 
-        for (Integer playerId : alivePlayers.keySet()) {
+        for (Integer playerId : gamePlayers.keySet()) {
             ItemPickedUp message;
             // If player is not null aka player picked up item send message with player's ID
             if (playerCharacter != null) {

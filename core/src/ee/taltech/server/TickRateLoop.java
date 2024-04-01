@@ -4,14 +4,10 @@ import com.esotericsoftware.kryonet.Server;
 import ee.taltech.server.components.SpellTypes;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Spell;
-import ee.taltech.server.entities.collision.CollisionListener;
 import ee.taltech.server.network.messages.game.*;
 import ee.taltech.server.entities.PlayerCharacter;
 
 import ee.taltech.server.components.Game;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TickRateLoop implements Runnable {
     private volatile boolean running = true;
@@ -64,30 +60,35 @@ public class TickRateLoop implements Runnable {
         for (Game game : this.gameServer.games.values()) {
             if (test < 481) test++; // Used only to demonstrate item generation by server
             if (test == 480) { // Trigger only once after 8 seconds
-                Item item1 = new Item(SpellTypes.FIREBALL, -100, -200);
-                Item item2 = new Item(SpellTypes.FIREBALL, 100, -200);
+                Item item1 = new Item(SpellTypes.FIREBALL, 4500, 5800);
+                Item item2 = new Item(SpellTypes.FIREBALL, 4500, 5600);
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
             }
 
-            for (PlayerCharacter player : game.alivePlayers.values()) {
-                player.updatePosition();
+            for (PlayerCharacter player : game.gamePlayers.values()) {
+                if (!game.deadPlayers.containsValue(player)) {
+                    player.updatePosition();
+                }
                 if (player.mana != 100) {
                     player.regenerateMana();
                 }
-                for (Integer playerId : game.alivePlayers.keySet()) {
+                for (Integer playerId : game.gamePlayers.keySet()) {
                     server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
                     server.sendToUDP(playerId, new UpdateHealth(player.playerID, player.health));
                     server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
-                    server.sendToUDP(playerId, new ActionTaken(player.playerID, player.isMouseLeftClick(),
-                            game.alivePlayers.get(player.playerID).mouseXPosition,
-                            game.alivePlayers.get(player.playerID).mouseYPosition));
+                    server.sendToUDP(playerId, new ActionTaken(player.playerID, player.getMouseLeftClick(),
+                            game.gamePlayers.get(player.playerID).mouseXPosition,
+                            game.gamePlayers.get(player.playerID).mouseYPosition));
+                    if (game.getKilledPlayerId() != 0) {
+                        server.sendToUDP(playerId, new KilledPlayer(game.getKilledPlayerId()));
+                    }
                 }
             }
             for (Spell spell : game.spells.values()) {
                 spell.updatePosition();
-                for (Integer playerId : game.alivePlayers.keySet()) {
+                for (Integer playerId : game.gamePlayers.keySet()) {
                     server.sendToUDP(playerId, new SpellPosition(spell.getPlayerId(), spell.getSpellId(),
                                 spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
                 }

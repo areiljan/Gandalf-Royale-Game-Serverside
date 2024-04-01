@@ -60,7 +60,6 @@ public class CollisionListener implements ContactListener {
         if (spell.getPlayerId() != player.getPlayerID()) {
             game.damagePlayer(player.playerID, 10);
             game.removeSpell(spell.getSpellId());
-            System.out.println(spell.getSpellId());
         }
     }
 

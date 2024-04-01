@@ -10,20 +10,25 @@ import java.util.Map;
 
 public class PlayerCharacter {
 
-    public static final Integer WIDTH = 20;
-    public static final Integer HEIGHT = 40;
+    public static final Integer WIDTH = 12;
+    public static final Integer HEIGHT = 24;
     private Body body;
     public int xPosition;
     public int yPosition;
     public int mouseXPosition;
     public int mouseYPosition;
-    public boolean mouseLeftClick;
+    private boolean mouseLeftClick;
     public final int playerID;
     public SpellTypes type;
     boolean moveLeft;
     boolean moveRight;
     boolean moveDown;
     boolean moveUp;
+
+    public boolean getMouseLeftClick() {
+        return mouseLeftClick;
+    }
+
     public Integer health;
     public double mana;
     private Map<Integer, Item> inventory;
@@ -34,9 +39,9 @@ public class PlayerCharacter {
      * @param playerID player's ID
      */
     public PlayerCharacter(Integer playerID) {
-        // Here should be the random spawn points for a PlayerCharacter
-        this.xPosition = 0;
-        this.yPosition = 0;
+        // Here should be the semi-random spawn points for a PlayerCharacter
+        this.xPosition = 4700;
+        this.yPosition = 5800;
         this.playerID = playerID;
         health = 100;
         mana = 100;
@@ -86,15 +91,6 @@ public class PlayerCharacter {
      */
     public double getMouseYPosition() {
         return mouseYPosition;
-    }
-
-    /**
-     * Check if mouse left click is pressed.
-     *
-     * @return true is clicked else false
-     */
-    public boolean isMouseLeftClick() {
-        return this.mouseLeftClick;
     }
 
     /**
@@ -225,9 +221,9 @@ public class PlayerCharacter {
      */
     public void updatePosition() {
         // updatePosition is activated every TPS.
-
+        System.out.println(xPosition + " " + yPosition);
         // One key press distance that a character travels.
-        int distance = 8;
+        int distance = 4;
         // Diagonal movement correction formula.
         int diagonal = (int) (distance / Math.sqrt(2));
 
@@ -246,8 +242,10 @@ public class PlayerCharacter {
         } else {
             oneWayMovement(distance);
         }
-        // Set the position of the Box2D body to match the player's coordinates
-        body.setTransform( (float) xPosition + 5, (float) yPosition + 25, body.getAngle());
+        if (body != null) {
+            // Set the position of the Box2D body to match the player's coordinates
+            body.setTransform((float) xPosition + 5, (float) yPosition + 25, body.getAngle());
+        }
     }
 
     /**

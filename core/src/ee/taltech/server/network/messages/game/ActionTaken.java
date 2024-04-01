@@ -1,6 +1,6 @@
 package ee.taltech.server.network.messages.game;
 public class ActionTaken {
-    public int userID;
+    public final int userID;
     public final boolean action;
     public final int mouseX;
     public final int mouseY;
