@@ -58,8 +58,8 @@ public class TickRateLoop implements Runnable {
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
-            if (test < 481) test++; // Used only to demonstrate item generation by server
-            if (test == 480) { // Trigger only once after 8 seconds
+            if (test < 1001) test++; // Used only to demonstrate item generation by server
+            if (test == 1000) { // Trigger only once after 8 seconds
                 Item item1 = new Item(SpellTypes.FIREBALL, 4500, 5800);
                 Item item2 = new Item(SpellTypes.FIREBALL, 4500, 5600);
 
