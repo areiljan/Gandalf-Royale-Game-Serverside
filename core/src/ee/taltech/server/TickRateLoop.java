@@ -94,6 +94,7 @@ public class TickRateLoop implements Runnable {
                                 spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
                 }
             }
+            game.getPlayZone().shrinkPlayZone(game.getStartTime());
             game.update();
         }
     }

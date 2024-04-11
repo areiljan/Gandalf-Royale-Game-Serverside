@@ -42,7 +42,7 @@ public class Game {
         world = new World(new Vector2(0, 0), true); // Create a new Box2D world
         CollisionListener collisionListener = new CollisionListener(this);
         world.setContactListener(collisionListener); // Set collision listener that detects collision
-        startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis() / 1000;
 
         this.server = server;
         this.lobby = lobby;
