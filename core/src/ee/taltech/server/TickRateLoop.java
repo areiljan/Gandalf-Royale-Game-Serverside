@@ -78,7 +78,7 @@ public class TickRateLoop implements Runnable {
                     server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
                     server.sendToUDP(playerId, new UpdateHealth(player.playerID, player.health));
                     server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
-                    server.sendToUDP(playerId, new PlayZoneUpdate(game.getPlayZone().getRadius()));
+                    server.sendToUDP(playerId, new PlayZoneUpdate(game.getPlayZone().getTimer()));
                     server.sendToUDP(playerId, new ActionTaken(player.playerID, player.getMouseLeftClick(),
                             game.gamePlayers.get(player.playerID).mouseXPosition,
                             game.gamePlayers.get(player.playerID).mouseYPosition));
@@ -94,7 +94,7 @@ public class TickRateLoop implements Runnable {
                                 spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
                 }
             }
-            game.getPlayZone().shrinkPlayZone(game.getStartTime());
+            game.getPlayZone().updateZone(game.getCurrentTime());
             game.update();
         }
     }

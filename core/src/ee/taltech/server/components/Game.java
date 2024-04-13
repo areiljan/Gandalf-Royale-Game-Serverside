@@ -30,6 +30,7 @@ public class Game {
     public final Map<Integer, Item> items;
     private final World world;
     private long startTime;
+    private int currentTime;
 
 
     /**
@@ -42,7 +43,8 @@ public class Game {
         world = new World(new Vector2(0, 0), true); // Create a new Box2D world
         CollisionListener collisionListener = new CollisionListener(this);
         world.setContactListener(collisionListener); // Set collision listener that detects collision
-        startTime = System.currentTimeMillis() / 1000;
+        startTime = System.currentTimeMillis();
+        this.currentTime = 0;
 
         this.server = server;
         this.lobby = lobby;
@@ -63,7 +65,7 @@ public class Game {
      */
     public void update() {
         world.step(1 / 60f, 6, 2); // Stepping world to update bodies
-        startTime = (System.currentTimeMillis() - startTime) / 1000;
+        currentTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
         for (Integer spellToDispel : spellsToDispel) {
             if (spells.containsKey(spellToDispel)) {
                 spells.get(spellToDispel).removeSpellBody(world);
@@ -253,8 +255,8 @@ public class Game {
      * startTime getter.
      * @return - startTime as long.
      */
-    public long getStartTime() {
-        return startTime;
+    public int getCurrentTime() {
+        return currentTime;
     }
 
     /**
