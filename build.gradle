@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'application'
+
+}
+application {
+    mainClass = 'ee.taltech.server.GameServer'
+}
+
+ext {
+    appName = "Server"
+    gdxVersion = '1.12.1'
+    roboVMVersion = '2.3.20'
+    box2DLightsVersion = '1.5'
+    ashleyVersion = '1.7.4'
+    aiVersion = '1.8.2'
+    gdxControllersVersion = '2.2.1'
+}
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    google()
+    gradlePluginPortal()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    implementation group: 'com.esotericsoftware', name: 'kryonet', version: '2.22.0-RC1'
+    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+    implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+}
