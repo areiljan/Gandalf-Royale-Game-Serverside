@@ -3,15 +3,18 @@ package ee.taltech.server;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers;
 import com.esotericsoftware.kryonet.Server;
-import ee.taltech.server.network.ServerListener;
-import ee.taltech.server.network.messages.game.*;
-import ee.taltech.server.network.messages.lobby.*;
 import ee.taltech.server.components.Game;
 import ee.taltech.server.components.Lobby;
 import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.network.ServerListener;
+import ee.taltech.server.network.messages.game.*;
+import ee.taltech.server.network.messages.lobby.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class GameServer {
     public final Server server;
@@ -51,7 +54,7 @@ public class GameServer {
     public void registerKryos() {
         // For registering allowed sendable data objects.
         Kryo kryo = server.getKryo();
-        kryo.register(java.util.ArrayList.class);
+        kryo.register(ArrayList.class);
         kryo.register(Position.class);
         kryo.register(ActionTaken.class);
         kryo.register(Join.class);
