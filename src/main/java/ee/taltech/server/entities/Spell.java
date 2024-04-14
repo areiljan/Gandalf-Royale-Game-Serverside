@@ -1,13 +1,19 @@
 package ee.taltech.server.entities;
 
-import com.badlogic.gdx.physics.box2d.*;
-import ee.taltech.server.components.SpellTypes;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
+import ee.taltech.server.components.ItemTypes;
 
-public class Spell {
+import java.util.List;
+
+public class Spell implements Entity {
     int playerId;
     int spellId;
-    private final SpellTypes type;
-    private final Body spellBody;
+    private final ItemTypes type;
+    private Body spellBody;
     double spellXPosition;
     double spellYPosition;
     double mouseXPosition;
@@ -25,11 +31,11 @@ public class Spell {
      * @param world world where spell's body will be put in
      */
     public Spell(PlayerCharacter playerCharacter, double mouseXPosition, double mouseYPosition,
-                 World world, SpellTypes type) {
+                 World world, ItemTypes type) {
         playerId = playerCharacter.getPlayerID();
         spellId = nextId++;
         this.type = type;
-        spellBody = createBody(world);
+        createBody(world);
 
         spellXPosition = playerCharacter.getXPosition();
         spellYPosition = playerCharacter.getYPosition() + 50;
@@ -56,7 +62,7 @@ public class Spell {
      *
      * @return type
      */
-    public SpellTypes getType() {
+    public ItemTypes getType() {
         return type;
     }
 
@@ -109,11 +115,11 @@ public class Spell {
      */
     public void updatePosition() {
         // Update fireball position based on angle and velocity
-        if (type.equals(SpellTypes.FIREBALL)) {
+        if (type.equals(ItemTypes.FIREBALL)) {
             this.spellXPosition += FIREBALLVELOCITY * Math.cos(angle);
             this.spellYPosition -= FIREBALLVELOCITY * Math.sin(angle);
             setHitBoxPosition(spellXPosition, spellYPosition - 30);
-        } else if (type.equals(SpellTypes.ICESHARD)) {
+        } else if (type.equals(ItemTypes.ICE_SHARD)) {
 
         }
     }
@@ -122,9 +128,8 @@ public class Spell {
      * Create fireball hit box.
      *
      * @param world world where the fireball body is created
-     * @return fireball body
      */
-    private Body createBody(World world) {
+    public void createBody(World world) {
         // Create fireball body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -142,14 +147,14 @@ public class Spell {
         shape.dispose();
 
         // Set user data to identify fireball
-        body.getFixtureList().get(0).setUserData(this);
-        return body;
+        body.getFixtureList().get(0).setUserData(List.of(this, "Hit_Box"));
+        spellBody = body;
     }
 
     /**
-     * Remove spells body.
+     * Remove body.
      */
     public void removeSpellBody(World world) {
-        world.destroyBody(spellBody); // Destroy the spells body
+        world.destroyBody(spellBody); // Destroy the spell's body
     }
 }

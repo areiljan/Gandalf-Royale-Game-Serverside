@@ -1,13 +1,13 @@
 package ee.taltech.server.network.messages.game;
 
-import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.components.ItemTypes;
 
 public class SpellPosition {
     public int senderPlayerID;
     public double xPosition;
     public double yPosition;
     public int id;
-    public SpellTypes type;
+    public ItemTypes type;
 
     /**
      * Empty constructor for Kryonet.
@@ -24,7 +24,7 @@ public class SpellPosition {
      * @param yPosition action's y coordinate
      * @param type action's type
      */
-    public SpellPosition(int senderPlayerID, int id, double xPosition, double yPosition, SpellTypes type) {
+    public SpellPosition(int senderPlayerID, int id, double xPosition, double yPosition, ItemTypes type) {
         this.senderPlayerID = senderPlayerID;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
