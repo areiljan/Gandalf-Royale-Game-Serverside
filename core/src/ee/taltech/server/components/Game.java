@@ -9,6 +9,7 @@ import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.collision.CollisionListener;
 import ee.taltech.server.network.messages.game.*;
+import ee.taltech.server.network.messages.lobby.LobbyCreation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +58,10 @@ public class Game {
         this.spellsToAdd = new ArrayList<>();
         this.killedPlayerId = 0;
         this.playZone = new PlayZone();
+        server.server.sendToAllTCP(new PlayZoneCoordinates(playZone.getFirstZoneX(),
+                playZone.getThirdZoneY(), playZone.getSecondZoneX(),
+                playZone.getSecondZoneY(), playZone.getThirdZoneX(),
+                playZone.getThirdZoneY()));
     }
 
 

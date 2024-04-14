@@ -1,13 +1,13 @@
 package ee.taltech.server.network.messages.game;
 
 public class PlayZoneUpdate {
-    public int radius;
+    public int timer;
 
     /**
      * Update PlayZone Radius.
-     * @param radius - new radius of zone.
+     * @param timer - new game timer.
      */
-    public PlayZoneUpdate(int radius) {
-        this.radius = radius;
+    public PlayZoneUpdate(int timer) {
+        this.timer = timer;
     }
 }
