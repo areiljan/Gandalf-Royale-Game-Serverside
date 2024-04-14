@@ -4,8 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import ee.taltech.server.GameServer;
 import ee.taltech.server.entities.Item;
-import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
+import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.collision.CollisionListener;
 import ee.taltech.server.network.messages.game.*;
 
