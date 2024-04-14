@@ -1,12 +1,13 @@
 package ee.taltech.server;
 
 import com.esotericsoftware.kryonet.Server;
-import ee.taltech.server.components.Game;
 import ee.taltech.server.components.SpellTypes;
 import ee.taltech.server.entities.Item;
-import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.network.messages.game.*;
+import ee.taltech.server.entities.PlayerCharacter;
+
+import ee.taltech.server.components.Game;
 
 public class TickRateLoop implements Runnable {
     private volatile boolean running = true;

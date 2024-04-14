@@ -1,10 +1,14 @@
 package ee.taltech.server.entities.collision;
 
+import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.physics.box2d.*;
-import ee.taltech.server.components.Game;
 import ee.taltech.server.entities.Item;
-import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.Spell;
+import ee.taltech.server.entities.PlayerCharacter;
+import ee.taltech.server.components.Game;
+
+import java.util.HashMap;
+import java.util.Optional;
 
 public class CollisionListener implements ContactListener {
     private Game game;

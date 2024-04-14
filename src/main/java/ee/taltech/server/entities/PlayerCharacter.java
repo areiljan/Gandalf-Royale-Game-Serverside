@@ -1,8 +1,8 @@
 package ee.taltech.server.entities;
 
 import com.badlogic.gdx.physics.box2d.*;
-import ee.taltech.server.components.SpellTypes;
 import ee.taltech.server.network.messages.game.KeyPress;
+import ee.taltech.server.components.SpellTypes;
 
 import java.util.HashMap;
 import java.util.Map;

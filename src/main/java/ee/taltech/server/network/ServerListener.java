@@ -3,14 +3,14 @@ package ee.taltech.server.network;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.server.GameServer;
-import ee.taltech.server.components.Game;
-import ee.taltech.server.components.Lobby;
 import ee.taltech.server.components.SpellTypes;
-import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.network.messages.game.KeyPress;
 import ee.taltech.server.network.messages.game.MouseClicks;
 import ee.taltech.server.network.messages.lobby.*;
+import ee.taltech.server.entities.PlayerCharacter;
+import ee.taltech.server.components.Game;
+import ee.taltech.server.components.Lobby;
 
 public class ServerListener extends Listener {
     private GameServer server;
