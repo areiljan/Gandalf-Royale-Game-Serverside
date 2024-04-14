@@ -1,19 +1,19 @@
 package ee.taltech.server;
 
 import com.esotericsoftware.kryonet.Server;
-import ee.taltech.server.components.Game;
-import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.entities.Item;
-import ee.taltech.server.entities.PlayerCharacter;
+import ee.taltech.server.entities.Mob;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.network.messages.game.*;
+import ee.taltech.server.entities.PlayerCharacter;
+
+import ee.taltech.server.components.Game;
 
 public class TickRateLoop implements Runnable {
     private volatile boolean running = true;
     private Server server;
     private GameServer gameServer;
-    Integer test = 0;
-
 
     /**
      * @param server The whole gameServer instance to access the servers contents.
@@ -57,13 +57,15 @@ public class TickRateLoop implements Runnable {
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
-            if (test < 1001) test++; // Used only to demonstrate item generation by server
-            if (test == 1000) { // Trigger only once after 8 seconds
-                Item item1 = new Item(SpellTypes.FIREBALL, 4500, 5800);
-                Item item2 = new Item(SpellTypes.FIREBALL, 4500, 5600);
+            if (game.getTicks() < 1001) game.addTick(); // Used only to demonstrate item generation by server
+            if (game.getTicks() == 1000) { // Trigger only once after 1000 ticks
+                Item item1 = new Item(ItemTypes.FIREBALL, 4500, 5800);
+                Item item2 = new Item(ItemTypes.FIREBALL, 4500, 5600);
+                Mob mob = new Mob(4000, 5700);
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
+                game.addMob(mob);
             }
 
             for (PlayerCharacter player : game.gamePlayers.values()) {
@@ -90,6 +92,17 @@ public class TickRateLoop implements Runnable {
                 for (Integer playerId : game.gamePlayers.keySet()) {
                     server.sendToUDP(playerId, new SpellPosition(spell.getPlayerId(), spell.getSpellId(),
                                 spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
+                }
+            }
+            for (Mob mob : game.mobs.values()) {
+                mob.updatePosition();
+                for (Integer playerId : game.gamePlayers.keySet()) {
+                    server.sendToUDP(playerId, new MobPosition(mob.getId(), mob.getXPosition(), mob.getYPosition()));
+                    server.sendToUDP(playerId, new UpdateMobHealth(mob.getId(), mob.getHealth()));
+                }
+
+                if (mob.getHealth() == 0) {
+                    game.mobsToRemove.add(mob);
                 }
             }
             game.update();

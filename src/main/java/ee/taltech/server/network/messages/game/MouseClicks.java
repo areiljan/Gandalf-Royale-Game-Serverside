@@ -1,12 +1,12 @@
 package ee.taltech.server.network.messages.game;
 
-import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.components.ItemTypes;
 
 public class MouseClicks {
     public boolean leftMouse;
     public double mouseXPosition;
     public double mouseYPosition;
-    public SpellTypes type;
+    public ItemTypes type;
 
     /**
      * Empty constructor for Kryonet.

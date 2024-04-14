@@ -1,12 +1,12 @@
 package ee.taltech.server.network.messages.game;
 
-import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.components.ItemTypes;
 
 public class ItemDropped {
 
     public Integer playerId;
     public Integer itemId;
-    public SpellTypes type;
+    public ItemTypes type;
     public float xPosition;
     public float yPosition;
 
@@ -25,7 +25,7 @@ public class ItemDropped {
      * @param xPosition item's x coordinate
      * @param yPosition item's y coordinate
      */
-    public ItemDropped(Integer playerId, Integer itemId, SpellTypes type, float xPosition, float yPosition) {
+    public ItemDropped(Integer playerId, Integer itemId, ItemTypes type, float xPosition, float yPosition) {
         this.playerId = playerId;
         this.itemId = itemId;
         this.type = type;

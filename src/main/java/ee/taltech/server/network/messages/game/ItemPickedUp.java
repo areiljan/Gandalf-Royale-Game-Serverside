@@ -1,12 +1,12 @@
 package ee.taltech.server.network.messages.game;
 
-import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.components.ItemTypes;
 
 public class ItemPickedUp {
     public Integer playerId;
     public Integer itemId;
 
-    public SpellTypes type;
+    public ItemTypes type;
 
     /**
      * Empty constructor for Kryonet.
@@ -14,7 +14,7 @@ public class ItemPickedUp {
     public ItemPickedUp() {
     }
 
-    public ItemPickedUp(Integer playerId, Integer itemId, SpellTypes type) {
+    public ItemPickedUp(Integer playerId, Integer itemId, ItemTypes type) {
         this.playerId = playerId;
         this.itemId = itemId;
         this.type = type;
