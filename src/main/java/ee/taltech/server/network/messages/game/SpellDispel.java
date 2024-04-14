@@ -1,7 +1,5 @@
 package ee.taltech.server.network.messages.game;
 
-import ee.taltech.server.components.SpellTypes;
-
 public class SpellDispel {
     public int id;
 
