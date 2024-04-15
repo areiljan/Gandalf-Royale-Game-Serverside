@@ -3,6 +3,8 @@ package ee.taltech.server.entities;
 import java.awt.geom.Point2D;
 import java.util.Random;
 
+import static com.badlogic.gdx.math.MathUtils.random;
+
 public class PlayZone {
     private int firstZoneX;
     private int firstZoneY;
@@ -36,15 +38,18 @@ public class PlayZone {
      * Generates the zoneCoordinates.
      */
     private void zoneCoordinateGenerator () {
-        int firstZoneMin = -2000;
-        int firstZoneMax = 300;
+        int firstZoneMin = 3085;
+        int firstZoneMax = 6515;
         Random random = new Random();
         // Generate a random integer within the specified range
         firstZoneX = random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMax;
         firstZoneY = random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMax;
-        // leaving as constants for now
-        secondZoneX = firstZoneX + 1200;
-        secondZoneY = firstZoneY + 1200;
+
+        int secondZoneXRandomizer = random.nextInt(900 - (-900) + 1) + 900;
+        int secondZoneYRandomizer = random.nextInt(900 - (-900) + 1) + 900;
+        secondZoneX = firstZoneX + secondZoneXRandomizer;
+        secondZoneY = firstZoneY + secondZoneYRandomizer;
+        //currently as constant
         thirdZoneX = secondZoneX + 800;
         thirdZoneY = secondZoneY + 800;
     }
