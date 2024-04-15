@@ -65,8 +65,9 @@ public class Game {
      * Send playZone information.
      */
     public void sendPlayZoneCoordinates() {
+        System.out.println(playZone.getFirstZoneX());
         server.server.sendToAllTCP(new PlayZoneCoordinates(playZone.getFirstZoneX(),
-                playZone.getThirdZoneY(), playZone.getSecondZoneX(),
+                playZone.getFirstZoneY(), playZone.getSecondZoneX(),
                 playZone.getSecondZoneY(), playZone.getThirdZoneX(),
                 playZone.getThirdZoneY()));
     }
