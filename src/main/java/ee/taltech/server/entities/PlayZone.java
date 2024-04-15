@@ -11,6 +11,11 @@ public class PlayZone {
     private int thirdZoneX;
     private int thirdZoneY;
     private int timer;
+    private int stage;
+
+    public int stage() {
+        return stage;
+    }
 
     /**
      * Game PlayZone constructor.
@@ -23,6 +28,7 @@ public class PlayZone {
         this.secondZoneY = 0;
         this.thirdZoneX = 0;
         this.thirdZoneY = 0;
+        this.stage = 0;
         zoneCoordinateGenerator();
     }
 
@@ -37,38 +43,39 @@ public class PlayZone {
         firstZoneX = random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMax;
         firstZoneY = random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMax;
         // leaving as constants for now
-        secondZoneX = firstZoneX + 800;
-        secondZoneY = firstZoneY + 800;
+        secondZoneX = firstZoneX + 1200;
+        secondZoneY = firstZoneY + 1200;
         thirdZoneX = secondZoneX + 800;
         thirdZoneY = secondZoneY + 800;
     }
 
-    /**
-     * Updates the zone based on time.
-     * @param startTime - startTime in seconds.
-     */
     public void updateZone(int startTime) {
         timer = startTime;
-        System.out.println(timer);
-        if (timer < 30) {
-            // do nothing
-        } else if (timer < 80) {
-            // show first zone
+        if (timer < 20) {
+            stage = 1;
+        } else if (timer < 100) {
+            stage = 2;
         } else if (timer < 200) {
+            stage = 3;
             // implement first zone
             // create body
-        } else if (timer < 250) {
+        } else if (timer < 300) {
+            stage = 4;
             // show second zone
-        } else if (timer < 350) {
+        } else if (timer < 400) {
+            stage = 5;
             // implement second zone
             // create body
-        } else if (timer < 450) {
+        } else if (timer < 500) {
+            stage = 6;
             // show third zone
-        } else if (timer < 550) {
+        } else if (timer < 600) {
+            stage = 7;
             // implement third zone
             // create body
             // final countdown
         } else if (timer < 800) {
+            stage = 8;
             // the entire map turns red
             // create body
         }

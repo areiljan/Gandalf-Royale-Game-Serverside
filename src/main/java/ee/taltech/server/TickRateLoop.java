@@ -65,6 +65,8 @@ public class TickRateLoop implements Runnable {
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
+
+                game.sendPlayZoneCoordinates();
             }
 
             for (PlayerCharacter player : game.gamePlayers.values()) {
@@ -78,7 +80,7 @@ public class TickRateLoop implements Runnable {
                     server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
                     server.sendToUDP(playerId, new UpdateHealth(player.playerID, player.health));
                     server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
-                    server.sendToUDP(playerId, new PlayZoneUpdate(game.getPlayZone().getTimer()));
+                    server.sendToUDP(playerId, new PlayZoneUpdate(game.getPlayZone().getTimer(), game.getPlayZone().stage()));
                     server.sendToUDP(playerId, new ActionTaken(player.playerID, player.getMouseLeftClick(),
                             game.gamePlayers.get(player.playerID).mouseXPosition,
                             game.gamePlayers.get(player.playerID).mouseYPosition));

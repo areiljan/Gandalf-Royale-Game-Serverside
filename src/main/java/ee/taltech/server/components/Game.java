@@ -58,12 +58,18 @@ public class Game {
         this.spellsToAdd = new ArrayList<>();
         this.killedPlayerId = 0;
         this.playZone = new PlayZone();
+    }
+
+
+    /**
+     * Send playZone information.
+     */
+    public void sendPlayZoneCoordinates() {
         server.server.sendToAllTCP(new PlayZoneCoordinates(playZone.getFirstZoneX(),
                 playZone.getThirdZoneY(), playZone.getSecondZoneX(),
                 playZone.getSecondZoneY(), playZone.getThirdZoneX(),
                 playZone.getThirdZoneY()));
     }
-
 
     /**
      * Basically.
