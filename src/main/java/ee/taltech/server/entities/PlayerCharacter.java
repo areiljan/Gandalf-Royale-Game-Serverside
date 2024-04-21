@@ -2,13 +2,14 @@ package ee.taltech.server.entities;
 
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.network.messages.game.KeyPress;
-import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.components.ItemTypes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
-public class PlayerCharacter {
+public class PlayerCharacter implements Entity {
 
     public static final Integer WIDTH = 12;
     public static final Integer HEIGHT = 24;
@@ -19,7 +20,7 @@ public class PlayerCharacter {
     public int mouseYPosition;
     private boolean mouseLeftClick;
     public final int playerID;
-    public SpellTypes type;
+    public ItemTypes type;
     boolean moveLeft;
     boolean moveRight;
     boolean moveDown;
@@ -98,7 +99,7 @@ public class PlayerCharacter {
      *
      * @return action
      */
-    public SpellTypes getSpell() {
+    public ItemTypes getSpell() {
         return type;
     }
 
@@ -150,7 +151,7 @@ public class PlayerCharacter {
      * @param mouseYPosition mouse y coordinate
      * @param type action that is chosen
      */
-    public void setMouseControl(boolean leftMouse, int mouseXPosition, int mouseYPosition, SpellTypes type){
+    public void setMouseControl(boolean leftMouse, int mouseXPosition, int mouseYPosition, ItemTypes type){
         this.mouseXPosition = mouseXPosition;
         this.mouseYPosition = mouseYPosition;
         this.mouseLeftClick = leftMouse;
@@ -183,7 +184,7 @@ public class PlayerCharacter {
      *
      * @param world world, where hit boxes are in
      */
-    public void createHitBox(World world) {
+    public void createBody(World world) {
         // Create a dynamic body for the player
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -204,7 +205,7 @@ public class PlayerCharacter {
         hitBoxShape.dispose();
 
         // Add this object as data
-        hitBoxBody.getFixtureList().get(0).setUserData(this);
+        hitBoxBody.getFixtureList().get(0).setUserData(List.of(this, "Hit_Box"));
         body = hitBoxBody;
     }
 
@@ -212,7 +213,7 @@ public class PlayerCharacter {
      * Remove body.
      */
     public void removeBody(World world) {
-        world.destroyBody(body); // Destroy the spells body
+        world.destroyBody(body); // Destroy the player's body
         body = null;
     }
 

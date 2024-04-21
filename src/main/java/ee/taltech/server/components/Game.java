@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import ee.taltech.server.GameServer;
 import ee.taltech.server.entities.Item;
+import ee.taltech.server.entities.Mob;
 import ee.taltech.server.entities.PlayZone;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
@@ -11,10 +12,7 @@ import ee.taltech.server.entities.collision.CollisionListener;
 import ee.taltech.server.network.messages.game.*;
 import ee.taltech.server.network.messages.lobby.LobbyCreation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Game {
 
@@ -25,11 +23,14 @@ public class Game {
     private final PlayZone playZone;
     private int killedPlayerId;
     public Map<Integer, PlayerCharacter> deadPlayers;
-    private ArrayList<Spell> spellsToAdd;
-    private ArrayList<Integer> spellsToDispel;
+    private final List<Spell> spellsToAdd;
+    private final List<Integer> spellsToDispel;
     public Map<Integer, Spell> spells;
     public final Map<Integer, Item> items;
+    public final Map<Integer, Mob> mobs;
+    public final List<Mob> mobsToRemove;
     private final World world;
+    private int ticks;
     private long startTime;
     private int currentTime;
 
@@ -54,9 +55,22 @@ public class Game {
         this.deadPlayers = new HashMap<>();
         this.spells = new HashMap<>();
         this.items = new HashMap<>();
+        this.mobs = new HashMap<>();
+        this.mobsToRemove = new ArrayList<>();
         this.spellsToDispel = new ArrayList<>();
         this.spellsToAdd = new ArrayList<>();
         this.killedPlayerId = 0;
+
+        this.ticks = 0;
+    }
+
+    /**
+     * Get how many ticks game have run.
+     *
+     * @return ticks
+     */
+    public int getTicks() {
+        return ticks;
         this.playZone = new PlayZone();
     }
 
@@ -73,10 +87,19 @@ public class Game {
     }
 
     /**
-     * Basically.
+     * Add tick to game.
+     */
+    public void addTick() {
+        ticks++;
+    }
+
+    /**
+     * Updating game values.
      */
     public void update() {
         world.step(1 / 60f, 6, 2); // Stepping world to update bodies
+
+        // *------------- SPELL REMOVING -------------*
         currentTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
         for (Integer spellToDispel : spellsToDispel) {
             if (spells.containsKey(spellToDispel)) {
@@ -87,22 +110,31 @@ public class Game {
                 spells.remove(spellToDispel);
             }
         }
+        spellsToDispel.clear();
+
+        // *------------- SPELL ADDING -------------*
         for (Spell spellToAdd : spellsToAdd) {
-            System.out.println(spellToAdd.getSpellId() + "x:" + spellToAdd.getSpellXPosition() + "y: " + spellToAdd.getSpellYPosition() + " ID:" + spellToAdd.getPlayerId());
             if(!spells.containsValue(spellToAdd)) {
                 spells.put(spellToAdd.getSpellId(), spellToAdd);
             }
         }
-        // resets the id to 0 each iteration.
-        killedPlayerId = 0;
+        spellsToAdd.clear();
+
+        // *------------- PLAYER REMOVING -------------*
+        killedPlayerId = 0; // resets the id to 0 each iteration.
         for (PlayerCharacter deadPlayer : deadPlayers.values()) {
             deadPlayer.removeBody(world);
             // this class integer id will be used to send a one-time message to the client.
             killedPlayerId = deadPlayer.getPlayerID();
         }
-        spellsToDispel.clear();
-        spellsToAdd.clear();
         deadPlayers.clear();
+
+        // *------------- MOB REMOVING -------------*
+        for (Mob mob : mobsToRemove) {
+            mob.removeBody(world);
+            mobs.remove(mob.getId());
+        }
+        mobsToRemove.clear();
     }
 
     /**
@@ -165,7 +197,7 @@ public class Game {
             if (lobby.players.contains(playerID)) { // If player ID is in lobby's players list
                 server.connections.put(playerID, gameId);
                 PlayerCharacter player = new PlayerCharacter(playerID); // Create character for player
-                player.createHitBox(world); // Create hit box for player
+                player.createBody(world); // Create hit box for player
                 result.put(player.playerID, player);
             }
         }
@@ -252,6 +284,25 @@ public class Game {
             }
             server.server.sendToUDP(playerId, message);
         }
+    }
+
+    /**
+     * Add mob to the game.
+     *
+     * @param mob mob that is added
+     */
+    public void addMob(Mob mob) {
+        mob.createBody(world);
+        mobs.put(mob.getId(), mob);
+    }
+
+    public void damageMob(Integer id, Integer amount) {
+        Mob mob = mobs.get(id); // Get mob
+
+        Integer newHealth = Math.max(mob.getHealth() - amount, 0); // Health can not be less than 0
+        mob.setHealth(newHealth);
+
+        // mob is added to mobsToRemove list in TickRateLoop
     }
 
     /**

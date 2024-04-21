@@ -3,12 +3,13 @@ package ee.taltech.server;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers;
 import com.esotericsoftware.kryonet.Server;
+import ee.taltech.server.ai.Grid;
 import ee.taltech.server.network.ServerListener;
 import ee.taltech.server.network.messages.game.*;
 import ee.taltech.server.network.messages.lobby.*;
 import ee.taltech.server.components.Game;
 import ee.taltech.server.components.Lobby;
-import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.components.ItemTypes;
 
 import java.io.IOException;
 import java.util.*;
@@ -28,6 +29,8 @@ public class GameServer {
         this.connections = new HashMap<>(); // Contains playerId: gameId
         this.games = new HashMap<>(); // Contains gameIds: game
         this.server = new Server();
+
+       Grid.setGrid(Grid.readGridFromFile()); // Read and set grid from the file
 
         server.start();
         try { // Establishes a connection with ports
@@ -63,7 +66,7 @@ public class GameServer {
         kryo.register(StartGame.class);
         kryo.register(PlayZoneUpdate.class);
         kryo.register(KeyPress.class);
-        kryo.register(SpellTypes.class);
+        kryo.register(ItemTypes.class);
         kryo.register(MouseClicks.class);
         kryo.register(KeyPress.Action.class);
         kryo.register(Position.class);
@@ -74,8 +77,10 @@ public class GameServer {
         kryo.register(UpdateMana.class);
         kryo.register(ItemPickedUp.class);
         kryo.register(ItemDropped.class);
+        kryo.register(MobPosition.class);
+        kryo.register(UpdateMobHealth.class);
         kryo.addDefaultSerializer(KeyPress.Action.class, DefaultSerializers.EnumSerializer.class);
-        kryo.addDefaultSerializer(SpellTypes.class, DefaultSerializers.EnumSerializer.class);
+        kryo.addDefaultSerializer(ItemTypes.class, DefaultSerializers.EnumSerializer.class);
     }
 
     /**

@@ -1,11 +1,16 @@
 package ee.taltech.server.entities;
 
 import com.badlogic.gdx.physics.box2d.*;
-import ee.taltech.server.components.SpellTypes;
+import ee.taltech.server.components.ItemTypes;
 
-public class Item {
+import java.util.List;
+
+public class Item implements Entity {
+
+    private static final float HIT_BOX_WIDTH = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
+    private static final float HIT_BOX_HEIGHT = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
     private final Integer id;
-    private final SpellTypes type;
+    private final ItemTypes type;
     private float xPosition;
     private float yPosition;
     private Body body;
@@ -19,7 +24,7 @@ public class Item {
      * @param xPosition item's x coordinate
      * @param yPosition item's y coordinate
      */
-    public Item(SpellTypes type, float xPosition, float yPosition) {
+    public Item(ItemTypes type, float xPosition, float yPosition) {
         this.id = currentId++;
         this.type = type;
         this.xPosition = xPosition;
@@ -41,7 +46,7 @@ public class Item {
      *
      * @return type
      */
-    public SpellTypes getType() {
+    public ItemTypes getType() {
         return type;
     }
 
@@ -113,17 +118,18 @@ public class Item {
 
         // Create a fixture defining the hit box shape
         PolygonShape hitBoxShape = new PolygonShape();
-        hitBoxShape.setAsBox(5, 5); // This size is chosen randomly, SHOULD NOT BE FINAL
+        hitBoxShape.setAsBox(HIT_BOX_WIDTH, HIT_BOX_HEIGHT);
 
         // Attach the fixture to the body
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = hitBoxShape;
+        //fixtureDef.isSensor = true; // Will work if we change movement from teleporting to vectors
         hitBoxBody.createFixture(fixtureDef);
 
         // Clean up
         hitBoxShape.dispose();
 
-        hitBoxBody.getFixtureList().get(0).setUserData(this);
+        hitBoxBody.getFixtureList().get(0).setUserData(List.of(this, "Hit_Box"));
         this.body = hitBoxBody;
     }
 
@@ -135,10 +141,10 @@ public class Item {
     }
 
     /**
-     * Remove item's body.
+     * Remove body.
      */
     public void removeBody(World world) {
-        world.destroyBody(body); // Destroy the items body
+        world.destroyBody(body); // Destroy the item's body
         body = null;
     }
 }
