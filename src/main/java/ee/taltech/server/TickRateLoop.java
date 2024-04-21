@@ -61,10 +61,12 @@ public class TickRateLoop implements Runnable {
             if (game.getTicks() == 1000) { // Trigger only once after 1000 ticks
                 Item item1 = new Item(ItemTypes.FIREBALL, 4500, 5800);
                 Item item2 = new Item(ItemTypes.FIREBALL, 4500, 5600);
+                Item coin = new Item(ItemTypes.COIN, 4500, 5700);
                 Mob mob = new Mob(4000, 5700);
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
+                game.addItem(coin, null);
                 game.addMob(mob);
             }
 
