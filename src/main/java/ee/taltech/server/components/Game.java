@@ -13,6 +13,7 @@ import ee.taltech.server.network.messages.game.*;
 import java.util.*;
 
 public class Game {
+    public static final Random random = new Random();
 
     public final Lobby lobby;
     public final GameServer server;
@@ -118,7 +119,7 @@ public class Game {
         // *------------- PLAYER REMOVING -------------*
         killedPlayerId = 0; // resets the id to 0 each iteration.
         for (PlayerCharacter deadPlayer : deadPlayers.values()) {
-            dropAllCoins(deadPlayer); // Drop all coins that dead player had
+            dropCoins(deadPlayer.getCoins(), deadPlayer.getXPosition(), deadPlayer.getYPosition()); // Drop all coins
             deadPlayer.removeBody(world);
 
             // this class integer id will be used to send a one-time message to the client.
@@ -128,6 +129,7 @@ public class Game {
 
         // *------------- MOB REMOVING -------------*
         for (Mob mob : mobsToRemove) {
+            dropCoins(5, mob.getXPosition(), mob.getYPosition()); // Drop 5 coins
             mob.removeBody(world);
             mobs.remove(mob.getId());
         }
@@ -311,13 +313,17 @@ public class Game {
     }
 
     /**
-     * Drop all coins from dead player.
+     * Drop given amount of coins to given position.
      *
-     * @param player player that died
+     * @param amount amount of coins to drop
+     * @param x x position to drop the coins at
+     * @param y y position to drop the coins at
      */
-    private void dropAllCoins(PlayerCharacter player) {
-        for (int i = 0; i < player.getCoins(); i++) {
-            Item coin = new Item(ItemTypes.COIN, player.getXPosition(), player.getYPosition());
+    public void dropCoins(Integer amount, float x, float y) {
+        for (int i = 0; i < amount; i++) {
+            float newX = random.nextInt((int) (x - 10), (int) (x + 10));
+            float newY = random.nextInt((int) (y - 10), (int) (y + 10));
+            Item coin = new Item(ItemTypes.COIN, newX, newY);
             addItem(coin, null);
         }
     }

@@ -16,9 +16,9 @@ import java.util.*;
 
 public class GameServer {
     public final Server server;
-    public Map<Integer, Integer> connections;
-    public Map<Integer, Lobby> lobbies;
-    public Map<Integer, Game> games;
+    public final Map<Integer, Integer> connections;
+    public final Map<Integer, Lobby> lobbies;
+    public final Map<Integer, Game> games;
 
 
     /**
