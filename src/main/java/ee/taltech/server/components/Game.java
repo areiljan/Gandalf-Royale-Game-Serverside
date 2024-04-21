@@ -118,7 +118,9 @@ public class Game {
         // *------------- PLAYER REMOVING -------------*
         killedPlayerId = 0; // resets the id to 0 each iteration.
         for (PlayerCharacter deadPlayer : deadPlayers.values()) {
+            dropAllCoins(deadPlayer); // Drop all coins that dead player had
             deadPlayer.removeBody(world);
+
             // this class integer id will be used to send a one-time message to the client.
             killedPlayerId = deadPlayer.getPlayerID();
         }
@@ -305,6 +307,18 @@ public class Game {
         // Send message to every player in this game
         for (Integer playerId : gamePlayers.keySet()) {
             server.server.sendToUDP(playerId, message);
+        }
+    }
+
+    /**
+     * Drop all coins from dead player.
+     *
+     * @param player player that died
+     */
+    private void dropAllCoins(PlayerCharacter player) {
+        for (int i = 0; i < player.getCoins(); i++) {
+            Item coin = new Item(ItemTypes.COIN, player.getXPosition(), player.getYPosition());
+            addItem(coin, null);
         }
     }
 
