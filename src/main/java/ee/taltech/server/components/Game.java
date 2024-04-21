@@ -20,7 +20,7 @@ public class Game {
     public final GameServer server;
     public final Integer gameId;
     public final Map<Integer, PlayerCharacter> gamePlayers; // Previous alivePlayers
-    private final PlayZone playZone;
+    private PlayZone playZone;
     private int killedPlayerId;
     public Map<Integer, PlayerCharacter> deadPlayers;
     private final List<Spell> spellsToAdd;
@@ -62,6 +62,7 @@ public class Game {
         this.killedPlayerId = 0;
 
         this.ticks = 0;
+        this.playZone = new PlayZone(world);
     }
 
     /**
@@ -71,7 +72,6 @@ public class Game {
      */
     public int getTicks() {
         return ticks;
-        this.playZone = new PlayZone();
     }
 
 

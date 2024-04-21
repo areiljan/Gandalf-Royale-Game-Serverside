@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="51820aa6-078f-40ef-86f8-5cb96790161e" name="Changes" comment="Set the logic for spawning all three zones in place. Bodies remain to be worked on.">
+      <change beforePath="$PROJECT_DIR$/src/main/java/ee/taltech/server/components/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ee/taltech/server/components/Game.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2f6ace6pDhOI8u8dCEKPRgnuBvx" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.iti0301-2024-server [:GameServer.main()].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#44-PlayZone-ServerSide&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="51820aa6-078f-40ef-86f8-5cb96790161e" name="Changes" comment="" />
+      <created>1713124062856</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1713124062856</updated>
+      <workItem from="1713124063980" duration="317000" />
+      <workItem from="1713124394407" duration="606000" />
+      <workItem from="1713125068514" duration="785000" />
+      <workItem from="1713133144600" duration="5009000" />
+      <workItem from="1713179828781" duration="3476000" />
+      <workItem from="1713197340359" duration="11601000" />
+      <workItem from="1713439627150" duration="419000" />
+      <workItem from="1713443374111" duration="2000" />
+      <workItem from="1713698951042" duration="1544000" />
+    </task>
+    <task id="LOCAL-00001" summary="Merged from branch #57.">
+      <option name="closed" value="true" />
+      <created>1713124934895</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1713124934895</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Merged from branch #57.">
+      <option name="closed" value="true" />
+      <created>1713125129032</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1713125129032</updated>
+    </task>
+    <task id="LOCAL-00003" summary="The first two zones are now displayed at semi-random coordinates. The body for the zones is yet to be done.">
+      <option name="closed" value="true" />
+      <created>1713140785066</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1713140785066</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Set the PlayZoneCoordinates as the center points.">
+      <option name="closed" value="true" />
+      <created>1713182391910</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1713182391911</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Set the logic for spawning all three zones in place. Bodies remain to be worked on.">
+      <option name="closed" value="true" />
+      <created>1713213125224</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1713213125224</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Merged from branch #57." />
+    <MESSAGE value="The first two zones are now displayed at semi-random coordinates. The body for the zones is yet to be done." />
+    <MESSAGE value="Set the PlayZoneCoordinates as the center points." />
+    <MESSAGE value="Set the logic for spawning all three zones in place. Bodies remain to be worked on." />
+    <option name="LAST_COMMIT_MESSAGE" value="Set the logic for spawning all three zones in place. Bodies remain to be worked on." />
+  </component>
+</project>

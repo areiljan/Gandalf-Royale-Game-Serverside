@@ -1,0 +1,18 @@
+
+s
+java:S62017"XReplace this instanceof check and cast with 'instanceof PlayerCharacter playercharacter'(Å½ÿÿÿÿÿ
+_
+java:S62019"DReplace this instanceof check and cast with 'instanceof Spell spell'(Á¢Éûÿÿÿÿ
+s
+java:S6201J"XReplace this instanceof check and cast with 'instanceof PlayerCharacter playercharacter'(Å½ÿÿÿÿÿ
+]
+java:S6201L"BReplace this instanceof check and cast with 'instanceof Item item'(ç¼ğéûÿÿÿÿ
+]
+java:S6201p"BReplace this instanceof check and cast with 'instanceof Item item'(ç¼ğéûÿÿÿÿ
+L
+java:S1128"6Remove this unused import 'com.badlogic.gdx.maps.Map'.(’òŞ
+I
+java:S1128
+".Remove this unused import 'java.util.HashMap'.(™˜”€ùÿÿÿÿ
+J
+java:S1128"/Remove this unused import 'java.util.Optional'.(¨˜ëİüÿÿÿÿ
