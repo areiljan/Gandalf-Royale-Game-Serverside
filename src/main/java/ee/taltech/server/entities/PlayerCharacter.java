@@ -33,6 +33,7 @@ public class PlayerCharacter implements Entity {
     public Integer health;
     public double mana;
     private Map<Integer, Item> inventory;
+    private Integer coins;
 
     /**
      * Construct PlayerCharacter.
@@ -40,13 +41,16 @@ public class PlayerCharacter implements Entity {
      * @param playerID player's ID
      */
     public PlayerCharacter(Integer playerID) {
+        this.playerID = playerID;
+
         // Here should be the semi-random spawn points for a PlayerCharacter
         this.xPosition = 4700;
         this.yPosition = 5800;
-        this.playerID = playerID;
+
         health = 100;
         mana = 100;
         inventory = new HashMap<>();
+        coins = 0;
     }
 
     /**
@@ -156,6 +160,22 @@ public class PlayerCharacter implements Entity {
         this.mouseYPosition = mouseYPosition;
         this.mouseLeftClick = leftMouse;
         this.type = type;
+    }
+
+    /**
+     * Get player's coins.
+     *
+     * @return integer value of coin amount that player has
+     */
+    public Integer getCoins() {
+        return coins;
+    }
+
+    /**
+     * Add one coin to player's coins.
+     */
+    public void addCoin() {
+        coins++;
     }
 
     /**

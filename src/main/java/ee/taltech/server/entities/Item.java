@@ -7,8 +7,12 @@ import java.util.List;
 
 public class Item implements Entity {
 
-    private static final float HIT_BOX_WIDTH = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
-    private static final float HIT_BOX_HEIGHT = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
+    private static final float BOOK_HIT_BOX_WIDTH = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
+    private static final float BOOK_HIT_BOX_HEIGHT = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
+    private static final float COIN_HIT_BOX_WIDTH = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
+    private static final float COIN_HIT_BOX_HEIGHT = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
+    private static final float POTION_HIT_BOX_WIDTH = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
+    private static final float POTION_HIT_BOX_HEIGHT = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
     private final Integer id;
     private final ItemTypes type;
     private float xPosition;
@@ -30,6 +34,36 @@ public class Item implements Entity {
         this.xPosition = xPosition;
         this.yPosition = yPosition;
         this.body = null;
+    }
+
+    /**
+     * Get item's height based on the item's type.
+     *
+     * @return item's height
+     */
+    private float getHeight() {
+        if (type == ItemTypes.COIN) {
+            return COIN_HIT_BOX_HEIGHT;
+        } else if (type == ItemTypes.HEALING_POTION) {
+            return POTION_HIT_BOX_HEIGHT;
+        } else {
+            return BOOK_HIT_BOX_HEIGHT;
+        }
+    }
+
+    /**
+     * Get item's width based on the item's type.
+     *
+     * @return item's width
+     */
+    private float getWidth() {
+        if (type == ItemTypes.COIN) {
+            return COIN_HIT_BOX_WIDTH;
+        } else if (type == ItemTypes.HEALING_POTION) {
+            return POTION_HIT_BOX_WIDTH;
+        } else {
+            return BOOK_HIT_BOX_WIDTH;
+        }
     }
 
     /**
@@ -118,7 +152,7 @@ public class Item implements Entity {
 
         // Create a fixture defining the hit box shape
         PolygonShape hitBoxShape = new PolygonShape();
-        hitBoxShape.setAsBox(HIT_BOX_WIDTH, HIT_BOX_HEIGHT);
+        hitBoxShape.setAsBox(getWidth(), getHeight()); // Hit box width and height based on the item's type
 
         // Attach the fixture to the body
         FixtureDef fixtureDef = new FixtureDef();
