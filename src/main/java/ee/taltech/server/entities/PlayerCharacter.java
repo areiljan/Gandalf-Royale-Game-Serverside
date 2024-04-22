@@ -21,6 +21,7 @@ public class PlayerCharacter implements Entity {
     private boolean mouseLeftClick;
     public final int playerID;
     public ItemTypes type;
+    private Map<Integer, Item> inventory;
     boolean moveLeft;
     boolean moveRight;
     boolean moveDown;
@@ -29,10 +30,8 @@ public class PlayerCharacter implements Entity {
     public boolean getMouseLeftClick() {
         return mouseLeftClick;
     }
-
-    public Integer health;
+    public float health;
     public double mana;
-    private Map<Integer, Item> inventory;
     private Integer coins;
 
     /**
@@ -112,7 +111,7 @@ public class PlayerCharacter implements Entity {
      *
      * @param newHealth new health value
      */
-    public void setHealth(Integer newHealth) {
+    public void setHealth(float newHealth) {
         health = newHealth;
     }
 
@@ -295,6 +294,15 @@ public class PlayerCharacter implements Entity {
         if (mana < 100){
             // Add mana every tick so that one second regenerates around 5 mana
             mana = Math.min(mana + 0.1, 100); // Mana can not be over 100
+        }
+    }
+
+    /**
+     * Regenerate mana.
+     */
+    public void receiveZoneDamage() {
+        if (health > 0) {
+            health = health - 0.03f;
         }
     }
 }

@@ -1,15 +1,27 @@
 
-~
-java:S3008"\Rename this field "FIRST_ZONE_RADIUS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(úı’şÿÿÿÿ8‹Ÿá†ğ1
-z
-java:S3008"]Rename this field "SECOND_ZONE_RADIUS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(²ßæÒ8ŒŸá†ğ1
+g
+java:S2184g"ECast one of the operands of this subtraction operation to a "double".(£æŒ£ùÿÿÿÿ8Á²Ì©ğ1
+g
+java:S2184g"ECast one of the operands of this subtraction operation to a "double".(£æŒ£ùÿÿÿÿ8Á²Ì©ğ1
+g
+java:S2184j"ECast one of the operands of this subtraction operation to a "double".(ÀËüûüÿÿÿÿ8Á²Ì©ğ1
+g
+java:S2184j"ECast one of the operands of this subtraction operation to a "double".(ÀËüûüÿÿÿÿ8Â²Ì©ğ1
+g
+java:S2184m"ECast one of the operands of this subtraction operation to a "double".(¼ŞÃüÿÿÿÿ8Â²Ì©ğ1
+g
+java:S2184m"ECast one of the operands of this subtraction operation to a "double".(¼ŞÃüÿÿÿÿ8Â²Ì©ğ1
 y
-java:S3008"\Rename this field "THIRD_ZONE_RADIUS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Çƒ±Ç8Ÿá†ğ1
+java:S3008"\Rename this field "FIRST_ZONE_RADIUS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¯éÚ–8Ö²Ì©ğ1
+z
+java:S3008"]Rename this field "SECOND_ZONE_RADIUS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(òè»¡8Ö²Ì©ğ1
+~
+java:S3008"\Rename this field "THIRD_ZONE_RADIUS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ó¹úıÿÿÿÿ8Ö²Ì©ğ1
 :
-java:S2119-"Save and re-use this "Random".(¼İÅf8®Ÿá†ğ1
-J
-java:S1905D"(Remove this unnecessary cast to "float".(›Åüûÿÿÿÿ8¶Ÿá†ğ1
-J
-java:S1905D"(Remove this unnecessary cast to "float".(›Åüûÿÿÿÿ8·Ÿá†ğ1
-e
-java:S1128"CRemove this unused import 'com.badlogic.gdx.math.MathUtils.random'.(ˆÎÖÅûÿÿÿÿ8ÔŸá†ğ1
+java:S2119."Save and re-use this "Random".(¼İÅf8á²Ì©ğ1
+M
+java:S1128"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ8µ„ä¨ğ1
+K
+java:S1068")Remove this unused "world" private field.(‹âÑïşÿÿÿÿ8î²Ì©ğ1
+N
+java:S1068",Remove this unused "zoneBody" private field.(êò»èûÿÿÿÿ8ï²Ì©ğ1

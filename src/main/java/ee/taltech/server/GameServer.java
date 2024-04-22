@@ -30,7 +30,7 @@ public class GameServer {
         this.games = new HashMap<>(); // Contains gameIds: game
         this.server = new Server();
 
-       Grid.setGrid(Grid.readGridFromFile()); // Read and set grid from the file
+        Grid.setGrid(Grid.readGridFromFile()); // Read and set grid from the file
 
         server.start();
         try { // Establishes a connection with ports

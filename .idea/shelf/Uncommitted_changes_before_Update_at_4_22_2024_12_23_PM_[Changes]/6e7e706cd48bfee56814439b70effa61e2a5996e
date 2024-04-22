@@ -1,0 +1,15 @@
+
+r
+java:S1104"UMake xPosition a static final constant or non-public and provide accessors if needed.(Ÿ ¦Æ8±µôğ1
+r
+java:S1104"UMake yPosition a static final constant or non-public and provide accessors if needed.(ÅÒÀ¦8³µôğ1
+w
+java:S1104"ZMake mouseXPosition a static final constant or non-public and provide accessors if needed.(ÓãÁ8µµôğ1
+|
+java:S1104"ZMake mouseYPosition a static final constant or non-public and provide accessors if needed.(åÆŒõşÿÿÿÿ8·µôğ1
+r
+java:S1104"PMake type a static final constant or non-public and provide accessors if needed.(®¦ÿ–üÿÿÿÿ8¸µôğ1
+o
+java:S1104!"RMake health a static final constant or non-public and provide accessors if needed.(¨ê·Å8ºµôğ1
+r
+java:S1104""PMake mana a static final constant or non-public and provide accessors if needed.(¸Ÿñáúÿÿÿÿ8»µôğ1

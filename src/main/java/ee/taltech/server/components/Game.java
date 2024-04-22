@@ -88,7 +88,6 @@ public class Game {
      * Send playZone information.
      */
     public void sendPlayZoneCoordinates() {
-        System.out.println(playZone.getFirstZoneX());
         server.server.sendToAllTCP(new PlayZoneCoordinates(playZone.getFirstZoneX(),
                 playZone.getFirstZoneY(), playZone.getSecondZoneX(),
                 playZone.getSecondZoneY(), playZone.getThirdZoneX(),
@@ -233,7 +232,7 @@ public class Game {
     public void damagePlayer(Integer id, Integer amount) {
         PlayerCharacter player = gamePlayers.get(id); // Get player
 
-        int newHealth = Math.max(player.health - amount, 0); // Health can not be less than 0
+        float newHealth = Math.max(player.health - amount, 0); // Health can not be less than 0
         player.setHealth(newHealth); // 10 damage per hit
 
         // If player has 0 health move them to dead players

@@ -1,18 +1,7 @@
 
-s
-java:S62017"XReplace this instanceof check and cast with 'instanceof PlayerCharacter playercharacter'(Å½ÿÿÿÿÿ
-_
-java:S62019"DReplace this instanceof check and cast with 'instanceof Spell spell'(Á¢Éûÿÿÿÿ
-s
-java:S6201J"XReplace this instanceof check and cast with 'instanceof PlayerCharacter playercharacter'(Å½ÿÿÿÿÿ
-]
-java:S6201L"BReplace this instanceof check and cast with 'instanceof Item item'(ç¼ğéûÿÿÿÿ
-]
-java:S6201p"BReplace this instanceof check and cast with 'instanceof Item item'(ç¼ğéûÿÿÿÿ
-L
-java:S1128"6Remove this unused import 'com.badlogic.gdx.maps.Map'.(’òŞ
-I
-java:S1128
-".Remove this unused import 'java.util.HashMap'.(™˜”€ùÿÿÿÿ
-J
-java:S1128"/Remove this unused import 'java.util.Optional'.(¨˜ëİüÿÿÿÿ
+d
+java:S1192G"HDefine a constant instead of duplicating this literal "Hit_Box" 4 times.(Ë§g8Ç¼Ì©ğ1
+n
+java:S1192@"QDefine a constant instead of duplicating this literal "Triggering_Range" 4 times.(Àê•ˆ8È¼Ì©ğ1
+t
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(µİ¦¿úÿÿÿÿ8 ±¦‡ğ1
