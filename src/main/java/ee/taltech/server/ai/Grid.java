@@ -2,10 +2,7 @@ package ee.taltech.server.ai;
 
 import com.esotericsoftware.minlog.Log;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class Grid {
     public static int[][] grid;
@@ -25,10 +22,10 @@ public class Grid {
      * @return read grid as a 2d array
      */
     public static int[][] readGridFromFile() {
-        String projectPath = new File("").getAbsolutePath();
         int[][] grid = new int[1200][1200];
 
-        try (BufferedReader br = new BufferedReader(new FileReader(projectPath + "/assets/grid.txt"))) {
+        try (InputStream inputStream = Grid.class.getResourceAsStream("/grid.txt");
+             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             int row = 0;
 

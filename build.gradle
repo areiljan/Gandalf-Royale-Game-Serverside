@@ -7,6 +7,14 @@ application {
     mainClass = 'ee.taltech.server.GameServer'
 }
 
+distributions {
+    main {
+        contents {
+            from 'src/main/resources/grid.txt'
+        }
+    }
+}
+
 ext {
     appName = "Server"
     gdxVersion = '1.12.1'
