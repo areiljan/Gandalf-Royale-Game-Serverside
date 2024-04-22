@@ -89,7 +89,7 @@ public class PlayerCharacter implements Entity {
     }
 
     /**
-     * Get mouse Y position.
+     * Get mouse Y Position.
      *
      * @return mouseYPosition
      */
