@@ -30,7 +30,7 @@ public class GameServer {
         this.games = new HashMap<>(); // Contains gameIds: game
         this.server = new Server();
 
-       Grid.setGrid(Grid.readGridFromFile()); // Read and set grid from the file
+        Grid.setGrid(Grid.readGridFromFile()); // Read and set grid from the file
 
         server.start();
         try { // Establishes a connection with ports
@@ -55,6 +55,7 @@ public class GameServer {
         // For registering allowed sendable data objects.
         Kryo kryo = server.getKryo();
         kryo.register(java.util.ArrayList.class);
+        kryo.register(PlayZoneCoordinates.class);
         kryo.register(Position.class);
         kryo.register(ActionTaken.class);
         kryo.register(Join.class);
@@ -63,6 +64,7 @@ public class GameServer {
         kryo.register(LobbyDismantle.class);
         kryo.register(GetLobbies.class);
         kryo.register(StartGame.class);
+        kryo.register(PlayZoneUpdate.class);
         kryo.register(KeyPress.class);
         kryo.register(ItemTypes.class);
         kryo.register(MouseClicks.class);

@@ -80,6 +80,7 @@ public class CollisionListener implements ContactListener {
         }
     }
 
+
     /**
      * Apply logic that happens when spell and player collide.
      *

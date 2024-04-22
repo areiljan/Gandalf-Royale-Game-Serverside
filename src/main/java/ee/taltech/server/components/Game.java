@@ -5,10 +5,12 @@ import com.badlogic.gdx.physics.box2d.World;
 import ee.taltech.server.GameServer;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Mob;
+import ee.taltech.server.entities.PlayZone;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.collision.CollisionListener;
 import ee.taltech.server.network.messages.game.*;
+import ee.taltech.server.network.messages.lobby.LobbyCreation;
 
 import java.util.*;
 
@@ -19,6 +21,7 @@ public class Game {
     public final GameServer server;
     public final Integer gameId;
     public final Map<Integer, PlayerCharacter> gamePlayers; // Previous alivePlayers
+    private PlayZone playZone;
     private int killedPlayerId;
     public Map<Integer, PlayerCharacter> deadPlayers;
     private final List<Spell> spellsToAdd;
@@ -30,15 +33,9 @@ public class Game {
     private final List<Item> coinsToRemove;
     private final World world;
     private int ticks;
+    private long startTime;
+    private int currentTime;
 
-    /**
-     * Get the killed player id.
-     * Zero if no killed players this tick.
-     * @return - 0 or an id.
-     */
-    public int getKilledPlayerId() {
-        return killedPlayerId;
-    }
 
     /**
      * Construct Game.
@@ -50,6 +47,8 @@ public class Game {
         world = new World(new Vector2(0, 0), true); // Create a new Box2D world
         CollisionListener collisionListener = new CollisionListener(this);
         world.setContactListener(collisionListener); // Set collision listener that detects collision
+        startTime = System.currentTimeMillis();
+        this.currentTime = 0;
 
         this.server = server;
         this.lobby = lobby;
@@ -72,6 +71,7 @@ public class Game {
         this.killedPlayerId = 0;
 
         this.ticks = 0;
+        this.playZone = new PlayZone(world);
     }
 
     /**
@@ -81,6 +81,17 @@ public class Game {
      */
     public int getTicks() {
         return ticks;
+    }
+
+
+    /**
+     * Send playZone information.
+     */
+    public void sendPlayZoneCoordinates() {
+        server.server.sendToAllTCP(new PlayZoneCoordinates(playZone.getFirstZoneX(),
+                playZone.getFirstZoneY(), playZone.getSecondZoneX(),
+                playZone.getSecondZoneY(), playZone.getThirdZoneX(),
+                playZone.getThirdZoneY()));
     }
 
     /**
@@ -97,6 +108,7 @@ public class Game {
         world.step(1 / 60f, 6, 2); // Stepping world to update bodies
 
         // *------------- SPELL REMOVING -------------*
+        currentTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
         for (Integer spellToDispel : spellsToDispel) {
             if (spells.containsKey(spellToDispel)) {
                 spells.get(spellToDispel).removeSpellBody(world);
@@ -220,7 +232,7 @@ public class Game {
     public void damagePlayer(Integer id, Integer amount) {
         PlayerCharacter player = gamePlayers.get(id); // Get player
 
-        int newHealth = Math.max(player.health - amount, 0); // Health can not be less than 0
+        float newHealth = Math.max(player.health - amount, 0); // Health can not be less than 0
         player.setHealth(newHealth); // 10 damage per hit
 
         // If player has 0 health move them to dead players
@@ -345,5 +357,30 @@ public class Game {
         mob.setHealth(newHealth);
 
         // mob is added to mobsToRemove list in TickRateLoop
+    }
+
+    /**
+     * Get the killed player id.
+     * Zero if no killed players this tick.
+     * @return - 0 or an id.
+     */
+    public int getKilledPlayerId() {
+        return killedPlayerId;
+    }
+
+    /**
+     * startTime getter.
+     * @return - startTime as long.
+     */
+    public int getCurrentTime() {
+        return currentTime;
+    }
+
+    /**
+     * PlayZone getter.
+     * @return - PlayZone.
+     */
+    public PlayZone getPlayZone() {
+        return playZone;
     }
 }

@@ -57,14 +57,16 @@ public class TickRateLoop implements Runnable {
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
-            if (game.getTicks() < 1001) game.addTick(); // Used only to demonstrate item generation by server
-            if (game.getTicks() == 1000) { // Trigger only once after 1000 ticks
+            if (game.getTicks() < 1501) game.addTick(); // Used only to demonstrate item generation by server
+            if (game.getTicks() == 1500) { // Trigger only once after 1000 ticks
                 Item item1 = new Item(ItemTypes.FIREBALL, 4500, 5800);
                 Item item2 = new Item(ItemTypes.FIREBALL, 4500, 5600);
                 Mob mob = new Mob(4000, 5700);
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
+
+                game.sendPlayZoneCoordinates();
                 game.dropCoins(4, 4500, 5700);
                 game.addMob(mob);
             }
@@ -76,10 +78,14 @@ public class TickRateLoop implements Runnable {
                 if (player.mana != 100) {
                     player.regenerateMana();
                 }
+                if (!game.getPlayZone().areCoordinatesInZone(player.xPosition, player.yPosition)) {
+                    player.receiveZoneDamage();
+                }
                 for (Integer playerId : game.gamePlayers.keySet()) {
                     server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
-                    server.sendToUDP(playerId, new UpdateHealth(player.playerID, player.health));
+                    server.sendToUDP(playerId, new UpdateHealth(player.playerID, (int) player.health));
                     server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
+                    server.sendToUDP(playerId, new PlayZoneUpdate(game.getPlayZone().getTimer(), game.getPlayZone().stage()));
                     server.sendToUDP(playerId, new ActionTaken(player.playerID, player.getMouseLeftClick(),
                             game.gamePlayers.get(player.playerID).mouseXPosition,
                             game.gamePlayers.get(player.playerID).mouseYPosition));
@@ -95,6 +101,7 @@ public class TickRateLoop implements Runnable {
                                 spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
                 }
             }
+            game.getPlayZone().updateZone(game.getCurrentTime());
             for (Mob mob : game.mobs.values()) {
                 mob.updatePosition();
                 for (Integer playerId : game.gamePlayers.keySet()) {
