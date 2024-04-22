@@ -13,6 +13,7 @@ import ee.taltech.server.network.messages.game.*;
 import java.util.*;
 
 public class Game {
+    public static final Random random = new Random();
 
     public final Lobby lobby;
     public final GameServer server;
@@ -26,6 +27,7 @@ public class Game {
     public final Map<Integer, Item> items;
     public final Map<Integer, Mob> mobs;
     public final List<Mob> mobsToRemove;
+    private final List<Item> coinsToRemove;
     private final World world;
     private int ticks;
 
@@ -52,14 +54,21 @@ public class Game {
         this.server = server;
         this.lobby = lobby;
         this.gameId = lobby.lobbyId;
+
         this.gamePlayers = createPlayersMap();
         this.deadPlayers = new HashMap<>();
+
+        this.spellsToAdd = new ArrayList<>();
+        this.spellsToDispel = new ArrayList<>();
         this.spells = new HashMap<>();
+
         this.items = new HashMap<>();
+
         this.mobs = new HashMap<>();
         this.mobsToRemove = new ArrayList<>();
-        this.spellsToDispel = new ArrayList<>();
-        this.spellsToAdd = new ArrayList<>();
+
+        this.coinsToRemove = new ArrayList<>();
+
         this.killedPlayerId = 0;
 
         this.ticks = 0;
@@ -110,7 +119,9 @@ public class Game {
         // *------------- PLAYER REMOVING -------------*
         killedPlayerId = 0; // resets the id to 0 each iteration.
         for (PlayerCharacter deadPlayer : deadPlayers.values()) {
+            dropCoins(deadPlayer.getCoins(), deadPlayer.getXPosition(), deadPlayer.getYPosition()); // Drop all coins
             deadPlayer.removeBody(world);
+
             // this class integer id will be used to send a one-time message to the client.
             killedPlayerId = deadPlayer.getPlayerID();
         }
@@ -118,10 +129,18 @@ public class Game {
 
         // *------------- MOB REMOVING -------------*
         for (Mob mob : mobsToRemove) {
+            dropCoins(5, mob.getXPosition(), mob.getYPosition()); // Drop 5 coins
             mob.removeBody(world);
             mobs.remove(mob.getId());
         }
         mobsToRemove.clear();
+
+        // *------------- COIN REMOVING -------------*
+        for (Item coin : coinsToRemove) {
+            coin.removeBody(world);
+            items.remove(coin.getId());
+        }
+        coinsToRemove.clear();
     }
 
     /**
@@ -225,8 +244,8 @@ public class Game {
         item.updateBody(); // Update item's body
         items.put(item.getId(), item); // Put it in the items map
 
+        ItemDropped message = createItemDropped(item, playerCharacter);
         for (Integer playerId : gamePlayers.keySet()) { // Send message for every player in the lobby
-            ItemDropped message = createItemDropped(item, playerCharacter);
             server.server.sendToUDP(playerId, message);
         }
     }
@@ -261,15 +280,51 @@ public class Game {
         item.removeBody(world); // Remove items body
         items.remove(item.getId()); // Remove item form items map
 
+        ItemPickedUp message;
+        // If player is not null aka player picked up item send message with player's ID
+        if (playerCharacter != null) {
+            message = new ItemPickedUp(playerCharacter.getPlayerID(), item.getId(), item.getType());
+        } else { // If player is null aka game removed item send message without player's ID
+            message = new ItemPickedUp(null, item.getId(), item.getType());
+        }
+
         for (Integer playerId : gamePlayers.keySet()) {
-            ItemPickedUp message;
-            // If player is not null aka player picked up item send message with player's ID
-            if (playerCharacter != null) {
-                message = new ItemPickedUp(playerCharacter.getPlayerID(), item.getId(), item.getType());
-            } else { // If player is null aka game removed item send message without player's ID
-                message = new ItemPickedUp(null, item.getId(), item.getType());
-            }
             server.server.sendToUDP(playerId, message);
+        }
+    }
+
+    /**
+     * Pick up a coin.
+     *
+     * @param player player that picked the coin up
+     * @param coin coin that is picked up
+     */
+    public void pickUpCoin(PlayerCharacter player, Item coin) {
+        coinsToRemove.add(coin); // Add coin to coinsToRemove list
+        player.addCoin(); // Give player a coin
+
+        // Create a message that coin was picked up
+        CoinPickedUp message = new CoinPickedUp(player.playerID, coin.getId());
+
+        // Send message to every player in this game
+        for (Integer playerId : gamePlayers.keySet()) {
+            server.server.sendToUDP(playerId, message);
+        }
+    }
+
+    /**
+     * Drop given amount of coins to given position.
+     *
+     * @param amount amount of coins to drop
+     * @param x x position to drop the coins at
+     * @param y y position to drop the coins at
+     */
+    public void dropCoins(Integer amount, float x, float y) {
+        for (int i = 0; i < amount; i++) {
+            float newX = random.nextInt((int) (x - 10), (int) (x + 10));
+            float newY = random.nextInt((int) (y - 10), (int) (y + 10));
+            Item coin = new Item(ItemTypes.COIN, newX, newY);
+            addItem(coin, null);
         }
     }
 

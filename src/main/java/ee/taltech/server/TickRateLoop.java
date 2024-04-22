@@ -65,6 +65,7 @@ public class TickRateLoop implements Runnable {
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
+                game.dropCoins(4, 4500, 5700);
                 game.addMob(mob);
             }
 

@@ -16,9 +16,9 @@ import java.util.*;
 
 public class GameServer {
     public final Server server;
-    public Map<Integer, Integer> connections;
-    public Map<Integer, Lobby> lobbies;
-    public Map<Integer, Game> games;
+    public final Map<Integer, Integer> connections;
+    public final Map<Integer, Lobby> lobbies;
+    public final Map<Integer, Game> games;
 
 
     /**
@@ -74,6 +74,7 @@ public class GameServer {
         kryo.register(KilledPlayer.class);
         kryo.register(UpdateMana.class);
         kryo.register(ItemPickedUp.class);
+        kryo.register(CoinPickedUp.class);
         kryo.register(ItemDropped.class);
         kryo.register(MobPosition.class);
         kryo.register(UpdateMobHealth.class);

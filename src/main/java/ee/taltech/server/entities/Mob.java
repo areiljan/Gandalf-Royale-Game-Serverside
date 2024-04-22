@@ -4,6 +4,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.ai.AStarPathFinding;
 import ee.taltech.server.ai.Grid;
 import ee.taltech.server.ai.Node;
+import ee.taltech.server.components.Game;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class Mob implements Entity {
     private int sourceNodeX;
     private int sourceNodeY;
     private Integer health;
-    private AStarPathFinding aStar;
+    private final AStarPathFinding aStar;
     private final List<PlayerCharacter> playersInRange;
     private List<Node> currentPath;
     private Node nextNode;
@@ -241,11 +242,10 @@ public class Mob implements Entity {
      * @return new chosen random path
      */
     private List<Node> chooseRandomPath() {
-        Random random = new Random();
         while (true) { // Try random X and Y values until pathing there is possible
-            int randomX = random.nextInt((int) (sourceNodeX - TRIGGERING_RANGE_RADIUS / 8),
+            int randomX = Game.random.nextInt((int) (sourceNodeX - TRIGGERING_RANGE_RADIUS / 8),
                     (int) (sourceNodeX + (TRIGGERING_RANGE_RADIUS / 8) + 1));
-            int randomY = random.nextInt((int) (sourceNodeY -  TRIGGERING_RANGE_RADIUS / 8),
+            int randomY = Game.random.nextInt((int) (sourceNodeY -  TRIGGERING_RANGE_RADIUS / 8),
                     (int) (sourceNodeY +  (TRIGGERING_RANGE_RADIUS / 8) + 1));
 
             if (Grid.grid[randomY][randomX] == 0 && randomX != sourceNodeX && randomY != sourceNodeY) {
