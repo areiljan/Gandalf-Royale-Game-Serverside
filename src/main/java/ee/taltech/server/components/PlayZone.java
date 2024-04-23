@@ -1,15 +1,8 @@
-package ee.taltech.server.entities;
-
-import com.badlogic.gdx.physics.box2d.*;
-
-import java.util.List;
-import java.util.Random;
+package ee.taltech.server.components;
 
 import static java.lang.Math.sqrt;
 
 public class PlayZone {
-    private final World world;
-    private Body zoneBody;
     private int firstZoneX;
     private int firstZoneY;
     private int secondZoneX;
@@ -18,9 +11,9 @@ public class PlayZone {
     private int thirdZoneY;
     private int timer;
     private int stage;
-    private static int FIRST_ZONE_RADIUS = 4450; // in pixels lmao
-    private static int SECOND_ZONE_RADIUS = 2430;
-    private static int THIRD_ZONE_RADIUS = 930;
+    private static final int FIRST_ZONE_RADIUS = 4450; // in pixels lmao
+    private static final int SECOND_ZONE_RADIUS = 2430;
+    private static final int THIRD_ZONE_RADIUS = 930;
 
     public int stage() {
         return stage;
@@ -29,8 +22,7 @@ public class PlayZone {
     /**
      * Game PlayZone constructor.
      */
-    public PlayZone(World world) {
-        this.world = world;
+    public PlayZone() {
         this.timer = 0; // all calculations currently in pixels
         zoneCoordinateGenerator();
         this.stage = 0;
@@ -43,16 +35,15 @@ public class PlayZone {
     private void zoneCoordinateGenerator () {
         int firstZoneMin = 3400;
         int firstZoneMax = 6000;
-        Random random = new Random();
         // Generate a random integer within the specified range
-        firstZoneX = random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMin;
-        firstZoneY = random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMin;
-        int secondZoneXRandomizer = random.nextInt(1500 - (-1500) + 1) + (-1500);
-        int secondZoneYRandomizer = random.nextInt(1500 - (-1500) + 1) + (-1500);
+        firstZoneX = Game.random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMin;
+        firstZoneY = Game.random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMin;
+        int secondZoneXRandomizer = Game.random.nextInt(1500 - (-1500) + 1) + (-1500);
+        int secondZoneYRandomizer = Game.random.nextInt(1500 - (-1500) + 1) + (-1500);
         secondZoneX =  firstZoneX + secondZoneXRandomizer;
         secondZoneY = firstZoneY + secondZoneYRandomizer;
-        int thirdZoneXRandomizer = random.nextInt(1600 - (-1600) + 1) + (-1600);
-        int thirdZoneYRandomizer = random.nextInt(1600 - (-1600) + 1) + (-1600);
+        int thirdZoneXRandomizer = Game.random.nextInt(1600 - (-1600) + 1) + (-1600);
+        int thirdZoneYRandomizer = Game.random.nextInt(1600 - (-1600) + 1) + (-1600);
         thirdZoneX = secondZoneX + thirdZoneXRandomizer;
         thirdZoneY = secondZoneY + thirdZoneYRandomizer;
     }

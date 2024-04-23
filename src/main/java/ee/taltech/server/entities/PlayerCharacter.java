@@ -13,26 +13,31 @@ public class PlayerCharacter implements Entity {
 
     public static final Integer WIDTH = 12;
     public static final Integer HEIGHT = 24;
+    private static final float HEAL_PER_TICK = 0.17f; // 10hp per sec
+    private static final Integer FULL_HEALING_TICKS = 600; // 10 seconds
+
     private Body body;
+
     public int xPosition;
     public int yPosition;
+
     public int mouseXPosition;
     public int mouseYPosition;
     private boolean mouseLeftClick;
+
     public final int playerID;
-    public ItemTypes type;
-    private Map<Integer, Item> inventory;
+
     boolean moveLeft;
     boolean moveRight;
     boolean moveDown;
     boolean moveUp;
 
-    public boolean getMouseLeftClick() {
-        return mouseLeftClick;
-    }
     public float health;
     public double mana;
+    private final Map<Integer, Item> inventory;
     private Integer coins;
+
+    private Integer healingTicks;
 
     /**
      * Construct PlayerCharacter.
@@ -48,6 +53,7 @@ public class PlayerCharacter implements Entity {
 
         health = 100;
         mana = 100;
+        healingTicks = 0;
         inventory = new HashMap<>();
         coins = 0;
     }
@@ -98,12 +104,12 @@ public class PlayerCharacter implements Entity {
     }
 
     /**
-     * Get players current action.
+     * Get player's left mouse click.
      *
-     * @return action
+     * @return true if left mouse click is pressed else false
      */
-    public ItemTypes getSpell() {
-        return type;
+    public boolean getMouseLeftClick() {
+        return mouseLeftClick;
     }
 
     /**
@@ -122,6 +128,22 @@ public class PlayerCharacter implements Entity {
      */
     public void setMana(double newMana) {
         mana = newMana;
+    }
+
+    /**
+     * Get player's healing ticks.
+     *
+     * @return healingTicks
+     */
+    public Integer getHealingTicks() {
+        return healingTicks;
+    }
+
+    /**
+     * Start player's healing.
+     */
+    public void startHealing() {
+        this.healingTicks = FULL_HEALING_TICKS;
     }
 
     /**
@@ -158,7 +180,6 @@ public class PlayerCharacter implements Entity {
         this.mouseXPosition = mouseXPosition;
         this.mouseYPosition = mouseYPosition;
         this.mouseLeftClick = leftMouse;
-        this.type = type;
     }
 
     /**
@@ -187,12 +208,12 @@ public class PlayerCharacter implements Entity {
     }
 
     /**
-     * Drop item from inventory.
+     * Remove item from inventory.
      *
-     * @param itemId item's id that is dropped
-     * @return item that is dropped
+     * @param itemId item's id that is removed
+     * @return item that is removed
      */
-    public Item dropItem(Integer itemId) {
+    public Item removeItem(Integer itemId) {
         Item droppedItem = inventory.get(itemId);
         inventory.remove(itemId);
         return droppedItem;
@@ -298,7 +319,17 @@ public class PlayerCharacter implements Entity {
     }
 
     /**
-     * Regenerate mana.
+     * Regenerate health.
+     */
+    public void regenerateHealth() {
+        if (healingTicks > 0) {
+            setHealth(Math.min(health + HEAL_PER_TICK, 100));
+            healingTicks--;
+        }
+    }
+
+    /**
+     * Damage player with zone.
      */
     public void receiveZoneDamage() {
         if (health > 0) {

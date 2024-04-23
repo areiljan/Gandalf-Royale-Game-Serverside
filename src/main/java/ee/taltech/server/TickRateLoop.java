@@ -61,13 +61,14 @@ public class TickRateLoop implements Runnable {
             if (game.getTicks() == 1500) { // Trigger only once after 1000 ticks
                 Item item1 = new Item(ItemTypes.FIREBALL, 4500, 5800);
                 Item item2 = new Item(ItemTypes.FIREBALL, 4500, 5600);
+                Item potion = new Item(ItemTypes.HEALING_POTION, 4500, 5700);
                 Mob mob = new Mob(4000, 5700);
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
+                game.addItem(potion, null);
 
                 game.sendPlayZoneCoordinates();
-                game.dropCoins(4, 4500, 5700);
                 game.addMob(mob);
             }
 
@@ -77,6 +78,9 @@ public class TickRateLoop implements Runnable {
                 }
                 if (player.mana != 100) {
                     player.regenerateMana();
+                }
+                if (player.getHealingTicks() > 0) {
+                    player.regenerateHealth();
                 }
                 if (!game.getPlayZone().areCoordinatesInZone(player.xPosition, player.yPosition)) {
                     player.receiveZoneDamage();
@@ -101,7 +105,6 @@ public class TickRateLoop implements Runnable {
                                 spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));
                 }
             }
-            game.getPlayZone().updateZone(game.getCurrentTime());
             for (Mob mob : game.mobs.values()) {
                 mob.updatePosition();
                 for (Integer playerId : game.gamePlayers.keySet()) {
