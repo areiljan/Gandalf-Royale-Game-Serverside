@@ -5,12 +5,10 @@ import com.badlogic.gdx.physics.box2d.World;
 import ee.taltech.server.GameServer;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Mob;
-import ee.taltech.server.entities.PlayZone;
 import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.collision.CollisionListener;
 import ee.taltech.server.network.messages.game.*;
-import ee.taltech.server.network.messages.lobby.LobbyCreation;
 
 import java.util.*;
 
@@ -71,7 +69,7 @@ public class Game {
         this.killedPlayerId = 0;
 
         this.ticks = 0;
-        this.playZone = new PlayZone(world);
+        this.playZone = new PlayZone();
     }
 
     /**
@@ -105,10 +103,11 @@ public class Game {
      * Updating game values.
      */
     public void update() {
+        playZone.updateZone(currentTime);
         world.step(1 / 60f, 6, 2); // Stepping world to update bodies
+        currentTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
 
         // *------------- SPELL REMOVING -------------*
-        currentTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
         for (Integer spellToDispel : spellsToDispel) {
             if (spells.containsKey(spellToDispel)) {
                 spells.get(spellToDispel).removeSpellBody(world);
@@ -188,7 +187,7 @@ public class Game {
      */
     public void setPlayerAction(KeyPress keyPress, PlayerCharacter player) {
         if (keyPress.action.equals(KeyPress.Action.DROP) && keyPress.extraField != null) {
-            Item droppedItem = player.dropItem(keyPress.extraField);
+            Item droppedItem = player.removeItem(keyPress.extraField);
             addItem(droppedItem, player);
         }
         if (keyPress.action.equals(KeyPress.Action.INTERACT)) {
@@ -239,6 +238,24 @@ public class Game {
         if (player.health == 0) {
             deadPlayers.put(id, player);
         }
+    }
+
+    /**
+     * Heal player.
+     *
+     * @param playerId player that is healed
+     * @param potionId potion that the player is head with
+     */
+    public void healPlayer(Integer playerId, Integer potionId) {
+        PlayerCharacter player= gamePlayers.get(playerId); // Get player
+
+        player.startHealing(); // Start player's healing
+        player.removeItem(potionId); // Remove potion from player
+
+        HealingPotionUsed message = new HealingPotionUsed(playerId, potionId);
+
+        // Notify the client that player used the potion
+        server.server.sendToUDP(playerId, message);
     }
 
     /**

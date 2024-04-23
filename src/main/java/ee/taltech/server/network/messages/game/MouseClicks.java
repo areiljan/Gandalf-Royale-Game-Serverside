@@ -7,6 +7,7 @@ public class MouseClicks {
     public double mouseXPosition;
     public double mouseYPosition;
     public ItemTypes type;
+    public Integer extraField;
 
     /**
      * Empty constructor for Kryonet.

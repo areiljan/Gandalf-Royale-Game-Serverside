@@ -75,9 +75,14 @@ public class ServerListener extends Listener {
                 if (player != null) {
                     // Set the direction player should be moving.
                     player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition, mouse.type);
-                    // Add new fireball
-                    if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse && player.mana >= 20) {
-                        // Add new fireball to the game
+
+                    // *------------- HEALING POTION -------------*
+                    if (mouse.type == ItemTypes.HEALING_POTION) {
+                        game.healPlayer(player.playerID, mouse.extraField);
+                    }
+                    // *------------- SPELL -------------*
+                    else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse && player.mana >= 20) {
+                        // Add new spell to the game
                         Spell spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, game.getWorld(),
                                 mouse.type);
                         game.addSpell(spell);
