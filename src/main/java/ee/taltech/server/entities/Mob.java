@@ -4,21 +4,14 @@ import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.ai.AStarPathFinding;
 import ee.taltech.server.ai.Grid;
 import ee.taltech.server.ai.Node;
+import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.Game;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class Mob implements Entity {
-
-    private static final float HIT_BOX_RADIUS= 12; // Should be changed
-    private static final float TRIGGERING_RANGE_RADIUS = 320; // Should be changed
-    private static final int MOB_HEALTH = 50;
-    public static final int MOB_DAMAGE = 15;
-    private static final int MAX_PATH_RANGE = 300;
-
     private final Integer id;
     private Body body;
     private float xPosition;
@@ -54,10 +47,10 @@ public class Mob implements Entity {
         this.yPosition = y;
         this.sourceNodeX = getSourceNodeX();
         this.sourceNodeY = getSourceNodeY();
-        this.health = MOB_HEALTH;
+        this.health = Constants.MOB_HEALTH;
 
         this.aStar = new AStarPathFinding();
-        this. playersInRange = new ArrayList<>();
+        this.playersInRange = new ArrayList<>();
         this.currentPath = new ArrayList<>();
         this.nextNode = null;
     }
@@ -71,17 +64,19 @@ public class Mob implements Entity {
         // Create a dynamic body for the mob
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(xPosition, yPosition);
+        bodyDef.fixedRotation = true;
+        bodyDef.position.set(getXPosition(), getYPosition());
         Body mobBody = world.createBody(bodyDef);
 
         // *----- HIT BOX -----*
         // Create a fixture for hit box
         CircleShape hitBoxShape = new CircleShape();
-        hitBoxShape.setRadius(HIT_BOX_RADIUS);
+        hitBoxShape.setRadius(Constants.HIT_BOX_RADIUS);
 
         // Attach the fixture to the body
         FixtureDef hitBoxFixtureDef = new FixtureDef();
         hitBoxFixtureDef.shape = hitBoxShape;
+        hitBoxFixtureDef.isSensor = true;
         // hitBoxFixtureDef.isSensor = true; // Will work if we change movement from teleporting to vectors
         mobBody.createFixture(hitBoxFixtureDef).setUserData(List.of(this, "Hit_Box"));
         hitBoxShape.dispose(); // Clean up
@@ -89,11 +84,12 @@ public class Mob implements Entity {
         // *----- TRIGGERING RANGE -----*
         // Create a fixture for triggering range
         CircleShape triggeringShape = new CircleShape();
-        triggeringShape.setRadius(TRIGGERING_RANGE_RADIUS);
+        triggeringShape.setRadius(Constants.TRIGGERING_RANGE_RADIUS);
 
         // Attach the fixture to the body
         FixtureDef triggeringFixtureDef = new FixtureDef();
         triggeringFixtureDef.shape = triggeringShape;
+        triggeringFixtureDef.isSensor = true;
         // triggeringFixtureDef.isSensor = true; // Will work if we change movement from teleporting to vectors
         mobBody.createFixture(triggeringFixtureDef).setUserData(List.of(this, "Triggering_Range"));
         triggeringShape.dispose(); // Clean up
@@ -124,7 +120,7 @@ public class Mob implements Entity {
      * @return xPosition
      */
     public float getXPosition() {
-        return xPosition;
+        return xPosition / Constants.PPM;
     }
 
     /**
@@ -133,7 +129,7 @@ public class Mob implements Entity {
      * @return yPosition
      */
     public float getYPosition() {
-        return yPosition;
+        return yPosition / Constants.PPM;
     }
 
     /**
@@ -200,12 +196,13 @@ public class Mob implements Entity {
 
         if (!playersInRange.isEmpty()) { // Start following player
             PlayerCharacter firstPlayer = playersInRange.getFirst(); // First player that was in range
-
-            // Get the best path to first enemy that was in range
-            currentPath = getPathFromAStar(firstPlayer.getXPosition(), firstPlayer.getYPosition());
+            // Get the best path to a first enemy that was in range
+            currentPath = getPathFromAStar(
+                    firstPlayer.getXPosition() * Constants.PPM,
+                    firstPlayer.getYPosition() * Constants.PPM);
         }
 
-        if (currentPath.isEmpty() || currentPath.size() >= MAX_PATH_RANGE) { // No player to follow
+        if (currentPath.isEmpty() || currentPath.size() >= Constants.MAX_PATH_RANGE) { // No player to follow
             currentPath = chooseRandomPath(); // Make a random path our current one
         }
 
@@ -243,14 +240,14 @@ public class Mob implements Entity {
      */
     private List<Node> chooseRandomPath() {
         while (true) { // Try random X and Y values until pathing there is possible
-            int randomX = Game.random.nextInt((int) (sourceNodeX - TRIGGERING_RANGE_RADIUS / 8),
-                    (int) (sourceNodeX + (TRIGGERING_RANGE_RADIUS / 8) + 1));
-            int randomY = Game.random.nextInt((int) (sourceNodeY -  TRIGGERING_RANGE_RADIUS / 8),
-                    (int) (sourceNodeY +  (TRIGGERING_RANGE_RADIUS / 8) + 1));
+            int randomX = Game.random.nextInt((int) (sourceNodeX - Constants.TRIGGERING_RANGE_RADIUS / 8),
+                    (int) (sourceNodeX + (Constants.TRIGGERING_RANGE_RADIUS / 8) + 1));
+            int randomY = Game.random.nextInt((int) (sourceNodeY -  Constants.TRIGGERING_RANGE_RADIUS / 8),
+                    (int) (sourceNodeY +  (Constants.TRIGGERING_RANGE_RADIUS / 8) + 1));
 
             if (Grid.grid[randomY][randomX] == 0 && randomX != sourceNodeX && randomY != sourceNodeY) {
                 List<Node> path = aStar.findPath(sourceNodeX, sourceNodeY, randomX, randomY);
-                if (!path.isEmpty() && path.size() < MAX_PATH_RANGE) {
+                if (!path.isEmpty() && path.size() < Constants.MAX_PATH_RANGE) {
                     return path;
                 }
             }
@@ -301,6 +298,6 @@ public class Mob implements Entity {
         } else if (Objects.equals(direction, "up")) {
             yPosition += 2;
         }
-        body.setTransform(xPosition, yPosition, body.getAngle());
+        body.setTransform(getXPosition(), getYPosition(), body.getAngle());
     }
 }

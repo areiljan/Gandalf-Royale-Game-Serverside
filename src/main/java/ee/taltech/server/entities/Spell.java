@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.ItemTypes;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class Spell implements Entity {
     double mouseYPosition;
     private final double angle;
     private static int nextId = 1;
-    private static final int FIREBALLVELOCITY = 3;
+    private static final float FIREBALLVELOCITY = 0.1f;
 
     /**
      * Construct Spell.
@@ -38,7 +39,7 @@ public class Spell implements Entity {
         createBody(world);
 
         spellXPosition = playerCharacter.getXPosition();
-        spellYPosition = playerCharacter.getYPosition() + 50;
+        spellYPosition = playerCharacter.getYPosition() + 50 / Constants.PPM;
 
         // These mousepositions are already relative to the player.
         this.mouseXPosition = mouseXPosition;
@@ -46,6 +47,7 @@ public class Spell implements Entity {
 
         // Adjust the velocity of the spell.
         angle = Math.atan2(mouseYPosition, mouseXPosition);
+        System.out.println(spellXPosition + " : " + spellYPosition);
     }
 
     /**
@@ -118,7 +120,7 @@ public class Spell implements Entity {
         if (type.equals(ItemTypes.FIREBALL)) {
             this.spellXPosition += FIREBALLVELOCITY * Math.cos(angle);
             this.spellYPosition -= FIREBALLVELOCITY * Math.sin(angle);
-            setHitBoxPosition(spellXPosition, spellYPosition - 30);
+            setHitBoxPosition(spellXPosition, spellYPosition - 30 / Constants.PPM);
         } else if (type.equals(ItemTypes.ICE_SHARD)) {
 
         }
@@ -138,7 +140,7 @@ public class Spell implements Entity {
 
         // Create fixture for fireball hit box
         CircleShape shape = new CircleShape();
-        shape.setRadius(5.0f); // Example hit box size
+        shape.setRadius(0.15f); // Example hit box size
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         body.createFixture(fixtureDef);

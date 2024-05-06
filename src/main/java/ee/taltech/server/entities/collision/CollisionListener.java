@@ -1,6 +1,7 @@
 package ee.taltech.server.entities.collision;
 
 import com.badlogic.gdx.physics.box2d.*;
+import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.entities.*;
 import ee.taltech.server.components.Game;
@@ -28,55 +29,57 @@ public class CollisionListener implements ContactListener {
         Fixture fixtureB = contact.getFixtureB();
 
         // Get data out from fixture A's user data
-        Entity entityA = (Entity) ((List<?>) fixtureA.getUserData()).getFirst();
-        String typeA = (String) ((List<?>) fixtureA.getUserData()).getLast();
+        if (fixtureA.getUserData() != null && fixtureB.getUserData() != null) {
+            Entity entityA = (Entity) ((List<?>) fixtureA.getUserData()).getFirst();
+            String typeA = (String) ((List<?>) fixtureA.getUserData()).getLast();
 
-        // Get data out from fixture B's user data
-        Entity entityB = (Entity) ((List<?>) fixtureB.getUserData()).getFirst();
-        String typeB = (String) ((List<?>) fixtureB.getUserData()).getLast();
-        // ------------------------------------------------------------------- \\
+            // Get data out from fixture B's user data
+            Entity entityB = (Entity) ((List<?>) fixtureB.getUserData()).getFirst();
+            String typeB = (String) ((List<?>) fixtureB.getUserData()).getLast();
+            // ------------------------------------------------------------------- \\
 
-        // If player and spell collide
-        if (entityA instanceof PlayerCharacter && entityB instanceof Spell
-                || entityA instanceof Spell && entityB instanceof PlayerCharacter) {
-            spellAndPlayerCollision(entityA, entityB);
-        }
+            // If player and spell collide
+            if (entityA instanceof PlayerCharacter && entityB instanceof Spell
+                    || entityA instanceof Spell && entityB instanceof PlayerCharacter) {
+                spellAndPlayerCollision(entityA, entityB);
+            }
 
-        // If player and coin collide
-        else if (entityA instanceof PlayerCharacter
-                && entityB instanceof Item itemB
-                && itemB.getType() == ItemTypes.COIN
-                ||
-                entityA instanceof Item itemA
-                && itemA.getType() == ItemTypes.COIN
-                && entityB instanceof PlayerCharacter) {
-            beginCoinAndPlayerCollision(entityA, entityB);
-        }
+            // If player and coin collide
+            else if (entityA instanceof PlayerCharacter
+                    && entityB instanceof Item itemB
+                    && itemB.getType() == ItemTypes.COIN
+                    ||
+                    entityA instanceof Item itemA
+                            && itemA.getType() == ItemTypes.COIN
+                            && entityB instanceof PlayerCharacter) {
+                beginCoinAndPlayerCollision(entityA, entityB);
+            }
 
-        // If player and item collide
-        else if (entityA instanceof PlayerCharacter && entityB instanceof Item
-                || entityA instanceof Item && entityB instanceof PlayerCharacter) {
-            beginItemAndPlayerCollision(entityA, entityB);
-        }
+            // If player and item collide
+            else if (entityA instanceof PlayerCharacter && entityB instanceof Item
+                    || entityA instanceof Item && entityB instanceof PlayerCharacter) {
+                beginItemAndPlayerCollision(entityA, entityB);
+            }
 
 
-        // If player and mob's triggering range collide
-        else if (entityA instanceof PlayerCharacter && entityB instanceof Mob && Objects.equals(typeB, "Triggering_Range")
-                || entityA instanceof Mob && Objects.equals(typeA, "Triggering_Range")
-                && entityB instanceof PlayerCharacter) {
-            playerInMobsTriggeringRange(entityA, entityB);
-        }
+            // If player and mob's triggering range collide
+            else if (entityA instanceof PlayerCharacter && entityB instanceof Mob && Objects.equals(typeB, "Triggering_Range")
+                    || entityA instanceof Mob && Objects.equals(typeA, "Triggering_Range")
+                    && entityB instanceof PlayerCharacter) {
+                playerInMobsTriggeringRange(entityA, entityB);
+            }
 
-        // If player and mob's hit box collide
-        else if (entityA instanceof PlayerCharacter && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
-                || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box") && entityB instanceof PlayerCharacter) {
-            mobAndPlayerCollision(entityA, entityB);
-        }
+            // If player and mob's hit box collide
+            else if (entityA instanceof PlayerCharacter && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
+                    || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box") && entityB instanceof PlayerCharacter) {
+                mobAndPlayerCollision(entityA, entityB);
+            }
 
-        // If spell and mob's hit box collide
-        else if (entityA instanceof Spell && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
-                || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box") && entityB instanceof Spell) {
-            mobAndSpellCollision(entityA, entityB);
+            // If spell and mob's hit box collide
+            else if (entityA instanceof Spell && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
+                    || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box") && entityB instanceof Spell) {
+                mobAndSpellCollision(entityA, entityB);
+            }
         }
     }
 
@@ -183,7 +186,7 @@ public class CollisionListener implements ContactListener {
         }
 
         if (player != null) {
-            game.damagePlayer(player.playerID, Mob.MOB_DAMAGE); // Mob damages player
+            game.damagePlayer(player.playerID, Constants.MOB_DAMAGE); // Mob damages player
         }
     }
 
@@ -219,23 +222,27 @@ public class CollisionListener implements ContactListener {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
         // Get data out from fixture A's user data
-        Entity entityA = (Entity) ((List<?>) fixtureA.getUserData()).getFirst();
-        String typeA = (String) ((List<?>) fixtureA.getUserData()).getLast();
-        // Get data out from fixture B's user data
-        Entity entityB = (Entity) ((List<?>) fixtureB.getUserData()).getFirst();
-        String typeB = (String) ((List<?>) fixtureB.getUserData()).getLast();
-        // ------------------------------------------------------------------- \\
 
-        // If player and item ends colliding
-        if (entityA instanceof PlayerCharacter && entityB instanceof Item
-                || entityA instanceof Item && entityB instanceof PlayerCharacter) {
-            endItemAndPlayerCollision(entityA, entityB);
-        }
+        if (fixtureA.getUserData() != null && fixtureB.getUserData() != null) {
 
-        // If player and mob's triggering range stop colliding
-        if (entityA instanceof PlayerCharacter && Objects.equals(typeB, "Triggering_Range")
-                || Objects.equals(typeA, "Triggering_Range") && entityB instanceof PlayerCharacter) {
-            playerNotInMobsTriggeringRange(entityA, entityB);
+            Entity entityA = (Entity) ((List<?>) fixtureA.getUserData()).getFirst();
+            String typeA = (String) ((List<?>) fixtureA.getUserData()).getLast();
+            // Get data out from fixture B's user data
+            Entity entityB = (Entity) ((List<?>) fixtureB.getUserData()).getFirst();
+            String typeB = (String) ((List<?>) fixtureB.getUserData()).getLast();
+            // ------------------------------------------------------------------- \\
+
+            // If player and item ends colliding
+            if (entityA instanceof PlayerCharacter && entityB instanceof Item
+                    || entityA instanceof Item && entityB instanceof PlayerCharacter) {
+                endItemAndPlayerCollision(entityA, entityB);
+            }
+
+            // If player and mob's triggering range stop colliding
+            if (entityA instanceof PlayerCharacter && Objects.equals(typeB, "Triggering_Range")
+                    || Objects.equals(typeA, "Triggering_Range") && entityB instanceof PlayerCharacter) {
+                playerNotInMobsTriggeringRange(entityA, entityB);
+            }
         }
     }
 

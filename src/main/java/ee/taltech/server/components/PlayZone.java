@@ -11,9 +11,6 @@ public class PlayZone {
     private int thirdZoneY;
     private int timer;
     private int stage;
-    private static final int FIRST_ZONE_RADIUS = 4450; // in pixels lmao
-    private static final int SECOND_ZONE_RADIUS = 2430;
-    private static final int THIRD_ZONE_RADIUS = 930;
 
     public int stage() {
         return stage;
@@ -33,17 +30,17 @@ public class PlayZone {
      * Currently turning the randomness off to not screw with testing.
      */
     private void zoneCoordinateGenerator () {
-        int firstZoneMin = 3400;
-        int firstZoneMax = 6000;
+        int firstZoneMin = 106;
+        int firstZoneMax = 185;
         // Generate a random integer within the specified range
-        firstZoneX = Game.random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMin;
-        firstZoneY = Game.random.nextInt(firstZoneMax - firstZoneMin + 1) + firstZoneMin;
-        int secondZoneXRandomizer = Game.random.nextInt(1500 - (-1500) + 1) + (-1500);
-        int secondZoneYRandomizer = Game.random.nextInt(1500 - (-1500) + 1) + (-1500);
-        secondZoneX =  firstZoneX + secondZoneXRandomizer;
+        firstZoneX = Game.random.nextInt(firstZoneMin, firstZoneMax + 1);
+        firstZoneY = Game.random.nextInt(firstZoneMin, firstZoneMax + 1);
+        int secondZoneXRandomizer = Game.random.nextInt(-45, 45 + 1);
+        int secondZoneYRandomizer = Game.random.nextInt(-45, 45 + 1);
+        secondZoneX = firstZoneX + secondZoneXRandomizer;
         secondZoneY = firstZoneY + secondZoneYRandomizer;
-        int thirdZoneXRandomizer = Game.random.nextInt(1600 - (-1600) + 1) + (-1600);
-        int thirdZoneYRandomizer = Game.random.nextInt(1600 - (-1600) + 1) + (-1600);
+        int thirdZoneXRandomizer = Game.random.nextInt(-50, 50 + 1);
+        int thirdZoneYRandomizer = Game.random.nextInt(-50, 50 + 1);
         thirdZoneX = secondZoneX + thirdZoneXRandomizer;
         thirdZoneY = secondZoneY + thirdZoneYRandomizer;
     }
@@ -92,13 +89,13 @@ public class PlayZone {
             return true;
         } else if (stage <= 3) {
             int distanceFromMidPoint = (int) sqrt(Math.pow(x - firstZoneX, 2) + (Math.pow(firstZoneY - y, 2)));
-            return (distanceFromMidPoint < FIRST_ZONE_RADIUS);
+            return (distanceFromMidPoint < Constants.FIRST_ZONE_RADIUS);
         } else if (stage <= 5) {
             int distanceFromMidPoint = (int) sqrt(Math.pow(x - secondZoneX, 2) + (Math.pow(secondZoneY - y, 2)));
-            return (distanceFromMidPoint < SECOND_ZONE_RADIUS);
+            return (distanceFromMidPoint < Constants.SECOND_ZONE_RADIUS);
         } else {
             int distanceFromMidPoint = (int) sqrt(Math.pow(x - thirdZoneX, 2) + (Math.pow(thirdZoneY - y, 2)));
-            return (distanceFromMidPoint < THIRD_ZONE_RADIUS);
+            return (distanceFromMidPoint < Constants.THIRD_ZONE_RADIUS);
         }
     }
 

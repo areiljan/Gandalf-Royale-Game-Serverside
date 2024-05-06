@@ -1,8 +1,8 @@
 package ee.taltech.server.network.messages.game;
 
 public class Position {
-    public int xPosition;
-    public int yPosition;
+    public float xPosition;
+    public float yPosition;
     public int userID;
 
     /**
@@ -12,7 +12,7 @@ public class Position {
      * @param xPosition player's x coordinate
      * @param yPosition player's y coordinate
      */
-    public Position(int userID, int xPosition, int yPosition) {
+    public Position(int userID, float xPosition, float yPosition) {
         this.userID = userID;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
