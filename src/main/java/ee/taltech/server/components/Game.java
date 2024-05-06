@@ -2,6 +2,7 @@ package ee.taltech.server.components;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.esotericsoftware.kryo.Kryo;
 import ee.taltech.server.GameServer;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Mob;
@@ -9,6 +10,7 @@ import ee.taltech.server.entities.Spell;
 import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.entities.collision.CollisionListener;
 import ee.taltech.server.network.messages.game.*;
+import ee.taltech.server.world.WorldCollision;
 
 import java.util.*;
 
@@ -29,6 +31,8 @@ public class Game {
     public final Map<Integer, Mob> mobs;
     public final List<Mob> mobsToRemove;
     private final List<Item> coinsToRemove;
+    private final Map<Item, PlayerCharacter> itemsToAdd;
+    private final Map<Item, PlayerCharacter> itemsToRemove;
     private final World world;
     private int ticks;
     private long startTime;
@@ -42,9 +46,13 @@ public class Game {
      * @param lobby given players that will be playing in this game
      */
     public Game(GameServer server, Lobby lobby) {
-        world = new World(new Vector2(0, 0), true); // Create a new Box2D world
+        world = new World(new Vector2(0, 0), true);
+        Kryo kryo = server.server.getKryo();
+        new WorldCollision(world, kryo);
+
         CollisionListener collisionListener = new CollisionListener(this);
         world.setContactListener(collisionListener); // Set collision listener that detects collision
+
         startTime = System.currentTimeMillis();
         this.currentTime = 0;
 
@@ -60,6 +68,8 @@ public class Game {
         this.spells = new HashMap<>();
 
         this.items = new HashMap<>();
+        this.itemsToRemove = new HashMap<>();
+        this.itemsToAdd = new HashMap<>();
 
         this.mobs = new HashMap<>();
         this.mobsToRemove = new ArrayList<>();
@@ -152,6 +162,19 @@ public class Game {
             items.remove(coin.getId());
         }
         coinsToRemove.clear();
+
+
+        // *------------- ITEM PICKUP -------------*
+        for (Map.Entry<Item, PlayerCharacter> itemPlayerCharacterEntry : itemsToAdd.entrySet()) {
+            addItem(itemPlayerCharacterEntry.getKey(), itemPlayerCharacterEntry.getValue());
+        }
+        itemsToAdd.clear();
+
+        // *------------- ITEM DROP -------------*
+        for (Map.Entry<Item, PlayerCharacter> itemPlayerCharacterEntry : itemsToRemove.entrySet()) {
+            removeItem(itemPlayerCharacterEntry.getKey(), itemPlayerCharacterEntry.getValue());
+        }
+        itemsToRemove.clear();
     }
 
     /**
@@ -188,13 +211,15 @@ public class Game {
     public void setPlayerAction(KeyPress keyPress, PlayerCharacter player) {
         if (keyPress.action.equals(KeyPress.Action.DROP) && keyPress.extraField != null) {
             Item droppedItem = player.removeItem(keyPress.extraField);
-            addItem(droppedItem, player);
+            // Add item to HashMap. Necessary for world stepping.
+            itemsToAdd.put(droppedItem, player);
         }
         if (keyPress.action.equals(KeyPress.Action.INTERACT)) {
             for (Item item : items.values()) {
                 if (Objects.equals(item.getCollidingWith(), player)) {
                     player.pickUpItem(item);
-                    removeItem(item, player);
+                    // Add item to HashMap. Necessary for world stepping.
+                    itemsToRemove.put(item, player);
                     break;
                 }
             }
@@ -350,8 +375,8 @@ public class Game {
      */
     public void dropCoins(Integer amount, float x, float y) {
         for (int i = 0; i < amount; i++) {
-            float newX = random.nextInt((int) (x - 10), (int) (x + 10));
-            float newY = random.nextInt((int) (y - 10), (int) (y + 10));
+            float newX = random.nextFloat((int) (x - Constants.COIN_DROP_RANGE), (int) (x + Constants.COIN_DROP_RANGE));
+            float newY = random.nextFloat((int) (y - Constants.COIN_DROP_RANGE), (int) (y + Constants.COIN_DROP_RANGE));
             Item coin = new Item(ItemTypes.COIN, newX, newY);
             addItem(coin, null);
         }

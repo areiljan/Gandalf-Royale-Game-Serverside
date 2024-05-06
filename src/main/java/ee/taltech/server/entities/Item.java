@@ -1,18 +1,15 @@
 package ee.taltech.server.entities;
 
 import com.badlogic.gdx.physics.box2d.*;
+import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.ItemTypes;
 
 import java.util.List;
 
+import static ee.taltech.server.components.Constants.*;
+
 public class Item implements Entity {
 
-    private static final float BOOK_HIT_BOX_WIDTH = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
-    private static final float BOOK_HIT_BOX_HEIGHT = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
-    private static final float COIN_HIT_BOX_WIDTH = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
-    private static final float COIN_HIT_BOX_HEIGHT = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
-    private static final float POTION_HIT_BOX_WIDTH = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
-    private static final float POTION_HIT_BOX_HEIGHT = 5; // This size is chosen randomly, SHOULD NOT BE FINAL
     private final Integer id;
     private final ItemTypes type;
     private float xPosition;
@@ -157,7 +154,7 @@ public class Item implements Entity {
         // Attach the fixture to the body
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = hitBoxShape;
-        //fixtureDef.isSensor = true; // Will work if we change movement from teleporting to vectors
+        fixtureDef.isSensor = true; // Will work if we change movement from teleporting to vectors
         hitBoxBody.createFixture(fixtureDef);
 
         // Clean up

@@ -10,6 +10,7 @@ import ee.taltech.server.network.messages.lobby.*;
 import ee.taltech.server.components.Game;
 import ee.taltech.server.components.Lobby;
 import ee.taltech.server.components.ItemTypes;
+import ee.taltech.server.world.MapObjectData;
 
 import java.io.IOException;
 import java.util.*;
@@ -81,6 +82,8 @@ public class GameServer {
         kryo.register(ItemDropped.class);
         kryo.register(MobPosition.class);
         kryo.register(UpdateMobHealth.class);
+        kryo.register(MapObjectData.class);
+        kryo.register(float[].class);
         kryo.addDefaultSerializer(KeyPress.Action.class, DefaultSerializers.EnumSerializer.class);
         kryo.addDefaultSerializer(ItemTypes.class, DefaultSerializers.EnumSerializer.class);
     }
@@ -91,6 +94,7 @@ public class GameServer {
      * @param args empty
      */
     public static void main(String[] args) {
+        Headless.loadHeadless();
         new GameServer();
     }
 }

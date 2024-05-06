@@ -1,6 +1,8 @@
 package ee.taltech.server.entities;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import ee.taltech.server.components.Constants;
 import ee.taltech.server.network.messages.game.KeyPress;
 import ee.taltech.server.components.ItemTypes;
 
@@ -17,20 +19,15 @@ public class PlayerCharacter implements Entity {
     private static final Integer FULL_HEALING_TICKS = 600; // 10 seconds
 
     private Body body;
-
-    public int xPosition;
-    public int yPosition;
-
+    public float xPosition;
+    public float yPosition;
     public int mouseXPosition;
     public int mouseYPosition;
     private boolean mouseLeftClick;
 
     public final int playerID;
 
-    boolean moveLeft;
-    boolean moveRight;
-    boolean moveDown;
-    boolean moveUp;
+    private Vector2 movement;
 
     public float health;
     public double mana;
@@ -45,12 +42,12 @@ public class PlayerCharacter implements Entity {
      * @param playerID player's ID
      */
     public PlayerCharacter(Integer playerID) {
-        this.playerID = playerID;
-
         // Here should be the semi-random spawn points for a PlayerCharacter
-        this.xPosition = 4700;
-        this.yPosition = 5800;
+        this.xPosition = 8200 / Constants.PPM;
+        this.yPosition = 2960 / Constants.PPM;
 
+        this.movement = new Vector2(0f, 0f);
+        this.playerID = playerID;
         health = 100;
         mana = 100;
         healingTicks = 0;
@@ -68,21 +65,23 @@ public class PlayerCharacter implements Entity {
     }
 
     /**
-     * Get x position.
-     *
-     * @return xPosition
+     * @return Player x position
      */
-    public int getXPosition() {
-        return this.xPosition;
+    public float getXPosition() {
+        if (body == null) {
+            return 0;
+        }
+        return body.getPosition().x;
     }
 
     /**
-     * Get y position.
-     *
-     * @return yPosition
+     * @return Player y position
      */
-    public int getYPosition() {
-        return this.yPosition;
+    public float getYPosition() {
+        if (body == null) {
+            return 0;
+        }
+        return body.getPosition().y;
     }
 
     /**
@@ -148,23 +147,48 @@ public class PlayerCharacter implements Entity {
 
     /**
      * Method sets the heading action for the player, but doesn't update the position coordinates.
-     * Only use if's, because multiple buttons can, be pressed simultaneously.
+     * Only use if's, because multiple buttons can be pressed simultaneously.
      *
-     * @param keyPress Incoming from client. Contains if and what button is pressed.
+     * @param keyPress Incoming from a client. Contains if and what button is pressed.
      */
     public void setMovement(KeyPress keyPress) {
-        // Set a action where player should be headed.
-        if (keyPress.action == KeyPress.Action.LEFT) {
-            this.moveLeft = keyPress.pressed;
+        // Set an action where player should be headed.
+        if (keyPress.pressed) {
+            if (keyPress.action == KeyPress.Action.LEFT) {
+                movement.x = -1;
+            } else if (keyPress.action == KeyPress.Action.RIGHT) {
+                movement.x = 1;
+            } else if (keyPress.action == KeyPress.Action.UP) {
+                movement.y = 1;
+            } else if (keyPress.action == KeyPress.Action.DOWN) {
+                movement.y = -1;
+            }
+        } else {
+            // Only cancel the movement if one key is pressed down.
+            if (keyPress.action == KeyPress.Action.LEFT && movement.x < 0) {
+                movement.x = 0;
+            } else if (keyPress.action == KeyPress.Action.RIGHT && movement.x > 0) {
+                movement.x = 0;
+            } else if (keyPress.action == KeyPress.Action.UP && movement.y > 0) {
+                movement.y = 0;
+            } else if (keyPress.action == KeyPress.Action.DOWN && movement.y < 0) {
+                movement.y = 0;
+            }
         }
-        if (keyPress.action == KeyPress.Action.RIGHT) {
-            this.moveRight = keyPress.pressed;
-        }
-        if (keyPress.action == KeyPress.Action.UP) {
-            this.moveUp = keyPress.pressed;
-        }
-        if (keyPress.action == KeyPress.Action.DOWN) {
-            this.moveDown = keyPress.pressed;
+    }
+
+    /**
+     * Update players position.
+     */
+    public void updatePosition() {
+        // updatePosition is activated every TPS.
+        // One key press distance that a character travels.
+        Vector2 scaledMovement = movement.cpy().scl(Constants.movementSpeed);
+        float maxSpeed = Constants.movementSpeed * (float) Math.sqrt(2);
+        scaledMovement.clamp(maxSpeed, maxSpeed);
+
+        if (body != null) {
+            body.setLinearVelocity(scaledMovement);
         }
     }
 
@@ -229,24 +253,39 @@ public class PlayerCharacter implements Entity {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(xPosition, yPosition);
-        Body hitBoxBody = world.createBody(bodyDef);
+        bodyDef.fixedRotation = true;
+        Body playerBody = world.createBody(bodyDef);
 
         // Create a fixture defining the hit box shape
         PolygonShape hitBoxShape = new PolygonShape();
-        hitBoxShape.setAsBox(PlayerCharacter.WIDTH, PlayerCharacter.HEIGHT);
+        hitBoxShape.setAsBox(PlayerCharacter.WIDTH / Constants.PPM, PlayerCharacter.HEIGHT / Constants.PPM);
+
+        CircleShape collisionCircle = new CircleShape();
+        float circleRadius = 10 / Constants.PPM;
+        collisionCircle.setRadius(circleRadius);
+        collisionCircle.setPosition(new Vector2(0f, -(PlayerCharacter.HEIGHT / Constants.PPM) + circleRadius));
+
+        FixtureDef fixtureDefCollisionCircle = new FixtureDef();
+        fixtureDefCollisionCircle.shape = collisionCircle;
+        fixtureDefCollisionCircle.density = 0.0f;
 
         // Attach the fixture to the body
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = hitBoxShape;
-        fixtureDef.density = 1.0f;
-        hitBoxBody.createFixture(fixtureDef);
+        FixtureDef fixtureDefHitbox = new FixtureDef();
+        fixtureDefHitbox.shape = hitBoxShape;
+        fixtureDefHitbox.density = 1.0f;
+        fixtureDefHitbox.isSensor = true;
+
+
+        playerBody.createFixture(fixtureDefHitbox);
+        playerBody.createFixture(fixtureDefCollisionCircle);
 
         // Clean up
         hitBoxShape.dispose();
+        collisionCircle.dispose();
 
         // Add this object as data
-        hitBoxBody.getFixtureList().get(0).setUserData(List.of(this, "Hit_Box"));
-        body = hitBoxBody;
+        playerBody.getFixtureList().get(0).setUserData(List.of(this, "Hit_Box"));
+        body = playerBody;
     }
 
     /**
@@ -257,56 +296,6 @@ public class PlayerCharacter implements Entity {
         body = null;
     }
 
-    /**
-     * Update players position.
-     */
-    public void updatePosition() {
-        // updatePosition is activated every TPS.
-        // One key press distance that a character travels.
-        int distance = 3;
-        // Diagonal movement correction formula.
-        int diagonal = (int) (distance / Math.sqrt(2));
-
-        if (moveLeft && moveUp) {
-            this.xPosition -= diagonal;
-            this.yPosition += diagonal;
-        } else if (moveLeft && moveDown) {
-            this.xPosition -= diagonal;
-            this.yPosition -= diagonal;
-        } else if (moveRight && moveUp) {
-            this.xPosition += diagonal;
-            this.yPosition += diagonal;
-        } else if (moveRight && moveDown) {
-            this.xPosition += diagonal;
-            this.yPosition -= diagonal;
-        } else {
-            oneWayMovement(distance);
-        }
-        if (body != null) {
-            // Set the position of the Box2D body to match the player's coordinates
-            body.setTransform((float) xPosition + 5, (float) yPosition + 25, body.getAngle());
-        }
-    }
-
-    /**
-     * Move player only in one action.
-     *
-     * @param distance how much to change player coordinates
-     */
-    private void oneWayMovement(int distance) {
-        if (moveLeft) {
-            this.xPosition -= distance;
-        }
-        if (moveRight) {
-            this.xPosition += distance;
-        }
-        if (moveUp) {
-            this.yPosition += distance;
-        }
-        if (moveDown) {
-            this.yPosition -= distance;
-        }
-    }
 
     /**
      * Regenerate mana.

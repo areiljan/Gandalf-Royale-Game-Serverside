@@ -1,6 +1,7 @@
 package ee.taltech.server;
 
 import com.esotericsoftware.kryonet.Server;
+import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Mob;
@@ -50,19 +51,19 @@ public class TickRateLoop implements Runnable {
 
     /**
      * Method is called out every tick (in run() method).
-     * Contains logic, that needs to be updated every tick.
+     * Contains logic that needs to be updated every tick.
      */
     public void tick() {
-        // This function activates according to ticks per second.
+        // This function activates, according to ticks per second.
         // If 1 TPS, then every second.
         // Update player positions for clients that are in the same game with player
         for (Game game : this.gameServer.games.values()) {
             if (game.getTicks() < 1501) game.addTick(); // Used only to demonstrate item generation by server
             if (game.getTicks() == 1500) { // Trigger only once after 1000 ticks
-                Item item1 = new Item(ItemTypes.FIREBALL, 4500, 5800);
-                Item item2 = new Item(ItemTypes.FIREBALL, 4500, 5600);
-                Item potion = new Item(ItemTypes.HEALING_POTION, 4500, 5700);
-                Mob mob = new Mob(4000, 5700);
+                Item item1 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2940 / Constants.PPM);
+                Item item2 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2910 / Constants.PPM);
+                Item potion = new Item(ItemTypes.HEALING_POTION, 7640 / Constants.PPM, 2880 / Constants.PPM);
+                Mob mob = new Mob(7640, 3020);
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
@@ -82,11 +83,11 @@ public class TickRateLoop implements Runnable {
                 if (player.getHealingTicks() > 0) {
                     player.regenerateHealth();
                 }
-                if (!game.getPlayZone().areCoordinatesInZone(player.xPosition, player.yPosition)) {
+                if (!game.getPlayZone().areCoordinatesInZone((int) player.getXPosition(), (int) player.getYPosition())) {
                     player.receiveZoneDamage();
                 }
                 for (Integer playerId : game.gamePlayers.keySet()) {
-                    server.sendToUDP(playerId, new Position(player.playerID, player.xPosition, player.yPosition));
+                    server.sendToUDP(playerId, new Position(player.playerID, player.getXPosition(), player.getYPosition()));
                     server.sendToUDP(playerId, new UpdateHealth(player.playerID, (int) player.health));
                     server.sendToUDP(playerId, new UpdateMana(player.playerID, player.mana));
                     server.sendToUDP(playerId, new PlayZoneUpdate(game.getPlayZone().getTimer(), game.getPlayZone().stage()));
