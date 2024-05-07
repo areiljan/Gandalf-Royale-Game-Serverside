@@ -276,15 +276,13 @@ public class PlayerCharacter implements Entity {
         fixtureDefHitbox.isSensor = true;
 
 
-        playerBody.createFixture(fixtureDefHitbox);
-        playerBody.createFixture(fixtureDefCollisionCircle);
+        playerBody.createFixture(fixtureDefHitbox).setUserData(List.of(this, "Hit_Box"));
+        playerBody.createFixture(fixtureDefCollisionCircle).setUserData(List.of(this, "World_Collision"));
 
         // Clean up
         hitBoxShape.dispose();
         collisionCircle.dispose();
 
-        // Add this object as data
-        playerBody.getFixtureList().get(0).setUserData(List.of(this, "Hit_Box"));
         body = playerBody;
     }
 

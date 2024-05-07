@@ -39,8 +39,8 @@ public class CollisionListener implements ContactListener {
             // ------------------------------------------------------------------- \\
 
             // If player and spell collide
-            if (entityA instanceof PlayerCharacter && entityB instanceof Spell
-                    || entityA instanceof Spell && entityB instanceof PlayerCharacter) {
+            if (entityA instanceof PlayerCharacter && typeA.equals("Hit_Box") && entityB instanceof Spell
+                    || entityA instanceof Spell && entityB instanceof PlayerCharacter && typeB.equals("Hit_Box")) {
                 spellAndPlayerCollision(entityA, entityB);
             }
 
@@ -70,8 +70,10 @@ public class CollisionListener implements ContactListener {
             }
 
             // If player and mob's hit box collide
-            else if (entityA instanceof PlayerCharacter && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
-                    || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box") && entityB instanceof PlayerCharacter) {
+            else if (entityA instanceof PlayerCharacter && typeA.equals("Hit_Box")
+                    && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
+                    || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box")
+                    && entityB instanceof PlayerCharacter && typeA.equals("Hit_Box")) {
                 mobAndPlayerCollision(entityA, entityB);
             }
 

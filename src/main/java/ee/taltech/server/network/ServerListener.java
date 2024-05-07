@@ -83,8 +83,7 @@ public class ServerListener extends Listener {
                     // *------------- SPELL -------------*
                     else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse && player.mana >= 20) {
                         // Add new spell to the game
-                        Spell spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, game.getWorld(),
-                                mouse.type);
+                        Spell spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
                         game.addSpell(spell);
                         // Action cost
                         player.setMana(player.mana - 20);

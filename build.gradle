@@ -11,6 +11,7 @@ distributions {
     main {
         contents {
             from 'src/main/resources/grid.txt'
+            from 'src/main/resources/mapdata.bin'
         }
     }
 }
