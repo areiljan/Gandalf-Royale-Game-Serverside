@@ -132,6 +132,7 @@ public class Game {
         // *------------- SPELL ADDING -------------*
         for (Spell spellToAdd : spellsToAdd) {
             if(!spells.containsValue(spellToAdd)) {
+                spellToAdd.createBody(getWorld());
                 spells.put(spellToAdd.getSpellId(), spellToAdd);
             }
         }

@@ -19,5 +19,6 @@ public class Constants {
     public static final int MOB_DAMAGE = 15;
     public static final int MAX_PATH_RANGE = 300;
     public static final float COIN_DROP_RANGE = 1;
+    public static final float FIREBALL_SPEED = 6;
 }
 
