@@ -27,10 +27,9 @@ public class PlayZone {
 
     /**
      * Generates the coordinates for the zone center points.
-     * Currently turning the randomness off to not screw with testing.
      */
     private void zoneCoordinateGenerator () {
-        int firstZoneMin = 106;
+        int firstZoneMin = 100;
         int firstZoneMax = 185;
         // Generate a random integer within the specified range
         firstZoneX = Game.random.nextInt(firstZoneMin, firstZoneMax + 1);
@@ -55,26 +54,22 @@ public class PlayZone {
         if (timer > 30 && timer < 60) {
             // *---first marker---*
             stage = 1;
-        } else if (timer < 120) {
+        } else if (timer > 60 && timer < 120) {
             // *--- first zone---*
             stage = 2;
-            // implement first zone
-        } else if (timer < 150) {
+        } else if (timer > 120 && timer < 180) {
             // *--- second marker---*
             stage = 3;
-        } else if (timer < 210) {
+        } else if (timer > 180 && timer < 240) {
             // *--- second zone---*
             stage = 4;
-        } else if (timer < 240) {
+        } else if (timer > 240 && timer < 300) {
             // *--- third marker---*
             stage = 5;
-        } else if (timer < 300) {
+        } else if (timer > 300) {
             // *---third zone---*
             // final countdown
             stage = 6;
-        } else if (timer < 500) {
-            stage = 7;
-            // entire map turns red - not implemented yet.
         }
     }
 
