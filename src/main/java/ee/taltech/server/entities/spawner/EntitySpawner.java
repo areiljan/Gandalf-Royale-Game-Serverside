@@ -20,10 +20,11 @@ public class EntitySpawner {
     public EntitySpawner(Game game) {
         this.game = game;
         this.coordinates = new ArrayList<>();
-        loadCoordinatesFromCSV();
 
-        setPlayerSpawn();
-        spawnEntities();
+        loadCoordinatesFromCSV(); // Load handpicked coords.
+
+        setPlayerSpawn(); // Move players to the right positions. Needs to be before items spawn.
+        spawnEntities(); // Spawn items by probability
 
     }
 
@@ -32,6 +33,9 @@ public class EntitySpawner {
         MOB, PLAYER, SPELL
     }
 
+    /**
+     * Spawn entities randomly
+     */
     public void spawnEntities() {
         // 2. Spawn items based on probabilities
         for (int[] coord : coordinates) {
@@ -43,6 +47,10 @@ public class EntitySpawner {
         }
     }
 
+    /**
+     * Spawn players and remove coords accordingly.
+     * This makes the items and players not spawn on top of each other.
+     */
     public void setPlayerSpawn() {
         Random random = new Random();
         for (PlayerCharacter player : game.gamePlayers.values()) {
@@ -52,6 +60,9 @@ public class EntitySpawner {
         }
     }
 
+    /**
+     * Load the coords into an array.
+     */
     private void loadCoordinatesFromCSV() {
         try (InputStream inputStream = getClass().getResourceAsStream("/spawn_points.csv");
              BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
@@ -66,6 +77,9 @@ public class EntitySpawner {
     }
 
 
+    /**
+     * @return Type of item, that is going to be spawned.
+     */
     private ItemType getRandomItemType() {
         float randomValue = MathUtils.random();
         float cumulativeProbability = 0.0f;
@@ -78,6 +92,12 @@ public class EntitySpawner {
         return null; // No item spawned based on probability
     }
 
+    /**
+     * Actually add the items to the game.
+     *
+     * @param coord of spawn position
+     * @param type of item/mob that will be spawned.
+     */
     private void spawnItem(int[] coord, ItemType type) {
         switch (type) {
             case MOB:
