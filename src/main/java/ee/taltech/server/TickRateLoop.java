@@ -4,11 +4,9 @@ import com.esotericsoftware.kryonet.Server;
 import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.components.Lobby;
-import ee.taltech.server.entities.Item;
-import ee.taltech.server.entities.Mob;
-import ee.taltech.server.entities.Spell;
+import ee.taltech.server.entities.*;
+import ee.taltech.server.entities.spawner.EntitySpawner;
 import ee.taltech.server.network.messages.game.*;
-import ee.taltech.server.entities.PlayerCharacter;
 
 import ee.taltech.server.components.Game;
 
@@ -88,6 +86,7 @@ public class TickRateLoop implements Runnable {
             // Item spawning to the world
             if (game.getStaringTicks() <= Constants.TICKS_TO_START_GAME) game.addTick(true);
             if (game.getStaringTicks() == Constants.TICKS_TO_START_GAME) { // Trigger only once
+                new EntitySpawner(game);
                 Item item1 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2940 / Constants.PPM);
                 Item item2 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2910 / Constants.PPM);
                 Item potion = new Item(ItemTypes.HEALING_POTION, 7640 / Constants.PPM, 2880 / Constants.PPM);
