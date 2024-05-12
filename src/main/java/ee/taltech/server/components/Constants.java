@@ -32,7 +32,10 @@ public class Constants {
 
     public static final float COIN_DROP_RANGE = 1;
     public static final float ITEM_DROP_RANGE = 0.5f;
-    public static final float FIREBALL_SPEED = 6;
+    public static final float FIREBALL_SPEED = 5;
+    public static final float PLASMA_SPEED = 8;
+    public static final float KUNAI_SPEED = 8;
+    public static final float METEOR_SPEED = 2;
 
     public static final int TICKS_TO_START_GAME = 1000;
     public static final int TICKS_TO_END_GAME = 60;

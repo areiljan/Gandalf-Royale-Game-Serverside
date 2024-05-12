@@ -3,6 +3,7 @@ package ee.taltech.server.entities;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.components.Constants;
+import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.entities.collision.CollisionBodyTypes;
 import ee.taltech.server.network.messages.game.KeyPress;
 
@@ -32,8 +33,8 @@ public class PlayerCharacter implements Entity {
     public float mana;
     private final Map<Integer, Item> inventory;
     private Integer coins;
-
     private Integer healingTicks;
+    public ItemTypes type;
     private boolean collidingWithMob;
 
     /**
@@ -192,10 +193,11 @@ public class PlayerCharacter implements Entity {
      * @param mouseXPosition mouse x coordinate
      * @param mouseYPosition mouse y coordinate
      */
-    public void setMouseControl(boolean leftMouse, int mouseXPosition, int mouseYPosition){
+    public void setMouseControl(boolean leftMouse, int mouseXPosition, int mouseYPosition, ItemTypes type){
         this.mouseXPosition = mouseXPosition;
         this.mouseYPosition = mouseYPosition;
         this.mouseLeftClick = leftMouse;
+        this.type = type;
     }
 
     /**
