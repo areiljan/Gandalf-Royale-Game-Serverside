@@ -135,7 +135,7 @@ public class CollisionListener implements ContactListener {
 
         // If player is not the person who cast the action then damage the player
         if (player != null && spell.getPlayerId() != player.getPlayerID()) {
-            game.damagePlayer(player.playerID, 10);
+            game.damagePlayer(player.playerID, spell.getSpellDamage());
             game.removeSpell(spell.getSpellId());
         }
     }
@@ -241,7 +241,7 @@ public class CollisionListener implements ContactListener {
             mob = (Mob) entityA;
         }
 
-        game.damageMob(mob.getId(), 10); // Damage mob
+        game.damageMob(mob.getId(), spell.getSpellDamage()); // Damage mob
         game.removeSpell(spell.getSpellId()); // Remove spell
     }
 

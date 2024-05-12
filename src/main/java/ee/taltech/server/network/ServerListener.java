@@ -75,19 +75,27 @@ public class ServerListener extends Listener {
             case MouseClicks mouse: // On MouseClicks message
                 if (player != null) {
                     // Set the direction player should be moving.
-                    player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition);
+                    player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition, mouse.type);
 
                     // *------------- HEALING POTION -------------*
                     if (mouse.type == ItemTypes.HEALING_POTION) {
                         game.healPlayer(player.playerID, mouse.extraField);
                     }
                     // *------------- SPELL -------------*
-                    else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse && player.mana >= 20) {
-                        // Add new spell to the game
-                        Spell spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
-                        game.addSpell(spell);
-                        // Action cost
-                        player.setMana(player.mana - 20);
+                    else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse) {
+                        Spell spell = null;
+                        if (mouse.type == ItemTypes.FIREBALL && player.mana >= 25) {
+                            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
+                        } else if (mouse.type == ItemTypes.PLASMA && player.mana >= 15) {
+                            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
+                        } else if (mouse.type == ItemTypes.METEOR && player.mana >= 33) {
+                            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
+                        } else if (mouse.type == ItemTypes.KUNAI && player.mana >= 50) {
+                            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
+                        }
+                        if (spell != null) {
+                            game.addSpell(spell);
+                        }
                     }
                 }
                 break;
