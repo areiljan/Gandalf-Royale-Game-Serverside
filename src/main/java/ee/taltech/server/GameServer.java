@@ -21,6 +21,10 @@ public class GameServer {
     public final Map<Integer, Lobby> lobbies;
     public final Map<Integer, Game> games;
 
+    public final List<Integer> connectionsToRemove;
+    public final List<Integer> lobbiesToRemove;
+    public final List<Integer> gamesToRemove;
+    public final Map<Integer, Lobby> playersToRemoveFromLobbies;
 
     /**
      * Main constructor for the server.
@@ -29,7 +33,14 @@ public class GameServer {
         this.lobbies = new HashMap<>(); // Contains gameIds: lobby
         this.connections = new HashMap<>(); // Contains playerId: gameId
         this.games = new HashMap<>(); // Contains gameIds: game
+
         this.server = new Server();
+
+        // Removal lists for avoiding concurrent modification
+        connectionsToRemove = new ArrayList<>();
+        lobbiesToRemove = new ArrayList<>();
+        gamesToRemove = new ArrayList<>();
+        playersToRemoveFromLobbies = new HashMap<>();
 
         Grid.setGrid(Grid.readGridFromFile()); // Read and set grid from the file
 
@@ -56,6 +67,8 @@ public class GameServer {
         // For registering allowed sendable data objects.
         Kryo kryo = server.getKryo();
         kryo.register(java.util.ArrayList.class);
+        kryo.register(MapObjectData.class);
+        kryo.register(float[].class);
         kryo.register(PlayZoneCoordinates.class);
         kryo.register(Position.class);
         kryo.register(ActionTaken.class);
@@ -74,7 +87,6 @@ public class GameServer {
         kryo.register(SpellPosition.class);
         kryo.register(SpellDispel.class);
         kryo.register(UpdateHealth.class);
-        kryo.register(KilledPlayer.class);
         kryo.register(UpdateMana.class);
         kryo.register(ItemPickedUp.class);
         kryo.register(CoinPickedUp.class);
@@ -82,8 +94,8 @@ public class GameServer {
         kryo.register(ItemDropped.class);
         kryo.register(MobPosition.class);
         kryo.register(UpdateMobHealth.class);
-        kryo.register(MapObjectData.class);
-        kryo.register(float[].class);
+        kryo.register(GameLeave.class);
+        kryo.register(GameOver.class);
         kryo.addDefaultSerializer(KeyPress.Action.class, DefaultSerializers.EnumSerializer.class);
         kryo.addDefaultSerializer(ItemTypes.class, DefaultSerializers.EnumSerializer.class);
     }

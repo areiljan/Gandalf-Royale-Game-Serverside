@@ -20,22 +20,31 @@ public class Game {
     public final Lobby lobby;
     public final GameServer server;
     public final Integer gameId;
-    public final Map<Integer, PlayerCharacter> gamePlayers; // Previous alivePlayers
-    private PlayZone playZone;
+
+    private final PlayZone playZone;
+
+    public final Map<Integer, PlayerCharacter> gamePlayers;
+    private final Map<Integer, PlayerCharacter> deadPlayers;
+    private final List<PlayerCharacter> playersToRemove;
     private int killedPlayerId;
-    public Map<Integer, PlayerCharacter> deadPlayers;
+
     private final List<Spell> spellsToAdd;
     private final List<Integer> spellsToDispel;
-    public Map<Integer, Spell> spells;
+    public final Map<Integer, Spell> spells;
+
     public final Map<Integer, Item> items;
-    public final Map<Integer, Mob> mobs;
-    public final List<Mob> mobsToRemove;
-    private final List<Item> coinsToRemove;
     private final Map<Item, PlayerCharacter> itemsToAdd;
     private final Map<Item, PlayerCharacter> itemsToRemove;
+    private final List<Item> coinsToRemove;
+
+    public final Map<Integer, Mob> mobs;
+    public final List<Mob> mobsToRemove;
+
     private final World world;
-    private int ticks;
-    private long startTime;
+
+    private int staringTicks;
+    private int endingTicks;
+    private final long startTime;
     private int currentTime;
 
 
@@ -61,6 +70,7 @@ public class Game {
         this.gameId = lobby.lobbyId;
 
         this.gamePlayers = createPlayersMap();
+        this.playersToRemove = new ArrayList<>();
         this.deadPlayers = new HashMap<>();
 
         this.spellsToAdd = new ArrayList<>();
@@ -70,16 +80,17 @@ public class Game {
         this.items = new HashMap<>();
         this.itemsToRemove = new HashMap<>();
         this.itemsToAdd = new HashMap<>();
+        this.coinsToRemove = new ArrayList<>();
 
         this.mobs = new HashMap<>();
         this.mobsToRemove = new ArrayList<>();
 
-        this.coinsToRemove = new ArrayList<>();
-
         this.killedPlayerId = 0;
 
-        this.ticks = 0;
         this.playZone = new PlayZone();
+
+        this.staringTicks = 0;
+        this.endingTicks = 0;
     }
 
     /**
@@ -87,95 +98,35 @@ public class Game {
      *
      * @return ticks
      */
-    public int getTicks() {
-        return ticks;
+    public int getStaringTicks() {
+        return staringTicks;
     }
 
+    public int getEndingTicks() {
+        return endingTicks;
+    }
 
     /**
      * Send playZone information.
      */
     public void sendPlayZoneCoordinates() {
-        server.server.sendToAllTCP(new PlayZoneCoordinates(playZone.getFirstZoneX(),
-                playZone.getFirstZoneY(), playZone.getSecondZoneX(),
-                playZone.getSecondZoneY(), playZone.getThirdZoneX(),
-                playZone.getThirdZoneY()));
+        for (Integer playerId : lobby.players) {
+            server.server.sendToTCP(playerId, new PlayZoneCoordinates(playZone.getFirstZoneX(),
+                    playZone.getFirstZoneY(), playZone.getSecondZoneX(),
+                    playZone.getSecondZoneY(), playZone.getThirdZoneX(),
+                    playZone.getThirdZoneY()));
+        }
     }
 
     /**
      * Add tick to game.
      */
-    public void addTick() {
-        ticks++;
-    }
-
-    /**
-     * Updating game values.
-     */
-    public void update() {
-        playZone.updateZone(currentTime);
-        world.step(1 / 60f, 6, 2); // Stepping world to update bodies
-        currentTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
-
-        // *------------- SPELL REMOVING -------------*
-        for (Integer spellToDispel : spellsToDispel) {
-            if (spells.containsKey(spellToDispel)) {
-                spells.get(spellToDispel).removeSpellBody(world);
-                for (Integer playerId : gamePlayers.keySet()) {
-                    server.server.sendToUDP(playerId, new SpellDispel(spells.get(spellToDispel).getSpellId()));
-                }
-                spells.remove(spellToDispel);
-            }
+    public void addTick(boolean startingTick) {
+        if (startingTick) {
+            staringTicks++;
+        } else {
+            endingTicks++;
         }
-        spellsToDispel.clear();
-
-        // *------------- SPELL ADDING -------------*
-        for (Spell spellToAdd : spellsToAdd) {
-            if(!spells.containsValue(spellToAdd)) {
-                spellToAdd.createBody(getWorld());
-                spells.put(spellToAdd.getSpellId(), spellToAdd);
-            }
-        }
-        spellsToAdd.clear();
-
-        // *------------- PLAYER REMOVING -------------*
-        killedPlayerId = 0; // resets the id to 0 each iteration.
-        for (PlayerCharacter deadPlayer : deadPlayers.values()) {
-            dropCoins(deadPlayer.getCoins(), deadPlayer.getXPosition(), deadPlayer.getYPosition()); // Drop all coins
-            deadPlayer.removeBody(world);
-
-            // this class integer id will be used to send a one-time message to the client.
-            killedPlayerId = deadPlayer.getPlayerID();
-        }
-        deadPlayers.clear();
-
-        // *------------- MOB REMOVING -------------*
-        for (Mob mob : mobsToRemove) {
-            dropCoins(5, mob.getXPosition(), mob.getYPosition()); // Drop 5 coins
-            mob.removeBody(world);
-            mobs.remove(mob.getId());
-        }
-        mobsToRemove.clear();
-
-        // *------------- COIN REMOVING -------------*
-        for (Item coin : coinsToRemove) {
-            coin.removeBody(world);
-            items.remove(coin.getId());
-        }
-        coinsToRemove.clear();
-
-
-        // *------------- ITEM PICKUP -------------*
-        for (Map.Entry<Item, PlayerCharacter> itemPlayerCharacterEntry : itemsToAdd.entrySet()) {
-            addItem(itemPlayerCharacterEntry.getKey(), itemPlayerCharacterEntry.getValue());
-        }
-        itemsToAdd.clear();
-
-        // *------------- ITEM DROP -------------*
-        for (Map.Entry<Item, PlayerCharacter> itemPlayerCharacterEntry : itemsToRemove.entrySet()) {
-            removeItem(itemPlayerCharacterEntry.getKey(), itemPlayerCharacterEntry.getValue());
-        }
-        itemsToRemove.clear();
     }
 
     /**
@@ -201,6 +152,15 @@ public class Game {
      */
     public World getWorld() {
         return world;
+    }
+
+    /**
+     * Get dead players.
+     *
+     * @return map of dead players where key is player ID and value PlayerCharacter
+     */
+    public Map<Integer, PlayerCharacter> getDeadPlayers() {
+        return deadPlayers;
     }
 
     /**
@@ -236,17 +196,14 @@ public class Game {
     private Map<Integer, PlayerCharacter> createPlayersMap(){
         Map<Integer, PlayerCharacter> result = new HashMap<>(); // New Map
 
-        for (Integer playerID : server.connections.keySet()) {
-            if (lobby.players.contains(playerID)) { // If player ID is in lobby's players list
-                server.connections.put(playerID, gameId);
-                PlayerCharacter player = new PlayerCharacter(playerID); // Create character for player
-                player.createBody(world); // Create hit box for player
-                result.put(player.playerID, player);
-            }
+        for (Integer playerId : lobby.players) {
+            server.connections.put(playerId, gameId);
+            PlayerCharacter player = new PlayerCharacter(playerId); // Create character for player
+            player.createBody(world); // Create hit box for player
+            result.put(player.playerID, player);
         }
         return result;
     }
-
 
     /**
      * Damage player and put them into deadPlayers if they have 0 hp
@@ -254,7 +211,7 @@ public class Game {
      * @param id player ID
      * @param amount amount of damage done to player
      */
-    public void damagePlayer(Integer id, Integer amount) {
+    public void damagePlayer(Integer id, float amount) {
         PlayerCharacter player = gamePlayers.get(id); // Get player
 
         float newHealth = Math.max(player.health - amount, 0); // Health can not be less than 0
@@ -262,6 +219,7 @@ public class Game {
 
         // If player has 0 health move them to dead players
         if (player.health == 0) {
+            playersToRemove.add(player);
             deadPlayers.put(id, player);
         }
     }
@@ -292,15 +250,21 @@ public class Game {
      */
     public void addItem(Item item, PlayerCharacter playerCharacter) {
         if (playerCharacter != null) { // If player is not null aka player dropped item, then update items position
-            item.setXPosition(playerCharacter.getXPosition());
-            item.setYPosition(playerCharacter.getYPosition());
+            item.setXPosition(random.nextFloat(
+                    ((playerCharacter.getXPosition() + PlayerCharacter.WIDTH / Constants.PPM / 2) - Constants.ITEM_DROP_RANGE),
+                    ((playerCharacter.getXPosition() + PlayerCharacter.WIDTH / Constants.PPM / 2) + Constants.ITEM_DROP_RANGE))
+            );
+            item.setYPosition(random.nextFloat(
+                    (playerCharacter.getYPosition() - Constants.ITEM_DROP_RANGE),
+                    (playerCharacter.getYPosition() + Constants.ITEM_DROP_RANGE))
+            );
         }
         item.createBody(world); // Create body for item
         item.updateBody(); // Update item's body
         items.put(item.getId(), item); // Put it in the items map
 
-        ItemDropped message = createItemDropped(item, playerCharacter);
-        for (Integer playerId : gamePlayers.keySet()) { // Send message for every player in the lobby
+        ItemDropped message = createItemDroppedMessage(item, playerCharacter);
+        for (Integer playerId : lobby.players) { // Send message for every player in the lobby
             server.server.sendToUDP(playerId, message);
         }
     }
@@ -312,12 +276,12 @@ public class Game {
      * @param playerCharacter player character that dropped item if player dropped else null
      * @return ItemDropped message
      */
-    private ItemDropped createItemDropped(Item item, PlayerCharacter playerCharacter) {
+    private ItemDropped createItemDroppedMessage(Item item, PlayerCharacter playerCharacter) {
         ItemDropped message;
         // If player in not null aka player dropped item send message with player's ID
         if (playerCharacter != null) {
             message = new ItemDropped(playerCharacter.getPlayerID(), item.getId(), item.getType(),
-                    playerCharacter.getXPosition(), playerCharacter.getYPosition());
+                    item.getXPosition(), item.getYPosition());
         } else { // If player is null aka game dropped item then send message without player's ID
             message = new ItemDropped(null, item.getId(), item.getType(),
                     item.getXPosition(), item.getYPosition());
@@ -362,7 +326,7 @@ public class Game {
         CoinPickedUp message = new CoinPickedUp(player.playerID, coin.getId());
 
         // Send message to every player in this game
-        for (Integer playerId : gamePlayers.keySet()) {
+        for (Integer playerId : lobby.players) {
             server.server.sendToUDP(playerId, message);
         }
     }
@@ -379,7 +343,18 @@ public class Game {
             float newX = random.nextFloat((int) (x - Constants.COIN_DROP_RANGE), (int) (x + Constants.COIN_DROP_RANGE));
             float newY = random.nextFloat((int) (y - Constants.COIN_DROP_RANGE), (int) (y + Constants.COIN_DROP_RANGE));
             Item coin = new Item(ItemTypes.COIN, newX, newY);
-            addItem(coin, null);
+            itemsToAdd.put(coin, null);
+        }
+    }
+
+    /**
+     * Drop all items from player's inventory.
+     *
+     * @param playerCharacter given player character
+     */
+    public void dropAllItems(PlayerCharacter playerCharacter) {
+        for (Item item : playerCharacter.getInventory()) {
+            addItem(playerCharacter.removeItem(item.getId()), playerCharacter);
         }
     }
 
@@ -393,6 +368,12 @@ public class Game {
         mobs.put(mob.getId(), mob);
     }
 
+    /**
+     * Damage mob.
+     *
+     * @param id mob's ID who is damaged
+     * @param amount amount of damage that is done to mob
+     */
     public void damageMob(Integer id, Integer amount) {
         Mob mob = mobs.get(id); // Get mob
 
@@ -425,5 +406,91 @@ public class Game {
      */
     public PlayZone getPlayZone() {
         return playZone;
+    }
+
+    /**
+     * Updating game values.
+     */
+    public void update() {
+        playZone.updateZone(currentTime);
+        world.step(1 / 60f, 6, 2); // Stepping world to update bodies
+        currentTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
+
+        // *------------- SPELL REMOVING -------------*
+        for (Integer spellToDispel : spellsToDispel) {
+            if (spells.containsKey(spellToDispel)) {
+                spells.get(spellToDispel).removeSpellBody(world);
+                for (Integer playerId : gamePlayers.keySet()) {
+                    server.server.sendToUDP(playerId, new SpellDispel(spells.get(spellToDispel).getSpellId()));
+                }
+                spells.remove(spellToDispel);
+            }
+        }
+        spellsToDispel.clear();
+
+        // *------------- SPELL ADDING -------------*
+        for (Spell spellToAdd : spellsToAdd) {
+            if(!spells.containsValue(spellToAdd)) {
+                spellToAdd.createBody(getWorld());
+                spells.put(spellToAdd.getSpellId(), spellToAdd);
+            }
+        }
+        spellsToAdd.clear();
+
+        // *------------- PLAYER REMOVING -------------*
+        killedPlayerId = 0; // resets the id to 0 each iteration.
+        for (PlayerCharacter deadPlayer : playersToRemove) {
+            dropCoins(deadPlayer.getCoins(), deadPlayer.getXPosition(), deadPlayer.getYPosition()); // Drop all coins
+            dropAllItems(deadPlayer); // Drop all items from player's inventory
+            deadPlayer.removeBody(world);
+
+            // this class integer id will be used to send a one-time message to the client.
+            killedPlayerId = deadPlayer.getPlayerID();
+        }
+        playersToRemove.clear();
+
+        // *------------- MOB REMOVING -------------*
+        for (Mob mob : mobsToRemove) {
+            dropCoins(5, mob.getXPosition(), mob.getYPosition()); // Drop 5 coins
+            mob.removeBody(world);
+            mobs.remove(mob.getId());
+        }
+        mobsToRemove.clear();
+
+        // *------------- COIN REMOVING -------------*
+        for (Item coin : coinsToRemove) {
+            coin.removeBody(world);
+            items.remove(coin.getId());
+        }
+        coinsToRemove.clear();
+
+        // *------------- ITEM PICKUP -------------*
+        for (Map.Entry<Item, PlayerCharacter> itemPlayerCharacterEntry : itemsToAdd.entrySet()) {
+            addItem(itemPlayerCharacterEntry.getKey(), itemPlayerCharacterEntry.getValue());
+        }
+        itemsToAdd.clear();
+
+        // *------------- ITEM DROP -------------*
+        for (Map.Entry<Item, PlayerCharacter> itemPlayerCharacterEntry : itemsToRemove.entrySet()) {
+            removeItem(itemPlayerCharacterEntry.getKey(), itemPlayerCharacterEntry.getValue());
+        }
+        itemsToRemove.clear();
+    }
+
+    /**
+     * End the current game, let the player's know who won and dispose everything.
+     */
+    public void endGame() {
+        if (gamePlayers.size() - deadPlayers.size() == 1) {
+            // *-------------- GETTING WINNER ID -------------*
+            Set<Integer> difference = new HashSet<>(gamePlayers.keySet());
+            difference.removeAll(deadPlayers.keySet());
+            Integer winnerId = difference.iterator().next();
+
+            // Send game over message to everyone who is still in the game
+            for (Integer playerId : lobby.players) {
+                server.server.sendToTCP(playerId, new GameOver(winnerId));
+            }
+        }
     }
 }

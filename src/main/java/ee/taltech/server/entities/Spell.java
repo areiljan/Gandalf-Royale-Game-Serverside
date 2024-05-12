@@ -36,7 +36,6 @@ public class Spell implements Entity {
         // These mouse positions are already relative to the player.
         spellVector = new Vector2((float) mouseXPosition, (float) mouseYPosition);
         spellVector.nor();
-        System.out.println(spellXStart + " : " + spellYStart);
     }
 
     /**

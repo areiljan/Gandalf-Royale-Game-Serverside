@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.server.GameServer;
 import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.entities.Spell;
+import ee.taltech.server.network.messages.game.GameLeave;
 import ee.taltech.server.network.messages.game.KeyPress;
 import ee.taltech.server.network.messages.game.MouseClicks;
 import ee.taltech.server.network.messages.lobby.*;
@@ -41,7 +42,7 @@ public class ServerListener extends Listener {
     @Override
     public void received(Connection connection, Object incomingData) {
         Class<?> dataClass = incomingData.getClass();
-        if (dataClass == KeyPress.class || dataClass == MouseClicks.class) {
+        if (dataClass == KeyPress.class || dataClass == MouseClicks.class || dataClass == GameLeave.class){
             gameMessagesListener(connection, incomingData); // If message is associated with game
         } else if (dataClass == LobbyCreation.class || dataClass == Join.class || dataClass == Leave.class
                 || dataClass == GetLobbies.class || dataClass == StartGame.class) {
@@ -74,7 +75,7 @@ public class ServerListener extends Listener {
             case MouseClicks mouse: // On MouseClicks message
                 if (player != null) {
                     // Set the direction player should be moving.
-                    player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition, mouse.type);
+                    player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition);
 
                     // *------------- HEALING POTION -------------*
                     if (mouse.type == ItemTypes.HEALING_POTION) {
@@ -89,6 +90,10 @@ public class ServerListener extends Listener {
                         player.setMana(player.mana - 20);
                     }
                 }
+                break;
+            case GameLeave message: // On GameLeave message
+                game.damagePlayer(message.playerID, 100); // Kill the player if they leave
+                server.playersToRemoveFromLobbies.put(message.playerID, game.lobby);
                 break;
             default: // Ignore everything else
                 break;
@@ -166,7 +171,25 @@ public class ServerListener extends Listener {
     @Override
     public void disconnected(Connection connection) {
         // Triggers when client disconnects from the server.
-        server.connections.remove(connection.getID()); // Remove player from the HashMap.
+
+        Game game = server.games.get(server.connections.get(connection.getID()));
+        if (game != null) { // Kill the player if they close the game
+            game.damagePlayer(connection.getID(), 100); // Kill the player
+        }
+
+        // Remove player from lobby
+        for (Lobby lobby : server.lobbies.values()) {
+            if (lobby.players.contains(connection.getID())) {
+                server.playersToRemoveFromLobbies.put(connection.getID(), lobby);
+                if (lobby.players.size() == 1) {
+                    server.server.sendToAllTCP(new LobbyDismantle(lobby.lobbyId));
+                } else {
+                    server.server.sendToAllTCP(new Leave(lobby.lobbyId, connection.getID()));
+                }
+            }
+        }
+
+        server.connectionsToRemove.add(connection.getID()); // Remove player from connections
         super.disconnected(connection);
     }
 }
