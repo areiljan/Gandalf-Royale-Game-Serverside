@@ -3,6 +3,7 @@ package ee.taltech.server.entities;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.components.Constants;
+import ee.taltech.server.entities.collision.CollisionBodyTypes;
 import ee.taltech.server.network.messages.game.KeyPress;
 
 import java.util.HashMap;
@@ -292,8 +293,8 @@ public class PlayerCharacter implements Entity {
         fixtureDefHitbox.isSensor = true;
 
 
-        playerBody.createFixture(fixtureDefHitbox).setUserData(List.of(this, "Hit_Box"));
-        playerBody.createFixture(fixtureDefCollisionCircle).setUserData(List.of(this, "World_Collision"));
+        playerBody.createFixture(fixtureDefHitbox).setUserData(List.of(this, CollisionBodyTypes.HIT_BOX));
+        playerBody.createFixture(fixtureDefCollisionCircle).setUserData(List.of(this, CollisionBodyTypes.WORLD_COLLISION_BOX));
 
         // Clean up
         hitBoxShape.dispose();

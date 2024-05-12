@@ -4,10 +4,14 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import ee.taltech.server.components.Constants;
+import ee.taltech.server.entities.Entity;
+import ee.taltech.server.entities.Terrain;
+import ee.taltech.server.entities.collision.CollisionBodyTypes;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class WorldCollision {
 
@@ -24,7 +28,7 @@ public class WorldCollision {
     public WorldCollision(World world, Kryo kryo) {
         this.world = world;
         this.kryo = kryo;
-        // Change if using different tilesets (measurement: px)
+        // Change if using different tile sets (measurement: px)
         this.tileHeight = 32;
         this.tileWidth = 32;
 
@@ -77,7 +81,9 @@ public class WorldCollision {
         CircleShape circleShape = new CircleShape();
         circleShape.setRadius(radius / 2f / Constants.PPM);
 
-        body.createFixture(circleShape, 0.0f);
+        body.createFixture(circleShape, 0.0f)
+                .setUserData(List.of(new Terrain(), CollisionBodyTypes.WORLD_CIRCLE));
+        circleShape.dispose(); // Dispose of the shape after use
     }
 
     /**
@@ -98,7 +104,9 @@ public class WorldCollision {
         Body body = world.createBody(bodyDef);
         PolygonShape rectangleShape = new PolygonShape();
         rectangleShape.setAsBox(width / 2f / Constants.PPM, height / 2f / Constants.PPM);
-        body.createFixture(rectangleShape, 0.0f);
+        body.createFixture(rectangleShape, 0.0f)
+                .setUserData(List.of(new Terrain(), CollisionBodyTypes.WORLD_RECTANGLE));
+        rectangleShape.dispose(); // Dispose of the shape after use
     }
 
     /**
@@ -139,12 +147,15 @@ public class WorldCollision {
             // PolygonShape can have a maximum of 8 vertices.
             PolygonShape polygonShape = new PolygonShape();
             polygonShape.set(scaledVertices);
-            body.createFixture(polygonShape, 0.0f);
+            body.createFixture(polygonShape, 0.0f)
+                    .setUserData(List.of(new Terrain(), CollisionBodyTypes.WORLD_POLYGON));
+            polygonShape.dispose(); // Dispose of the shape after use
         } else {
             // Use ChainShape for complex shapes (more than 8 vertices)
             ChainShape chainShape = new ChainShape();
             chainShape.createLoop(scaledVertices);
-            body.createFixture(chainShape, 0.0f);
+            body.createFixture(chainShape, 0.0f)
+                    .setUserData(List.of(new Terrain(), CollisionBodyTypes.WORLD_CHAIN));
             chainShape.dispose(); // Dispose of the shape after use
         }
     }
@@ -167,10 +178,10 @@ public class WorldCollision {
         bodyDef.type = BodyDef.BodyType.StaticBody;
 
         // Calculate offset based on tile coordinates
-        float bodyX = (float) (tileX * tileWidth) / Constants.PPM +
+        float bodyX = (tileX * tileWidth) / Constants.PPM +
                 (textureRegionWidth != 0 ? -x / Constants.PPM : x / Constants.PPM)
                 + (width / 2f / Constants.PPM) + textureRegionWidth / Constants.PPM;
-        float bodyY = (float) (tileY * tileHeight) / Constants.PPM + y / Constants.PPM + (height / 2f / Constants.PPM);
+        float bodyY = (tileY * tileHeight) / Constants.PPM + y / Constants.PPM + (height / 2f / Constants.PPM);
 
         bodyDef.position.set(bodyX, bodyY);
         bodyDef.fixedRotation = true;
