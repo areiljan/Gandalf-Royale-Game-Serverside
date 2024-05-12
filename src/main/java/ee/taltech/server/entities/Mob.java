@@ -310,6 +310,7 @@ public class Mob implements Entity {
             movement.y += 1;
         }
 
+        // Use scaling to scale movement up to wanted speed
         Vector2 scaledMovement = movement.cpy().scl(Constants.MOB_MOVEMENT_SPEED);
         float maxSpeed = Constants.MOB_MOVEMENT_SPEED * (float) Math.sqrt(2);
         scaledMovement.clamp(maxSpeed, maxSpeed);
