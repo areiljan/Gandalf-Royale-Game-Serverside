@@ -142,6 +142,12 @@ public class TickRateLoop implements Runnable {
             }
             for (Spell spell : game.spells.values()) {
                 spell.updatePosition();
+
+                // Remove spells that are out of the world
+                if (0 > spell.getSpellXPosition() || spell.getSpellXPosition() > 300
+                        || 0 > spell.getSpellYPosition() || spell.getSpellYPosition() > 300) {
+                    game.removeSpell(spell.getSpellId());
+                }
                 for (Integer playerId : game.lobby.players) {
                     server.sendToUDP(playerId, new SpellPosition(spell.getPlayerId(), spell.getSpellId(),
                                 spell.getSpellXPosition(), spell.getSpellYPosition(), spell.getType()));

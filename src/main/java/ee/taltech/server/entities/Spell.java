@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.ItemTypes;
+import ee.taltech.server.entities.collision.CollisionBodyTypes;
 
 import java.util.List;
 
@@ -117,7 +118,7 @@ public class Spell implements Entity {
         shape.dispose();
 
         // Set user data to identify fireball
-        body.getFixtureList().get(0).setUserData(List.of(this, "Hit_Box"));
+        body.getFixtureList().get(0).setUserData(List.of(this, CollisionBodyTypes.HIT_BOX));
         spellBody = body;
     }
 
