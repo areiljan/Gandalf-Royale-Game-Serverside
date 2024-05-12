@@ -87,18 +87,7 @@ public class TickRateLoop implements Runnable {
             if (game.getStaringTicks() <= Constants.TICKS_TO_START_GAME) game.addTick(true);
             if (game.getStaringTicks() == Constants.TICKS_TO_START_GAME) { // Trigger only once
                 new EntitySpawner(game);
-                Item item1 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2940 / Constants.PPM);
-                Item item2 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2910 / Constants.PPM);
-                Item potion = new Item(ItemTypes.HEALING_POTION, 7640 / Constants.PPM, 2880 / Constants.PPM);
-                Mob mob = new Mob(7640 / Constants.PPM, 3020 / Constants.PPM);
-
-
-                game.addItem(item1, null);
-                game.addItem(item2, null);
-                game.addItem(potion, null);
-
                 game.sendPlayZoneCoordinates();
-                game.addMob(mob);
             }
 
             // End the game
