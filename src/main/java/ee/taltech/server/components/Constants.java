@@ -42,7 +42,8 @@ public class Constants {
 
     public static final Map<EntitySpawner.ItemType, Float> SPAWN_PROBABILITIES = Map.of(
             EntitySpawner.ItemType.MOB, 0.1f, // Probability of spawning a mob
-            EntitySpawner.ItemType.SPELL, 0.8f // Probability of spawning a book
+            EntitySpawner.ItemType.SPELL, 0.8f, // Probability of spawning a book
+            EntitySpawner.ItemType.POTION, 0.1f
     );
 
 }

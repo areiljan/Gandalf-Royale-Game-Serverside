@@ -30,7 +30,7 @@ public class EntitySpawner {
 
 
     public enum ItemType {
-        MOB, PLAYER, SPELL
+        MOB, SPELL, POTION
     }
 
     /**
