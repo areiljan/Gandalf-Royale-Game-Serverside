@@ -3,7 +3,8 @@ package ee.taltech.server.components;
 public class Constants {
     public static final float PPM = 32;
 
-    public static final float MOVEMENT_SPEED = 5;
+    public static final float PLAYER_MOVEMENT_SPEED = 5;
+    public static final float MOB_MOVEMENT_SPEED = 4;
 
     public static final float STATUS_BAR_WIDTH_PX = 60;
 
@@ -22,7 +23,7 @@ public class Constants {
 
     public static final float TRIGGERING_RANGE_RADIUS = 20f; // Should be changed
     public static final int MOB_HEALTH = 50;
-    public static final int MOB_DAMAGE = 15;
+    public static final float MOD_SPIN_ATTACK_DAMAGE = 10;
     public static final int MAX_PATH_RANGE = 300;
 
     public static final float COIN_DROP_RANGE = 1;
@@ -31,5 +32,8 @@ public class Constants {
 
     public static final int TICKS_TO_START_GAME = 1000;
     public static final int TICKS_TO_END_GAME = 60;
+
+    public static final float MOB_DMG_PER_TIC = 0.15f;
+    public static final float ZONE_DMG_PER_TIC = 0.03f;
 }
 
