@@ -91,7 +91,7 @@ public class TickRateLoop implements Runnable {
                 Item item1 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2940 / Constants.PPM);
                 Item item2 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2910 / Constants.PPM);
                 Item potion = new Item(ItemTypes.HEALING_POTION, 7640 / Constants.PPM, 2880 / Constants.PPM);
-                Mob mob = new Mob(7640, 3020);
+                Mob mob = new Mob(7640 / Constants.PPM, 3020 / Constants.PPM);
 
                 game.addItem(item1, null);
                 game.addItem(item2, null);
@@ -116,6 +116,9 @@ public class TickRateLoop implements Runnable {
                 if (!game.getDeadPlayers().containsValue(player)) {
                     player.updatePosition();
                 }
+                if (player.getCollidingWithMob()) {
+                    game.damagePlayer(player.playerID, Constants.MOB_DMG_PER_TIC);
+                }
                 if (player.mana != 100) {
                     player.regenerateMana();
                 }
@@ -124,7 +127,7 @@ public class TickRateLoop implements Runnable {
                 }
                 if (!game.getPlayZone().areCoordinatesInZone((int) player.getXPosition(), (int) player.getYPosition())
                         && !game.getDeadPlayers().containsValue(player)) {
-                    game.damagePlayer(player.getPlayerID(), 0.03f);
+                    game.damagePlayer(player.getPlayerID(), Constants.ZONE_DMG_PER_TIC);
                 }
                 for (Integer playerId : game.lobby.players) {
                     server.sendToUDP(playerId, new Position(player.playerID, player.getXPosition(), player.getYPosition()));

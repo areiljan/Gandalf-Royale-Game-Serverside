@@ -33,6 +33,7 @@ public class PlayerCharacter implements Entity {
     private Integer coins;
 
     private Integer healingTicks;
+    private boolean collidingWithMob;
 
     /**
      * Construct PlayerCharacter.
@@ -46,11 +47,15 @@ public class PlayerCharacter implements Entity {
 
         this.movement = new Vector2(0f, 0f);
         this.playerID = playerID;
+
         health = 100;
         mana = 100;
-        healingTicks = 0;
-        inventory = new HashMap<>();
         coins = 0;
+
+        inventory = new HashMap<>();
+
+        healingTicks = 0;
+        collidingWithMob = false;
     }
 
     /**
@@ -166,8 +171,8 @@ public class PlayerCharacter implements Entity {
         // updatePosition is activated every TPS.
         if (body != null) {
             // One key press distance that a character travels.
-            Vector2 scaledMovement = movement.cpy().scl(Constants.MOVEMENT_SPEED);
-            float maxSpeed = Constants.MOVEMENT_SPEED * (float) Math.sqrt(2);
+            Vector2 scaledMovement = movement.cpy().scl(Constants.PLAYER_MOVEMENT_SPEED);
+            float maxSpeed = Constants.PLAYER_MOVEMENT_SPEED * (float) Math.sqrt(2);
             scaledMovement.clamp(maxSpeed, maxSpeed);
             body.setLinearVelocity(scaledMovement);
 
@@ -203,6 +208,22 @@ public class PlayerCharacter implements Entity {
      */
     public void addCoin() {
         coins++;
+    }
+
+    /**
+     * Change the colliding with mob value.
+     *
+     * @param bool new bool value
+     */
+    public void changeCollidingWithMob(boolean bool) {
+        collidingWithMob = bool;
+    }
+
+    /**
+     * Get if player is colliding with a mob.
+     */
+    public boolean getCollidingWithMob() {
+        return collidingWithMob;
     }
 
     /**
@@ -287,7 +308,6 @@ public class PlayerCharacter implements Entity {
             body = null;
         }
     }
-
 
     /**
      * Regenerate mana.

@@ -192,7 +192,8 @@ public class CollisionListener implements ContactListener {
         }
 
         if (player != null) {
-            game.damagePlayer(player.playerID, Constants.MOB_DAMAGE); // Mob damages player
+            game.damagePlayer(player.playerID, Constants.MOD_SPIN_ATTACK_DAMAGE);
+            player.changeCollidingWithMob(true); // Toggle the boolean value that player is not colliding with mob
         }
     }
 
@@ -245,9 +246,17 @@ public class CollisionListener implements ContactListener {
             }
 
             // If player and mob's triggering range stop colliding
-            if (entityA instanceof PlayerCharacter && Objects.equals(typeB, "Triggering_Range")
+            else if (entityA instanceof PlayerCharacter && Objects.equals(typeB, "Triggering_Range")
                     || Objects.equals(typeA, "Triggering_Range") && entityB instanceof PlayerCharacter) {
                 playerNotInMobsTriggeringRange(entityA, entityB);
+            }
+
+            // If player and mob's hit box stop colliding
+            else if (entityA instanceof PlayerCharacter && typeA.equals("Hit_Box")
+                    && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
+                    || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box")
+                    && entityB instanceof PlayerCharacter && typeA.equals("Hit_Box")) {
+                endMobAndPlayerCollision(entityA, entityB);
             }
         }
     }
@@ -289,6 +298,25 @@ public class CollisionListener implements ContactListener {
 
         if (player != null) {
             mob.removePlayerInRange(player); // Remove player from mob's players in range list
+        }
+    }
+
+    /**
+     * Apply logic that happens when player and mob collide.
+     *
+     * @param entityA one collision body
+     * @param entityB second collision body
+     */
+    private void endMobAndPlayerCollision(Entity entityA, Entity entityB) {
+        PlayerCharacter player;
+        if (entityA instanceof PlayerCharacter playerA) {
+            player = playerA;
+        } else {
+            player = (PlayerCharacter) entityB;
+        }
+
+        if (player != null) {
+            player.changeCollidingWithMob(false); // Toggle the boolean value that player is not colliding with mob
         }
     }
 
