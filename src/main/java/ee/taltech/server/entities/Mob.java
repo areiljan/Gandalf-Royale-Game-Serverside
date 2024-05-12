@@ -1,6 +1,5 @@
 package ee.taltech.server.entities;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.ai.AStarPathFinding;
 import ee.taltech.server.ai.Grid;
@@ -24,8 +23,6 @@ public class Mob implements Entity {
     private final List<PlayerCharacter> playersInRange;
     private List<Node> currentPath;
     private Node nextNode;
-
-    private Vector2 movement;
 
     private static Integer currentId = 0;
     /**
@@ -56,8 +53,6 @@ public class Mob implements Entity {
         this.playersInRange = new ArrayList<>();
         this.currentPath = new ArrayList<>();
         this.nextNode = null;
-
-        movement = new Vector2();
     }
 
     /**
@@ -82,6 +77,7 @@ public class Mob implements Entity {
         FixtureDef hitBoxFixtureDef = new FixtureDef();
         hitBoxFixtureDef.shape = hitBoxShape;
         hitBoxFixtureDef.isSensor = true;
+        // hitBoxFixtureDef.isSensor = true; // Will work if we change movement from teleporting to vectors
         mobBody.createFixture(hitBoxFixtureDef).setUserData(List.of(this, "Hit_Box"));
         hitBoxShape.dispose(); // Clean up
 
@@ -94,6 +90,7 @@ public class Mob implements Entity {
         FixtureDef triggeringFixtureDef = new FixtureDef();
         triggeringFixtureDef.shape = triggeringShape;
         triggeringFixtureDef.isSensor = true;
+        // triggeringFixtureDef.isSensor = true; // Will work if we change movement from teleporting to vectors
         mobBody.createFixture(triggeringFixtureDef).setUserData(List.of(this, "Triggering_Range"));
         triggeringShape.dispose(); // Clean up
 
@@ -123,7 +120,7 @@ public class Mob implements Entity {
      * @return xPosition
      */
     public float getXPosition() {
-        return xPosition;
+        return xPosition / Constants.PPM;
     }
 
     /**
@@ -132,7 +129,7 @@ public class Mob implements Entity {
      * @return yPosition
      */
     public float getYPosition() {
-        return yPosition;
+        return yPosition / Constants.PPM;
     }
 
     /**
@@ -159,7 +156,7 @@ public class Mob implements Entity {
      * @return node's X value
      */
     private int getSourceNodeX() {
-        return (int) Math.floor(xPosition * 4);
+        return (int) Math.floor(xPosition / 8);
     }
 
     /**
@@ -168,7 +165,7 @@ public class Mob implements Entity {
      * @return node's Y value
      */
     private int getSourceNodeY() {
-        return (int) Math.floor(yPosition * 4);
+        return (int) Math.floor(yPosition / 8);
     }
 
     /**
@@ -201,8 +198,8 @@ public class Mob implements Entity {
             PlayerCharacter firstPlayer = playersInRange.getFirst(); // First player that was in range
             // Get the best path to a first enemy that was in range
             currentPath = getPathFromAStar(
-                    firstPlayer.getXPosition(),
-                    firstPlayer.getYPosition());
+                    firstPlayer.getXPosition() * Constants.PPM,
+                    firstPlayer.getYPosition() * Constants.PPM);
         }
 
         if (currentPath.isEmpty() || currentPath.size() >= Constants.MAX_PATH_RANGE) { // No player to follow
@@ -215,10 +212,6 @@ public class Mob implements Entity {
             nextNode = currentPath.getFirst();
             currentPath.removeFirst();
         }
-
-        // Reset current movement
-        movement.x = 0;
-        movement.y = 0;
 
         // Move according to the next nodes position
         if (nextNode.getX() < sourceNodeX && nextNode.getY() < sourceNodeY) { // Move diagonally left down
@@ -238,10 +231,6 @@ public class Mob implements Entity {
         } else if (nextNode.getX() == sourceNodeX && nextNode.getY() > sourceNodeY) { // Move up
             move("up");
         }
-
-        // Update x and y position
-        xPosition = body.getPosition().x;
-        yPosition = body.getPosition().y;
     }
 
     /**
@@ -273,8 +262,8 @@ public class Mob implements Entity {
      * @return gotten path
      */
     private List<Node> getPathFromAStar(float destX, float destY) {
-        int destNodesX = (int) Math.floor(destX * 4);
-        int destNodesY = (int) Math.floor(destY * 4);
+        int destNodesX = (int) Math.floor(destX / 8);
+        int destNodesY = (int) Math.floor(destY / 8);
         // Check that player's coordinates are not in the map
         if (Grid.grid[destNodesY][destNodesX] == 0) {
             return aStar.findPath(sourceNodeX, sourceNodeY, destNodesX, destNodesY);
@@ -289,30 +278,26 @@ public class Mob implements Entity {
      */
     private void move(String direction) {
         if (Objects.equals(direction, "left_down")) {
-            movement.x -= 1;
-            movement.y -= 1;
+            xPosition -= 2;
+            yPosition -= 2;
         } else if (Objects.equals(direction, "right_down")) {
-            movement.x += 1;
-            movement.y -= 1;
+            xPosition += 2;
+            yPosition -= 2;
         } else if (Objects.equals(direction, "left_up")) {
-            movement.x -= 1;
-            movement.y += 1;
+            xPosition -= 2;
+            yPosition += 2;
         } else if (Objects.equals(direction, "right_up")) {
-            movement.x += 1;
-            movement.y += 1;
+            xPosition += 2;
+            yPosition += 2;
         } else if (Objects.equals(direction, "left")) {
-            movement.x -= 1;
+            xPosition -= 2;
         } else if (Objects.equals(direction, "right")) {
-            movement.x += 1;
+            xPosition += 2;
         } else if (Objects.equals(direction, "down")) {
-            movement.y -= 1;
+            yPosition -= 2;
         } else if (Objects.equals(direction, "up")) {
-            movement.y += 1;
+            yPosition += 2;
         }
-
-        Vector2 scaledMovement = movement.cpy().scl(Constants.MOB_MOVEMENT_SPEED);
-        float maxSpeed = Constants.MOB_MOVEMENT_SPEED * (float) Math.sqrt(2);
-        scaledMovement.clamp(maxSpeed, maxSpeed);
-        body.setLinearVelocity(scaledMovement);
+        body.setTransform(getXPosition(), getYPosition(), body.getAngle());
     }
 }
