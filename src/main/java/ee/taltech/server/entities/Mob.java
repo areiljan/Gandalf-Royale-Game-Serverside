@@ -7,6 +7,7 @@ import ee.taltech.server.ai.Grid;
 import ee.taltech.server.ai.Node;
 import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.Game;
+import ee.taltech.server.entities.collision.CollisionBodyTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +83,7 @@ public class Mob implements Entity {
         FixtureDef hitBoxFixtureDef = new FixtureDef();
         hitBoxFixtureDef.shape = hitBoxShape;
         hitBoxFixtureDef.isSensor = true;
-        mobBody.createFixture(hitBoxFixtureDef).setUserData(List.of(this, "Hit_Box"));
+        mobBody.createFixture(hitBoxFixtureDef).setUserData(List.of(this, CollisionBodyTypes.HIT_BOX));
         hitBoxShape.dispose(); // Clean up
 
         // *----- TRIGGERING RANGE -----*
@@ -94,7 +95,7 @@ public class Mob implements Entity {
         FixtureDef triggeringFixtureDef = new FixtureDef();
         triggeringFixtureDef.shape = triggeringShape;
         triggeringFixtureDef.isSensor = true;
-        mobBody.createFixture(triggeringFixtureDef).setUserData(List.of(this, "Triggering_Range"));
+        mobBody.createFixture(triggeringFixtureDef).setUserData(List.of(this, CollisionBodyTypes.TRIGGERING_RANGE));
         triggeringShape.dispose(); // Clean up
 
         body = mobBody;

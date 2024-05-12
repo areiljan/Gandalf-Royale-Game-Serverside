@@ -31,64 +31,90 @@ public class CollisionListener implements ContactListener {
         // Get data out from fixture A's user data
         if (fixtureA.getUserData() != null && fixtureB.getUserData() != null) {
             Entity entityA = (Entity) ((List<?>) fixtureA.getUserData()).getFirst();
-            String typeA = (String) ((List<?>) fixtureA.getUserData()).getLast();
+            CollisionBodyTypes typeA = (CollisionBodyTypes) ((List<?>) fixtureA.getUserData()).getLast();
 
             // Get data out from fixture B's user data
             Entity entityB = (Entity) ((List<?>) fixtureB.getUserData()).getFirst();
-            String typeB = (String) ((List<?>) fixtureB.getUserData()).getLast();
+            CollisionBodyTypes typeB = (CollisionBodyTypes) ((List<?>) fixtureB.getUserData()).getLast();
             // ------------------------------------------------------------------- \\
 
             // If player and spell collide
-            if (entityA instanceof PlayerCharacter && typeA.equals("Hit_Box") && entityB instanceof Spell
-                    || entityA instanceof Spell && entityB instanceof PlayerCharacter && typeB.equals("Hit_Box")) {
+            if (entityA instanceof PlayerCharacter
+                    && typeA.equals(CollisionBodyTypes.HIT_BOX)
+                    && entityB instanceof Spell
+                    || entityA instanceof Spell
+                    && entityB instanceof PlayerCharacter
+                    && typeB.equals(CollisionBodyTypes.HIT_BOX)) {
                 spellAndPlayerCollision(entityA, entityB);
             }
 
             // If player and coin collide
             else if (entityA instanceof PlayerCharacter
-                    && typeA.equals("World_Collision")
+                    && typeA.equals(CollisionBodyTypes.WORLD_COLLISION_BOX)
                     && entityB instanceof Item itemB
                     && itemB.getType() == ItemTypes.COIN
                     || entityA instanceof Item itemA
                     && itemA.getType() == ItemTypes.COIN
                     && entityB instanceof PlayerCharacter
-                    && typeB.equals("World_Collision")) {
+                    && typeB.equals(CollisionBodyTypes.WORLD_COLLISION_BOX)) {
                 beginCoinAndPlayerCollision(entityA, entityB);
             }
 
             // If player and item collide
             else if (entityA instanceof PlayerCharacter
-                    && typeA.equals("World_Collision")
+                    && typeA.equals(CollisionBodyTypes.WORLD_COLLISION_BOX)
                     && entityB instanceof Item
                     || entityA instanceof Item
                     && entityB instanceof PlayerCharacter
-                    && typeB.equals("World_Collision")) {
+                    && typeB.equals(CollisionBodyTypes.WORLD_COLLISION_BOX)) {
                 beginItemAndPlayerCollision(entityA, entityB);
             }
 
             // If player and mob's triggering range collide
-            else if (entityA instanceof PlayerCharacter && entityB instanceof Mob && Objects.equals(typeB, "Triggering_Range")
-                    || entityA instanceof Mob && Objects.equals(typeA, "Triggering_Range")
+            else if (entityA instanceof PlayerCharacter
+                    && entityB instanceof Mob
+                    && Objects.equals(typeB, CollisionBodyTypes.TRIGGERING_RANGE)
+                    || entityA instanceof Mob
+                    && Objects.equals(typeA, CollisionBodyTypes.TRIGGERING_RANGE)
                     && entityB instanceof PlayerCharacter) {
                 playerInMobsTriggeringRange(entityA, entityB);
             }
 
             // If player and mob's hit box collide
-            else if (entityA instanceof PlayerCharacter && typeA.equals("Hit_Box")
-                    && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
-                    || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box")
-                    && entityB instanceof PlayerCharacter && typeA.equals("Hit_Box")) {
+            else if (entityA instanceof PlayerCharacter
+                    && typeA.equals(CollisionBodyTypes.HIT_BOX)
+                    && entityB instanceof Mob
+                    && Objects.equals(typeB, CollisionBodyTypes.HIT_BOX)
+                    || entityA instanceof Mob
+                    && Objects.equals(typeA, CollisionBodyTypes.HIT_BOX)
+                    && entityB instanceof PlayerCharacter
+                    && typeA.equals(CollisionBodyTypes.HIT_BOX)) {
                 mobAndPlayerCollision(entityA, entityB);
             }
 
             // If spell and mob's hit box collide
-            else if (entityA instanceof Spell && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
-                    || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box") && entityB instanceof Spell) {
+            else if (entityA instanceof Spell
+                    && entityB instanceof Mob
+                    && Objects.equals(typeB, CollisionBodyTypes.HIT_BOX)
+                    || entityA instanceof Mob
+                    && Objects.equals(typeA, CollisionBodyTypes.HIT_BOX)
+                    && entityB instanceof Spell) {
                 mobAndSpellCollision(entityA, entityB);
+            }
+
+            // If spell and terrain collide
+            else if (entityA instanceof Spell
+                    && (typeB == CollisionBodyTypes.WORLD_CIRCLE
+                    || typeB == CollisionBodyTypes.WORLD_POLYGON
+                    || typeB == CollisionBodyTypes.WORLD_CHAIN)
+                    || (typeA == CollisionBodyTypes.WORLD_CIRCLE
+                    || typeA == CollisionBodyTypes.WORLD_POLYGON
+                    || typeA == CollisionBodyTypes.WORLD_CHAIN)
+                    && entityB instanceof Spell) {
+                spellAndTerrainCollision(entityA, entityB);
             }
         }
     }
-
 
     /**
      * Apply logic that happens when spell and player collide.
@@ -219,6 +245,17 @@ public class CollisionListener implements ContactListener {
         game.removeSpell(spell.getSpellId()); // Remove spell
     }
 
+    private void spellAndTerrainCollision(Entity entityA, Entity entityB) {
+        Spell spell;
+        if (entityA instanceof Spell spellA) {
+            spell = spellA;
+        } else {
+            spell = (Spell) entityB;
+        }
+
+        game.removeSpell(spell.getSpellId());
+    }
+
     /**
      * Detect collision ending.
      *
@@ -234,29 +271,33 @@ public class CollisionListener implements ContactListener {
         if (fixtureA.getUserData() != null && fixtureB.getUserData() != null) {
 
             Entity entityA = (Entity) ((List<?>) fixtureA.getUserData()).getFirst();
-            String typeA = (String) ((List<?>) fixtureA.getUserData()).getLast();
+            CollisionBodyTypes typeA = (CollisionBodyTypes) ((List<?>) fixtureA.getUserData()).getLast();
             // Get data out from fixture B's user data
             Entity entityB = (Entity) ((List<?>) fixtureB.getUserData()).getFirst();
-            String typeB = (String) ((List<?>) fixtureB.getUserData()).getLast();
+            CollisionBodyTypes typeB = (CollisionBodyTypes) ((List<?>) fixtureB.getUserData()).getLast();
             // ------------------------------------------------------------------- \\
 
             // If player and item ends colliding
-            if (entityA instanceof PlayerCharacter && entityB instanceof Item
-                    || entityA instanceof Item && entityB instanceof PlayerCharacter) {
+            if (entityA instanceof PlayerCharacter
+                    && entityB instanceof Item
+                    || entityA instanceof Item
+                    && entityB instanceof PlayerCharacter) {
                 endItemAndPlayerCollision(entityA, entityB);
             }
 
             // If player and mob's triggering range stop colliding
-            else if (entityA instanceof PlayerCharacter && Objects.equals(typeB, "Triggering_Range")
-                    || Objects.equals(typeA, "Triggering_Range") && entityB instanceof PlayerCharacter) {
+            else if (entityA instanceof PlayerCharacter
+                    && Objects.equals(typeB, CollisionBodyTypes.TRIGGERING_RANGE)
+                    || Objects.equals(typeA, CollisionBodyTypes.TRIGGERING_RANGE)
+                    && entityB instanceof PlayerCharacter) {
                 playerNotInMobsTriggeringRange(entityA, entityB);
             }
 
             // If player and mob's hit box stop colliding
-            else if (entityA instanceof PlayerCharacter && typeA.equals("Hit_Box")
-                    && entityB instanceof Mob && Objects.equals(typeB, "Hit_Box")
-                    || entityA instanceof Mob && Objects.equals(typeA, "Hit_Box")
-                    && entityB instanceof PlayerCharacter && typeA.equals("Hit_Box")) {
+            else if (entityA instanceof PlayerCharacter && typeA.equals(CollisionBodyTypes.HIT_BOX)
+                    && entityB instanceof Mob && Objects.equals(typeB, CollisionBodyTypes.HIT_BOX)
+                    || entityA instanceof Mob && Objects.equals(typeA, CollisionBodyTypes.HIT_BOX)
+                    && entityB instanceof PlayerCharacter && typeA.equals(CollisionBodyTypes.HIT_BOX)) {
                 endMobAndPlayerCollision(entityA, entityB);
             }
         }

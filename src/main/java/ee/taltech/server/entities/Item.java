@@ -3,6 +3,7 @@ package ee.taltech.server.entities;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.ItemTypes;
+import ee.taltech.server.entities.collision.CollisionBodyTypes;
 
 import java.util.List;
 
@@ -160,7 +161,7 @@ public class Item implements Entity {
         // Clean up
         hitBoxShape.dispose();
 
-        hitBoxBody.getFixtureList().get(0).setUserData(List.of(this, "Hit_Box"));
+        hitBoxBody.getFixtureList().get(0).setUserData(List.of(this, CollisionBodyTypes.HIT_BOX));
         this.body = hitBoxBody;
     }
 
