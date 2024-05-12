@@ -227,7 +227,7 @@ public class Game {
     /**
      * Heal player.
      *
-     * @param playerId player that is healed
+     * @param playerId player that is healed.
      * @param potionId potion that the player is head with
      */
     public void healPlayer(Integer playerId, Integer potionId) {
