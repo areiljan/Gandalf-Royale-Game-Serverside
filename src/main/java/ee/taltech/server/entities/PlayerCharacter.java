@@ -4,12 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.server.components.Constants;
 import ee.taltech.server.network.messages.game.KeyPress;
-import ee.taltech.server.components.ItemTypes;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 public class PlayerCharacter implements Entity {
 
@@ -30,7 +28,7 @@ public class PlayerCharacter implements Entity {
     private Vector2 movement;
 
     public float health;
-    public double mana;
+    public float mana;
     private final Map<Integer, Item> inventory;
     private Integer coins;
 
@@ -69,7 +67,7 @@ public class PlayerCharacter implements Entity {
      */
     public float getXPosition() {
         if (body == null) {
-            return 0;
+            return xPosition;
         }
         return body.getPosition().x;
     }
@@ -79,27 +77,9 @@ public class PlayerCharacter implements Entity {
      */
     public float getYPosition() {
         if (body == null) {
-            return 0;
+            return yPosition;
         }
         return body.getPosition().y;
-    }
-
-    /**
-     * Get mouse x position.
-     *
-     * @return mouseXPosition
-     */
-    public double getMouseXPosition() {
-        return mouseXPosition;
-    }
-
-    /**
-     * Get mouse Y position.
-     *
-     * @return mouseYPosition
-     */
-    public double getMouseYPosition() {
-        return mouseYPosition;
     }
 
     /**
@@ -125,7 +105,7 @@ public class PlayerCharacter implements Entity {
      *
      * @param newMana new mana value
      */
-    public void setMana(double newMana) {
+    public void setMana(float newMana) {
         mana = newMana;
     }
 
@@ -153,26 +133,28 @@ public class PlayerCharacter implements Entity {
      */
     public void setMovement(KeyPress keyPress) {
         // Set an action where player should be headed.
-        if (keyPress.pressed) {
-            if (keyPress.action == KeyPress.Action.LEFT) {
-                movement.x = -1;
-            } else if (keyPress.action == KeyPress.Action.RIGHT) {
-                movement.x = 1;
-            } else if (keyPress.action == KeyPress.Action.UP) {
-                movement.y = 1;
-            } else if (keyPress.action == KeyPress.Action.DOWN) {
-                movement.y = -1;
-            }
-        } else {
-            // Only cancel the movement if one key is pressed down.
-            if (keyPress.action == KeyPress.Action.LEFT && movement.x < 0) {
-                movement.x = 0;
-            } else if (keyPress.action == KeyPress.Action.RIGHT && movement.x > 0) {
-                movement.x = 0;
-            } else if (keyPress.action == KeyPress.Action.UP && movement.y > 0) {
-                movement.y = 0;
-            } else if (keyPress.action == KeyPress.Action.DOWN && movement.y < 0) {
-                movement.y = 0;
+        if (body != null) {
+            if (keyPress.pressed) {
+                if (keyPress.action == KeyPress.Action.LEFT) {
+                    movement.x = -1;
+                } else if (keyPress.action == KeyPress.Action.RIGHT) {
+                    movement.x = 1;
+                } else if (keyPress.action == KeyPress.Action.UP) {
+                    movement.y = 1;
+                } else if (keyPress.action == KeyPress.Action.DOWN) {
+                    movement.y = -1;
+                }
+            } else {
+                // Only cancel the movement if one key is pressed down.
+                if (keyPress.action == KeyPress.Action.LEFT && movement.x < 0) {
+                    movement.x = 0;
+                } else if (keyPress.action == KeyPress.Action.RIGHT && movement.x > 0) {
+                    movement.x = 0;
+                } else if (keyPress.action == KeyPress.Action.UP && movement.y > 0) {
+                    movement.y = 0;
+                } else if (keyPress.action == KeyPress.Action.DOWN && movement.y < 0) {
+                    movement.y = 0;
+                }
             }
         }
     }
@@ -182,13 +164,15 @@ public class PlayerCharacter implements Entity {
      */
     public void updatePosition() {
         // updatePosition is activated every TPS.
-        // One key press distance that a character travels.
-        Vector2 scaledMovement = movement.cpy().scl(Constants.movementSpeed);
-        float maxSpeed = Constants.movementSpeed * (float) Math.sqrt(2);
-        scaledMovement.clamp(maxSpeed, maxSpeed);
-
         if (body != null) {
+            // One key press distance that a character travels.
+            Vector2 scaledMovement = movement.cpy().scl(Constants.MOVEMENT_SPEED);
+            float maxSpeed = Constants.MOVEMENT_SPEED * (float) Math.sqrt(2);
+            scaledMovement.clamp(maxSpeed, maxSpeed);
             body.setLinearVelocity(scaledMovement);
+
+            xPosition = body.getPosition().x;
+            yPosition = body.getPosition().y;
         }
     }
 
@@ -198,9 +182,8 @@ public class PlayerCharacter implements Entity {
      * @param leftMouse is left mouse clicked
      * @param mouseXPosition mouse x coordinate
      * @param mouseYPosition mouse y coordinate
-     * @param type action that is chosen
      */
-    public void setMouseControl(boolean leftMouse, int mouseXPosition, int mouseYPosition, ItemTypes type){
+    public void setMouseControl(boolean leftMouse, int mouseXPosition, int mouseYPosition){
         this.mouseXPosition = mouseXPosition;
         this.mouseYPosition = mouseYPosition;
         this.mouseLeftClick = leftMouse;
@@ -241,6 +224,15 @@ public class PlayerCharacter implements Entity {
         Item droppedItem = inventory.get(itemId);
         inventory.remove(itemId);
         return droppedItem;
+    }
+
+    /**
+     * Get player's inventory.
+     *
+     * @return list of all items in players inventory
+     */
+    public List<Item> getInventory() {
+        return inventory.values().stream().toList();
     }
 
     /**
@@ -290,8 +282,10 @@ public class PlayerCharacter implements Entity {
      * Remove body.
      */
     public void removeBody(World world) {
-        world.destroyBody(body); // Destroy the player's body
-        body = null;
+        if (body != null) {
+            world.destroyBody(body); // Destroy the player's body
+            body = null;
+        }
     }
 
 
@@ -301,7 +295,7 @@ public class PlayerCharacter implements Entity {
     public void regenerateMana() {
         if (mana < 100){
             // Add mana every tick so that one second regenerates around 5 mana
-            mana = Math.min(mana + 0.1, 100); // Mana can not be over 100
+            mana = (float) Math.min(mana + 0.1, 100f); // Mana can not be over 100
         }
     }
 
@@ -312,15 +306,6 @@ public class PlayerCharacter implements Entity {
         if (healingTicks > 0) {
             setHealth(Math.min(health + HEAL_PER_TICK, 100));
             healingTicks--;
-        }
-    }
-
-    /**
-     * Damage player with zone.
-     */
-    public void receiveZoneDamage() {
-        if (health > 0) {
-            health = health - 0.03f;
         }
     }
 }

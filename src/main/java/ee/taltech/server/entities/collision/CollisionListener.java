@@ -46,21 +46,25 @@ public class CollisionListener implements ContactListener {
 
             // If player and coin collide
             else if (entityA instanceof PlayerCharacter
+                    && typeA.equals("World_Collision")
                     && entityB instanceof Item itemB
                     && itemB.getType() == ItemTypes.COIN
-                    ||
-                    entityA instanceof Item itemA
-                            && itemA.getType() == ItemTypes.COIN
-                            && entityB instanceof PlayerCharacter) {
+                    || entityA instanceof Item itemA
+                    && itemA.getType() == ItemTypes.COIN
+                    && entityB instanceof PlayerCharacter
+                    && typeB.equals("World_Collision")) {
                 beginCoinAndPlayerCollision(entityA, entityB);
             }
 
             // If player and item collide
-            else if (entityA instanceof PlayerCharacter && entityB instanceof Item
-                    || entityA instanceof Item && entityB instanceof PlayerCharacter) {
+            else if (entityA instanceof PlayerCharacter
+                    && typeA.equals("World_Collision")
+                    && entityB instanceof Item
+                    || entityA instanceof Item
+                    && entityB instanceof PlayerCharacter
+                    && typeB.equals("World_Collision")) {
                 beginItemAndPlayerCollision(entityA, entityB);
             }
-
 
             // If player and mob's triggering range collide
             else if (entityA instanceof PlayerCharacter && entityB instanceof Mob && Objects.equals(typeB, "Triggering_Range")
