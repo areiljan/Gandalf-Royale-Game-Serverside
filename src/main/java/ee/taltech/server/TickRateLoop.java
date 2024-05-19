@@ -2,7 +2,6 @@ package ee.taltech.server;
 
 import com.esotericsoftware.kryonet.Server;
 import ee.taltech.server.components.Constants;
-import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.components.Lobby;
 import ee.taltech.server.entities.*;
 import ee.taltech.server.entities.spawner.EntitySpawner;
