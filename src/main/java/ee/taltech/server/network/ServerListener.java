@@ -13,6 +13,9 @@ import ee.taltech.server.entities.PlayerCharacter;
 import ee.taltech.server.components.Game;
 import ee.taltech.server.components.Lobby;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ServerListener extends Listener {
     private GameServer server;
 
@@ -83,7 +86,13 @@ public class ServerListener extends Listener {
                             game.healPlayer(player.playerID, mouse.extraField);
                         }
                         // *------------- SPELL -------------*
-                        else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse) {
+                        else if (mouse.type == ItemTypes.ICE_SHARD && mouse.leftMouse) {
+                            List<Spell> spellList = getIceShards(mouse, player);
+                            System.out.println("ice shard");
+                            for (Spell spell : spellList) {
+                                game.addSpell(spell);
+                            }
+                        } else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse) {
                             Spell spell = getSpell(mouse, player);
                             if (spell != null) {
                                 game.addSpell(spell);
@@ -110,13 +119,32 @@ public class ServerListener extends Listener {
      */
     private Spell getSpell(MouseClicks mouse, PlayerCharacter player) {
         Spell spell = null;
-        if (mouse.type == ItemTypes.FIREBALL && player.mana >= 25
-                || mouse.type == ItemTypes.PLASMA && player.mana >= 15
-                || mouse.type == ItemTypes.METEOR && player.mana >= 33
-                || mouse.type == ItemTypes.KUNAI && player.mana >= 50) {
+        if (mouse.type == ItemTypes.FIREBALL && player.mana >= 20
+                || mouse.type == ItemTypes.PLASMA && player.mana >= 8
+                || mouse.type == ItemTypes.METEOR && player.mana >= 25
+                || mouse.type == ItemTypes.KUNAI && player.mana >= 40
+                || mouse.type == ItemTypes.MAGICMISSILE && player.mana >= 12) {
             spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
         }
         return spell;
+    }
+
+    /**
+     * Created special method, because ice shards create multiple spell items.
+     * @param mouse given mouse click message.
+     * @param player player that cast the spell.
+     * @return - list of ice shards.
+     */
+    private List<Spell> getIceShards(MouseClicks mouse, PlayerCharacter player) {
+        ArrayList<Spell> shardList = new ArrayList<>();
+        if (mouse.type == ItemTypes.ICE_SHARD && player.mana >= 30) {
+            shardList.add(new Spell(player, mouse.mouseXPosition - 30, mouse.mouseYPosition - 30, mouse.type));
+            shardList.add(new Spell(player, mouse.mouseXPosition - 15, mouse.mouseYPosition - 15, mouse.type));
+            shardList.add(new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type));
+            shardList.add(new Spell(player, mouse.mouseXPosition + 30, mouse.mouseYPosition + 30, mouse.type));
+            shardList.add(new Spell(player, mouse.mouseXPosition + 15, mouse.mouseYPosition + 15, mouse.type));
+        }
+        return shardList;
     }
 
     /**

@@ -9,18 +9,24 @@ import ee.taltech.server.entities.collision.CollisionBodyTypes;
 import java.util.List;
 
 public class Spell implements Entity {
-    private final Vector2 spellVector;
+    private Vector2 spellVector;
+    private final PlayerCharacter playerCharacter;
     int playerId;
     int spellId;
     private final ItemTypes type;
     private Body spellBody;
-    double spellXStart;
-    double spellYStart;
+    float spellXStart;
+    float spellYStart;
     private static int nextId = 1;
     private float manaCost;
     private float hitBoxSize;
     private float spellSpeed;
     private int damage;
+    private float speed;
+    private float amplitude;
+    private float frequency;
+    private float elapsedTime;
+    private float angle;
 
     /**
      * Construct Spell.
@@ -30,6 +36,7 @@ public class Spell implements Entity {
      * @param mouseYPosition mouse y coordinate
      */
     public Spell(PlayerCharacter playerCharacter, double mouseXPosition, double mouseYPosition, ItemTypes type) {
+        this.playerCharacter = playerCharacter;
         playerId = playerCharacter.getPlayerID();
         spellId = nextId++;
         this.type = type;
@@ -39,43 +46,68 @@ public class Spell implements Entity {
 
         spellXStart = playerCharacter.getXPosition();
         spellYStart = playerCharacter.getYPosition(); // Position the fireball on top of the head.
-
+        float dx = (float) (mouseXPosition);
+        float dy = (float) (mouseYPosition);
+        angle = (float) (Math.atan2(dy, dx));
         // These mouse positions are already relative to the player.
         spellVector = new Vector2((float) mouseXPosition, (float) mouseYPosition);
         spellVector.nor();
+
+        this.amplitude = 10F;
+        this.frequency = 7;
+        this.elapsedTime = 0f;
     }
 
+    /**
+     * Get parameters based on the incoming spell type.
+     */
     private void setParametersBasedOnSpellType() {
         if (type == ItemTypes.FIREBALL) {
             // Fireballs take precision to hit, but deal a lot of damage.
-            manaCost = 25;
+            manaCost = 20;
             hitBoxSize = 0.3f;
             spellSpeed = Constants.FIREBALL_SPEED;
-            damage = 25;
+            damage = 30;
         } else if (type == ItemTypes.PLASMA) {
             // Plasma is a pea-gun, shoots fast and takes little mana, but also deals little damage.
-            manaCost = 5;
+            manaCost = 8;
             hitBoxSize = 0.2f;
             spellSpeed = Constants.PLASMA_SPEED;
             damage = 7;
         } else if (type == ItemTypes.METEOR) {
             // Meteors are huge and really slow, but deal huge damage.
-            manaCost = 33;
-            hitBoxSize = 0.4f;
+            manaCost = 25;
+            hitBoxSize = 0.5f;
             spellSpeed = Constants.METEOR_SPEED;
-            damage = 60;
+            damage = 50;
         } else if (type == ItemTypes.KUNAI) {
             // Kunais move fast, and deal big damage, but take a lot of mana.
             // supposed to be a sniper
-            manaCost = 50;
+            manaCost = 40;
             hitBoxSize = 0.2f;
             spellSpeed = Constants.KUNAI_SPEED;
             damage = 30;
+        } else if (type == ItemTypes.MAGICMISSILE) {
+            // magic missiles move in sinusoidal pattern
+            // cheap to cast but hard to aim
+            manaCost = 12;
+            hitBoxSize = 0.2f;
+            spellSpeed = Constants.MAGICMISSILE_SPEED;
+            damage = 25;
+        } else if (type == ItemTypes.ICE_SHARD) {
+            // Ice shard is a shotgun spell with 5 ice shards.
+            manaCost = 6; // per one
+            hitBoxSize = 0.2f;
+            spellSpeed = Constants.ICE_SHARD_SPEED;
+            damage = 10;
         }
-        // Ice shard is a shotgun spell with 5 ice shards.
         // Helix beam only does damage short range
     }
 
+    /**
+     * Spell damage getter.
+     * @return
+     */
     public int getSpellDamage() {
         return damage;
     }
@@ -83,11 +115,32 @@ public class Spell implements Entity {
     /**
      * Update spell position.
      */
-    public void updatePosition() {
-        // Update fireball position based on angle and velocity
-        spellVector.clamp(spellSpeed, spellSpeed);
-        spellBody.setLinearVelocity(spellVector);
+    public void updatePosition(float deltaTime) {
+        elapsedTime += deltaTime;
+        if (type == ItemTypes.MAGICMISSILE) {
+            // Calculate the perpendicular vector
+            Vector2 perpendicularVector = new Vector2(-spellVector.y, spellVector.x);
+
+            // Calculate the scalar value for the perpendicular vector
+            float scalar = (float) Math.sin(frequency * elapsedTime) * amplitude * 0.1f;
+
+            // Scale the perpendicular vector by the scalar value
+            Vector2 scaledPerpendicularVector = perpendicularVector.scl(scalar);
+
+            // Calculate the velocity of the poison ball vector by adding the scaled perpendicular vector to the main vector
+            Vector2 poisonBallVector = spellVector.cpy().add(scaledPerpendicularVector);
+
+            // Set the linear velocity of the spell body using the poison ball vector
+            spellVector.clamp(spellSpeed, spellSpeed);
+            spellBody.setLinearVelocity(poisonBallVector);
+        } else {
+            // Update regular projectile position based on angle and velocity
+            // In case it is a regular projectile
+            spellVector.clamp(spellSpeed, spellSpeed);
+            spellBody.setLinearVelocity(spellVector);
+        }
     }
+
 
     /**
      * Get spell's type.

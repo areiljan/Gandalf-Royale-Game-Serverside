@@ -90,6 +90,7 @@ public class TickRateLoop implements Runnable {
         gameServer.playersToRemoveFromLobbies.clear();
 
         // *--------------- GAME LOOPS ---------------*
+        float deltaTime = 1.0f / 60f;
         for (Game game : gameServer.games.values()) {
             // Item spawning to the world
             if (game.getStaringTicks() <= Constants.TICKS_TO_START_GAME) game.addTick(true);
@@ -137,7 +138,7 @@ public class TickRateLoop implements Runnable {
                 }
             }
             for (Spell spell : game.spells.values()) {
-                spell.updatePosition();
+                spell.updatePosition(deltaTime);
 
                 // Remove spells that are out of the world
                 if (0 > spell.getSpellXPosition() || spell.getSpellXPosition() > 300
