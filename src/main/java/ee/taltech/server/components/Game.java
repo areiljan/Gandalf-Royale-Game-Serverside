@@ -13,6 +13,8 @@ import ee.taltech.server.network.messages.game.*;
 import ee.taltech.server.world.WorldCollision;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class Game {
     public static final Random random = new Random();
@@ -24,9 +26,8 @@ public class Game {
     private final PlayZone playZone;
 
     public final Map<Integer, PlayerCharacter> gamePlayers;
-    private final Map<Integer, PlayerCharacter> deadPlayers;
+    private final List<PlayerCharacter> deadPlayers;
     private final List<PlayerCharacter> playersToRemove;
-    private int killedPlayerId;
 
     private final List<Spell> spellsToAdd;
     private final List<Integer> spellsToDispel;
@@ -38,6 +39,7 @@ public class Game {
     private final List<Item> coinsToRemove;
 
     public final Map<Integer, Mob> mobs;
+    public final List<Mob> mobsToAdd;
     public final List<Mob> mobsToRemove;
 
     private final World world;
@@ -70,12 +72,12 @@ public class Game {
         this.gameId = lobby.lobbyId;
 
         this.gamePlayers = createPlayersMap();
-        this.playersToRemove = new ArrayList<>();
-        this.deadPlayers = new HashMap<>();
+        this.playersToRemove = new CopyOnWriteArrayList<>();
+        this.deadPlayers = new CopyOnWriteArrayList<>();
 
-        this.spellsToAdd = new ArrayList<>();
-        this.spellsToDispel = new ArrayList<>();
         this.spells = new HashMap<>();
+        this.spellsToAdd = new CopyOnWriteArrayList<>();
+        this.spellsToDispel = new CopyOnWriteArrayList<>();
 
         this.items = new HashMap<>();
         this.itemsToRemove = new HashMap<>();
@@ -83,9 +85,8 @@ public class Game {
         this.coinsToRemove = new ArrayList<>();
 
         this.mobs = new HashMap<>();
-        this.mobsToRemove = new ArrayList<>();
-
-        this.killedPlayerId = 0;
+        this.mobsToAdd = new CopyOnWriteArrayList<>();
+        this.mobsToRemove = new CopyOnWriteArrayList<>();
 
         this.playZone = new PlayZone();
 
@@ -130,7 +131,9 @@ public class Game {
     }
 
     /**
-     * Add a spell to dispel.
+     * Remove spell from the game.
+     *
+     * @param spellId ID of the spell that will be removed
      */
     public void removeSpell(Integer spellId) {
         spellsToDispel.add(spellId);
@@ -159,7 +162,7 @@ public class Game {
      *
      * @return map of dead players where key is player ID and value PlayerCharacter
      */
-    public Map<Integer, PlayerCharacter> getDeadPlayers() {
+    public List<PlayerCharacter> getDeadPlayers() {
         return deadPlayers;
     }
 
@@ -217,11 +220,22 @@ public class Game {
         float newHealth = Math.max(player.health - amount, 0); // Health can not be less than 0
         player.setHealth(newHealth); // 10 damage per hit
 
-        // If player has 0 health move them to dead players
+        // If player has 0 health, then kill them
         if (player.health == 0) {
-            playersToRemove.add(player);
-            deadPlayers.put(id, player);
+            killPlayer(player);
+
         }
+    }
+
+    /**
+     * Kill player.
+     *
+     * @param deadPlayer given player that is killed
+     */
+    private void killPlayer(PlayerCharacter deadPlayer) {
+        deadPlayer.stopHealing(); // Stop player's healing if they died
+        playersToRemove.add(deadPlayer); // Put player to removing list
+        deadPlayers.add(deadPlayer); // Put player to deadPlayer
     }
 
     /**
@@ -364,8 +378,7 @@ public class Game {
      * @param mob mob that is added
      */
     public void addMob(Mob mob) {
-        mob.createBody(world);
-        mobs.put(mob.getId(), mob);
+        mobsToAdd.add(mob);
     }
 
     /**
@@ -374,30 +387,22 @@ public class Game {
      * @param id mob's ID who is damaged
      * @param amount amount of damage that is done to mob
      */
-    public void damageMob(Integer id, Integer amount) {
+    public void damageMob(Integer id, float amount) {
         Mob mob = mobs.get(id); // Get mob
 
-        Integer newHealth = Math.max(mob.getHealth() - amount, 0); // Health can not be less than 0
+        float newHealth = Math.max(mob.getHealth() - amount, 0); // Health can not be less than 0
         mob.setHealth(newHealth);
 
         // mob is added to mobsToRemove list in TickRateLoop
     }
 
     /**
-     * Get the killed player id.
-     * Zero if no killed players this tick.
-     * @return - 0 or an id.
+     * Remove mob from the game.
+     *
+     * @param mob mob that is removed
      */
-    public int getKilledPlayerId() {
-        return killedPlayerId;
-    }
-
-    /**
-     * startTime getter.
-     * @return - startTime as long.
-     */
-    public int getCurrentTime() {
-        return currentTime;
+    public void removeMob(Mob mob) {
+        mobsToRemove.add(mob);
     }
 
     /**
@@ -438,14 +443,12 @@ public class Game {
         spellsToAdd.clear();
 
         // *------------- PLAYER REMOVING -------------*
-        killedPlayerId = 0; // resets the id to 0 each iteration.
         for (PlayerCharacter deadPlayer : playersToRemove) {
             dropCoins(deadPlayer.getCoins(), deadPlayer.getXPosition(), deadPlayer.getYPosition()); // Drop all coins
             dropAllItems(deadPlayer); // Drop all items from player's inventory
             deadPlayer.removeBody(world);
 
             // this class integer id will be used to send a one-time message to the client.
-            killedPlayerId = deadPlayer.getPlayerID();
         }
         playersToRemove.clear();
 
@@ -456,6 +459,13 @@ public class Game {
             mobs.remove(mob.getId());
         }
         mobsToRemove.clear();
+
+        // *------------- MOB ADDING -------------*
+        for (Mob mob : mobsToAdd) {
+            mob.createBody(world);
+            mobs.put(mob.getId(), mob);
+        }
+        mobsToAdd.clear();
 
         // *------------- COIN REMOVING -------------*
         for (Item coin : coinsToRemove) {
@@ -484,8 +494,16 @@ public class Game {
         if (gamePlayers.size() - deadPlayers.size() == 1) {
             // *-------------- GETTING WINNER ID -------------*
             Set<Integer> difference = new HashSet<>(gamePlayers.keySet());
-            difference.removeAll(deadPlayers.keySet());
+            difference.removeAll(deadPlayers.stream().map(PlayerCharacter::getPlayerID).collect(Collectors.toSet()));
             Integer winnerId = difference.iterator().next();
+
+            // Send game over message to everyone who is still in the game
+            for (Integer playerId : lobby.players) {
+                server.server.sendToTCP(playerId, new GameOver(winnerId));
+            }
+        } else {
+            // *-------------- GETTING WINNER ID -------------*
+            Integer winnerId = deadPlayers.getLast().playerID; // Get player's ID who was added to dead list later
 
             // Send game over message to everyone who is still in the game
             for (Integer playerId : lobby.players) {

@@ -2,15 +2,14 @@ package ee.taltech.server;
 
 import com.esotericsoftware.kryonet.Server;
 import ee.taltech.server.components.Constants;
-import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.components.Lobby;
-import ee.taltech.server.entities.Item;
-import ee.taltech.server.entities.Mob;
-import ee.taltech.server.entities.Spell;
+import ee.taltech.server.entities.*;
+import ee.taltech.server.entities.spawner.EntitySpawner;
 import ee.taltech.server.network.messages.game.*;
-import ee.taltech.server.entities.PlayerCharacter;
 
 import ee.taltech.server.components.Game;
+import ee.taltech.server.network.messages.lobby.Leave;
+import ee.taltech.server.network.messages.lobby.LobbyDismantle;
 
 import java.util.Map;
 
@@ -80,6 +79,13 @@ public class TickRateLoop implements Runnable {
             Integer playerId = lobbyEntry.getKey();
             Lobby lobby = lobbyEntry.getValue();
             lobby.removePlayer(playerId);
+
+            if (lobby.players.isEmpty()) {
+                gameServer.lobbies.remove(lobby.lobbyId);
+                server.sendToAllTCP(new LobbyDismantle(lobby.lobbyId));
+            } else {
+                server.sendToAllTCP(new Leave(lobby.lobbyId, playerId));
+            }
         }
         gameServer.playersToRemoveFromLobbies.clear();
 
@@ -88,27 +94,8 @@ public class TickRateLoop implements Runnable {
             // Item spawning to the world
             if (game.getStaringTicks() <= Constants.TICKS_TO_START_GAME) game.addTick(true);
             if (game.getStaringTicks() == Constants.TICKS_TO_START_GAME) { // Trigger only once
-                Item item1 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2940 / Constants.PPM);
-                Item item2 = new Item(ItemTypes.METEOR, 7640 / Constants.PPM, 2910 / Constants.PPM);
-                Item item3 = new Item(ItemTypes.PLASMA, 7640 / Constants.PPM, 2850 / Constants.PPM);
-                Item item4 = new Item(ItemTypes.KUNAI, 7600 / Constants.PPM, 2940 / Constants.PPM);
-                Item item5 = new Item(ItemTypes.ICE_SHARD, 7600 / Constants.PPM, 2910 / Constants.PPM);
-                Item item6 = new Item(ItemTypes.POISONBALL, 7600 / Constants.PPM, 2850 / Constants.PPM);
-                Item potion = new Item(ItemTypes.HEALING_POTION, 7640 / Constants.PPM, 2880 / Constants.PPM);
-                // Mob mob = new Mob(7640, 3020);
-                Mob mob = new Mob(7640 / Constants.PPM, 3020 / Constants.PPM);
-
-
-                game.addItem(item1, null);
-                game.addItem(item2, null);
-                game.addItem(item3, null);
-                game.addItem(item4, null);
-                game.addItem(item5, null);
-                game.addItem(item6, null);
-                game.addItem(potion, null);
-
+                new EntitySpawner(game);
                 game.sendPlayZoneCoordinates();
-                // game.addMob(mob);
             }
 
             // End the game
@@ -123,7 +110,7 @@ public class TickRateLoop implements Runnable {
             }
 
             for (PlayerCharacter player : game.gamePlayers.values()) {
-                if (!game.getDeadPlayers().containsValue(player)) {
+                if (!game.getDeadPlayers().contains(player)) {
                     player.updatePosition();
                 }
                 if (player.getCollidingWithMob()) {
@@ -136,7 +123,7 @@ public class TickRateLoop implements Runnable {
                     player.regenerateHealth();
                 }
                 if (!game.getPlayZone().areCoordinatesInZone((int) player.getXPosition(), (int) player.getYPosition())
-                        && !game.getDeadPlayers().containsValue(player)) {
+                        && !game.getDeadPlayers().contains(player)) {
                     game.damagePlayer(player.getPlayerID(), Constants.ZONE_DMG_PER_TIC);
                 }
                 for (Integer playerId : game.lobby.players) {
@@ -164,13 +151,19 @@ public class TickRateLoop implements Runnable {
             }
             for (Mob mob : game.mobs.values()) {
                 mob.updatePosition();
-                for (Integer playerId : game.lobby.players) {
-                    server.sendToUDP(playerId, new MobPosition(mob.getId(), mob.getXPosition(), mob.getYPosition()));
-                    server.sendToUDP(playerId, new UpdateMobHealth(mob.getId(), mob.getHealth()));
+
+                if (!game.getPlayZone().areCoordinatesInZone((int) mob.getXPosition(), (int) mob.getYPosition())
+                        && mob.getHealth() > 0) {
+                    game.damageMob(mob.getId(), Constants.ZONE_DMG_PER_TIC);
                 }
 
-                if (mob.getHealth() == 0) {
-                    game.mobsToRemove.add(mob);
+                for (Integer playerId : game.lobby.players) {
+                    server.sendToUDP(playerId, new MobPosition(mob.getId(), mob.getXPosition(), mob.getYPosition()));
+                    server.sendToUDP(playerId, new UpdateMobHealth(mob.getId(), (int) mob.getHealth()));
+                }
+
+                if (mob.getHealth() == 0) { // Check if mob is dead
+                    game.removeMob(mob);
                 }
             }
             game.update();

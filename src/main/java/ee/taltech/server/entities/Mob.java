@@ -20,7 +20,7 @@ public class Mob implements Entity {
     private float yPosition;
     private int sourceNodeX;
     private int sourceNodeY;
-    private Integer health;
+    private float health;
     private final AStarPathFinding aStar;
     private final List<PlayerCharacter> playersInRange;
     private List<Node> currentPath;
@@ -141,7 +141,7 @@ public class Mob implements Entity {
      *
      * @return health
      */
-    public Integer getHealth() {
+    public float getHealth() {
         return health;
     }
 
@@ -150,7 +150,7 @@ public class Mob implements Entity {
      *
      * @param newHealth new mob's health
      */
-    public void setHealth(Integer newHealth) {
+    public void setHealth(float newHealth) {
         health = newHealth;
     }
 
@@ -252,12 +252,14 @@ public class Mob implements Entity {
      */
     private List<Node> chooseRandomPath() {
         while (true) { // Try random X and Y values until pathing there is possible
-            int randomX = Game.random.nextInt((int) (sourceNodeX - Constants.TRIGGERING_RANGE_RADIUS / 8),
-                    (int) (sourceNodeX + (Constants.TRIGGERING_RANGE_RADIUS / 8) + 1));
-            int randomY = Game.random.nextInt((int) (sourceNodeY -  Constants.TRIGGERING_RANGE_RADIUS / 8),
-                    (int) (sourceNodeY +  (Constants.TRIGGERING_RANGE_RADIUS / 8) + 1));
+            int randomX = Game.random.nextInt((int) (sourceNodeX - Constants.TRIGGERING_RANGE_RADIUS * 4),
+                    (int) (sourceNodeX + (Constants.TRIGGERING_RANGE_RADIUS * 4) + 1));
+            int randomY = Game.random.nextInt((int) (sourceNodeY -  Constants.TRIGGERING_RANGE_RADIUS * 4),
+                    (int) (sourceNodeY +  (Constants.TRIGGERING_RANGE_RADIUS * 4) + 1));
 
-            if (Grid.grid[randomY][randomX] == 0 && randomX != sourceNodeX && randomY != sourceNodeY) {
+            if (0 < randomX && randomX < Constants.MAX_X_NODE
+                    && 0 < randomY && randomY < Constants.MAX_Y_NODE
+                    && Grid.grid[randomY][randomX] == 0 && randomX != sourceNodeX && randomY != sourceNodeY) {
                 List<Node> path = aStar.findPath(sourceNodeX, sourceNodeY, randomX, randomY);
                 if (!path.isEmpty() && path.size() < Constants.MAX_PATH_RANGE) {
                     return path;

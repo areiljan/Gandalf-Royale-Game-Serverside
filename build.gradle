@@ -12,6 +12,7 @@ distributions {
         contents {
             from 'src/main/resources/grid.txt'
             from 'src/main/resources/mapdata.bin'
+            from 'src/main/resources/spawn_points.csv'
         }
     }
 }

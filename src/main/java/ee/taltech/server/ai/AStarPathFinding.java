@@ -1,5 +1,8 @@
 package ee.taltech.server.ai;
 
+import com.esotericsoftware.minlog.Log;
+import ee.taltech.server.components.Constants;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.concurrent.*;
 
 public class AStarPathFinding {
 
@@ -15,13 +19,28 @@ public class AStarPathFinding {
     private final int[][] grid;
     private final int[][] neighbours = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
+    private final ExecutorService service;
+
     public AStarPathFinding() {
         grid = Grid.grid;
-        this.maxX = 1200;
-        this.maxY = 1200;
+        this.maxX = Constants.MAX_X_NODE;
+        this.maxY = Constants.MAX_Y_NODE;
+        this.service = Executors.newSingleThreadExecutor();
     }
 
     public List<Node> findPath(int srcX, int srcY, int dstX, int dstY) {
+        try {
+            return service.submit(() -> findPathPrivate(srcX, srcY, dstX, dstY)).get();
+        } catch (InterruptedException e) {
+            Log.info("Path finding got interrupted! Exception: " + e);
+            return Collections.emptyList();
+        } catch (ExecutionException e) {
+            Log.info("Path finding got interrupted! Exception: " + e);
+            return Collections.emptyList();
+        }
+    }
+
+    private List<Node> findPathPrivate(int srcX, int srcY, int dstX, int dstY) {
         List<Node> path = new ArrayList<>();
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingInt(Node::getFScore));
         openSet.add(new Node(srcX, srcY, maxY));

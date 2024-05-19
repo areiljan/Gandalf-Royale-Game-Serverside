@@ -59,53 +59,64 @@ public class ServerListener extends Listener {
     private void gameMessagesListener(Connection connection, Object incomingData) {
         Integer gameId = server.connections.get(connection.getID());
         Game game = server.games.get(gameId);
-        PlayerCharacter player = game.gamePlayers.get(connection.getID());
-        switch (incomingData) {
-            case KeyPress key: // On KeyPress message
-                if (player != null) {
-                    // Set the direction player should be moving.
-                    if (key.action.equals(KeyPress.Action.UP) || key.action.equals(KeyPress.Action.DOWN)
-                            || key.action.equals(KeyPress.Action.LEFT) ||  key.action.equals(KeyPress.Action.RIGHT)) {
-                        player.setMovement(key);
-                    } else {
-                        game.setPlayerAction(key, player);
+        if (game != null) {
+            PlayerCharacter player = game.gamePlayers.get(connection.getID());
+            switch (incomingData) {
+                case KeyPress key: // On KeyPress message
+                    if (player != null) {
+                        // Set the direction player should be moving.
+                        if (key.action.equals(KeyPress.Action.UP) || key.action.equals(KeyPress.Action.DOWN)
+                                || key.action.equals(KeyPress.Action.LEFT) || key.action.equals(KeyPress.Action.RIGHT)) {
+                            player.setMovement(key);
+                        } else {
+                            game.setPlayerAction(key, player);
+                        }
                     }
-                }
-                break;
-            case MouseClicks mouse: // On MouseClicks message
-                if (player != null) {
-                    // Set the direction player should be moving.
-                    player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition, mouse.type);
+                    break;
+                case MouseClicks mouse: // On MouseClicks message
+                    if (player != null) {
+                        // Set the direction player should be moving.
+                        player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition, mouse.type);
 
-                    // *------------- HEALING POTION -------------*
-                    if (mouse.type == ItemTypes.HEALING_POTION) {
-                        game.healPlayer(player.playerID, mouse.extraField);
-                    }
-                    // *------------- SPELL -------------*
-                    else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse) {
-                        Spell spell = null;
-                        if (mouse.type == ItemTypes.FIREBALL && player.mana >= 25) {
-                            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
-                        } else if (mouse.type == ItemTypes.PLASMA && player.mana >= 15) {
-                            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
-                        } else if (mouse.type == ItemTypes.METEOR && player.mana >= 33) {
-                            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
-                        } else if (mouse.type == ItemTypes.KUNAI && player.mana >= 50) {
-                            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
+                        // *------------- HEALING POTION -------------*
+                        if (mouse.type == ItemTypes.HEALING_POTION && player.getHealth() != 0) {
+                            game.healPlayer(player.playerID, mouse.extraField);
                         }
-                        if (spell != null) {
-                            game.addSpell(spell);
+                        // *------------- SPELL -------------*
+                        else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse) {
+                            Spell spell = getSpell(mouse, player);
+                            if (spell != null) {
+                                game.addSpell(spell);
+                            }
                         }
                     }
-                }
-                break;
-            case GameLeave message: // On GameLeave message
-                game.damagePlayer(message.playerID, 100); // Kill the player if they leave
-                server.playersToRemoveFromLobbies.put(message.playerID, game.lobby);
-                break;
-            default: // Ignore everything else
-                break;
+                    break;
+                case GameLeave message: // On GameLeave message
+                    game.damagePlayer(message.playerID, 100); // Kill the player if they leave
+                    server.playersToRemoveFromLobbies.put(message.playerID, game.lobby);
+                    break;
+                default: // Ignore everything else
+                    break;
+            }
         }
+    }
+
+    /**
+     * Get spell based of message.
+     *
+     * @param mouse given mouse click message
+     * @param player player that clicked the mouse
+     * @return spell that player cast or null if player clicked while on an empty slot
+     */
+    private Spell getSpell(MouseClicks mouse, PlayerCharacter player) {
+        Spell spell = null;
+        if (mouse.type == ItemTypes.FIREBALL && player.mana >= 25
+                || mouse.type == ItemTypes.PLASMA && player.mana >= 15
+                || mouse.type == ItemTypes.METEOR && player.mana >= 33
+                || mouse.type == ItemTypes.KUNAI && player.mana >= 50) {
+            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
+        }
+        return spell;
     }
 
     /**
@@ -189,11 +200,6 @@ public class ServerListener extends Listener {
         for (Lobby lobby : server.lobbies.values()) {
             if (lobby.players.contains(connection.getID())) {
                 server.playersToRemoveFromLobbies.put(connection.getID(), lobby);
-                if (lobby.players.size() == 1) {
-                    server.server.sendToAllTCP(new LobbyDismantle(lobby.lobbyId));
-                } else {
-                    server.server.sendToAllTCP(new Leave(lobby.lobbyId, connection.getID()));
-                }
             }
         }
 

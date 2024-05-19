@@ -88,6 +88,10 @@ public class PlayerCharacter implements Entity {
         return body.getPosition().y;
     }
 
+    public void setSpawn(int[] coord) {
+        body.setTransform(coord[0], coord[1], body.getAngle());
+    }
+
     /**
      * Get player's left mouse click.
      *
@@ -129,6 +133,14 @@ public class PlayerCharacter implements Entity {
      */
     public void startHealing() {
         this.healingTicks = FULL_HEALING_TICKS;
+    }
+
+    /**
+     * Stop player's healing.
+     * Used when player dies.
+     */
+    public void stopHealing() {
+        this.healingTicks = 0;
     }
 
     /**
@@ -259,6 +271,15 @@ public class PlayerCharacter implements Entity {
     }
 
     /**
+     * Get player's health.
+     *
+     * @return player's health
+     */
+    public float getHealth() {
+        return health;
+    }
+
+    /**
      * Create player's hit box.
      *
      * @param world world, where hit boxes are in
@@ -311,14 +332,13 @@ public class PlayerCharacter implements Entity {
         }
     }
 
-
     /**
      * Regenerate mana.
      */
     public void regenerateMana() {
         if (mana < 100){
             // Add mana every tick so that one second regenerates around 5 mana
-            mana = (float) Math.min(mana + 0.1, 100f); // Mana can not be over 100
+            mana = (float) Math.min(mana + Constants.MANA_REGEN, 100f); // Mana can not be over 100
         }
     }
 
