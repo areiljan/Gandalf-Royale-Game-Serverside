@@ -4,11 +4,9 @@ import com.esotericsoftware.kryonet.Server;
 import ee.taltech.server.components.Constants;
 import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.components.Lobby;
-import ee.taltech.server.entities.Item;
-import ee.taltech.server.entities.Mob;
-import ee.taltech.server.entities.Spell;
+import ee.taltech.server.entities.*;
+import ee.taltech.server.entities.spawner.EntitySpawner;
 import ee.taltech.server.network.messages.game.*;
-import ee.taltech.server.entities.PlayerCharacter;
 
 import ee.taltech.server.components.Game;
 
@@ -88,27 +86,8 @@ public class TickRateLoop implements Runnable {
             // Item spawning to the world
             if (game.getStaringTicks() <= Constants.TICKS_TO_START_GAME) game.addTick(true);
             if (game.getStaringTicks() == Constants.TICKS_TO_START_GAME) { // Trigger only once
-                Item item1 = new Item(ItemTypes.FIREBALL, 7640 / Constants.PPM, 2940 / Constants.PPM);
-                Item item2 = new Item(ItemTypes.METEOR, 7640 / Constants.PPM, 2910 / Constants.PPM);
-                Item item3 = new Item(ItemTypes.PLASMA, 7640 / Constants.PPM, 2850 / Constants.PPM);
-                Item item4 = new Item(ItemTypes.KUNAI, 7600 / Constants.PPM, 2940 / Constants.PPM);
-                Item item5 = new Item(ItemTypes.ICE_SHARD, 7600 / Constants.PPM, 2910 / Constants.PPM);
-                Item item6 = new Item(ItemTypes.POISONBALL, 7600 / Constants.PPM, 2850 / Constants.PPM);
-                Item potion = new Item(ItemTypes.HEALING_POTION, 7640 / Constants.PPM, 2880 / Constants.PPM);
-                // Mob mob = new Mob(7640, 3020);
-                Mob mob = new Mob(7640 / Constants.PPM, 3020 / Constants.PPM);
-
-
-                game.addItem(item1, null);
-                game.addItem(item2, null);
-                game.addItem(item3, null);
-                game.addItem(item4, null);
-                game.addItem(item5, null);
-                game.addItem(item6, null);
-                game.addItem(potion, null);
-
+                new EntitySpawner(game);
                 game.sendPlayZoneCoordinates();
-                // game.addMob(mob);
             }
 
             // End the game

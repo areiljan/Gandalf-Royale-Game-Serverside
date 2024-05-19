@@ -1,5 +1,9 @@
 package ee.taltech.server.components;
 
+import ee.taltech.server.entities.spawner.EntitySpawner;
+
+import java.util.Map;
+
 public class Constants {
     public static final float PPM = 32;
 
@@ -38,5 +42,12 @@ public class Constants {
 
     public static final float MOB_DMG_PER_TIC = 0.15f;
     public static final float ZONE_DMG_PER_TIC = 0.03f;
+
+    public static final Map<EntitySpawner.ItemType, Float> SPAWN_PROBABILITIES = Map.of(
+            EntitySpawner.ItemType.MOB, 0.1f, // Probability of spawning a mob
+            EntitySpawner.ItemType.SPELL, 0.8f, // Probability of spawning a book
+            EntitySpawner.ItemType.POTION, 0.1f
+    );
+
 }
 

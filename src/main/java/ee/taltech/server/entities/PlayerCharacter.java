@@ -88,6 +88,10 @@ public class PlayerCharacter implements Entity {
         return body.getPosition().y;
     }
 
+    public void setSpawn(int[] coord) {
+        body.setTransform(coord[0], coord[1], body.getAngle());
+    }
+
     /**
      * Get player's left mouse click.
      *
