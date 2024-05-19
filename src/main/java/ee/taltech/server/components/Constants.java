@@ -45,18 +45,18 @@ public class Constants {
     public static final float ZONE_DMG_PER_TIC = 0.03f;
 
     public static final Map<EntitySpawner.EntityType, Float> SPAWN_PROBABILITIES = Map.of(
-            EntitySpawner.EntityType.MOB, 0.00f, // Probability of spawning a mob
-            EntitySpawner.EntityType.ITEM, 1f // Probability of spawning a book
+            EntitySpawner.EntityType.MOB, 0.08f, // Probability of spawning a mob
+            EntitySpawner.EntityType.ITEM, 0.92f // Probability of spawning a book
     );
 
     public static final Map<ItemTypes, Float> SPAWN_PROBABILITIES_ITEMS = Map.of(
-            ItemTypes.FIREBALL, 0.1f,
-            ItemTypes.COIN, 0f,
+            ItemTypes.FIREBALL, 0.2f,
+            ItemTypes.COIN, 0.1f,
             ItemTypes.METEOR, 0.1f,
-            ItemTypes.ICE_SHARD, 0.4f,
+            ItemTypes.ICE_SHARD, 0.1f,
             ItemTypes.KUNAI, 0.1f,
             ItemTypes.PLASMA, 0.1f,
-            ItemTypes.HEALING_POTION, 0.1f,
+            ItemTypes.HEALING_POTION, 0.2f,
             ItemTypes.MAGICMISSILE, 0.1f
     );
 
