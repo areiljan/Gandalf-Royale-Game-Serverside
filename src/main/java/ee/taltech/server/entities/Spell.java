@@ -54,7 +54,7 @@ public class Spell implements Entity {
             damage = 25;
         } else if (type == ItemTypes.PLASMA) {
             // Plasma is a pea-gun, shoots fast and takes little mana, but also deals little damage.
-            manaCost = 15;
+            manaCost = 5;
             hitBoxSize = 0.2f;
             spellSpeed = Constants.PLASMA_SPEED;
             damage = 7;
