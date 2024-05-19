@@ -10,7 +10,7 @@ public enum ItemTypes {
     METEOR,
     KUNAI,
     ICE_SHARD,
-    POISONBALL,
+    MAGICMISSILE,
     COIN,
     HEALING_POTION
 }

@@ -26,17 +26,18 @@ public class Constants {
     public static final float HIT_BOX_RADIUS = 1f; // One cell size
 
     public static final float TRIGGERING_RANGE_RADIUS = 15f;
-    public static final int MOB_HEALTH = 50;
+    public static final int MOB_HEALTH = 70;
     public static final float MOD_SPIN_ATTACK_DAMAGE = 10;
     public static final int MAX_PATH_RANGE = 150;
 
     public static final float COIN_DROP_RANGE = 1;
     public static final float ITEM_DROP_RANGE = 0.5f;
-    public static final float FIREBALL_SPEED = 7;
+    public static final float FIREBALL_SPEED = 10;
     public static final float PLASMA_SPEED = 10;
-    public static final float KUNAI_SPEED = 10;
-    public static final float METEOR_SPEED = 5;
-
+    public static final float KUNAI_SPEED = 14;
+    public static final float METEOR_SPEED = 6;
+    public static final float MAGICMISSILE_SPEED = 8;
+    public static final float ICE_SHARD_SPEED = 8;
     public static final int TICKS_TO_START_GAME = 1000;
     public static final int TICKS_TO_END_GAME = 60;
 
@@ -50,13 +51,13 @@ public class Constants {
 
     public static final Map<ItemTypes, Float> SPAWN_PROBABILITIES_ITEMS = Map.of(
             ItemTypes.FIREBALL, 0.2f,
-            ItemTypes.COIN, 0f,
+            ItemTypes.COIN, 0.1f,
             ItemTypes.METEOR, 0.1f,
             ItemTypes.ICE_SHARD, 0.1f,
             ItemTypes.KUNAI, 0.1f,
-            ItemTypes.PLASMA, 0.2f,
+            ItemTypes.PLASMA, 0.1f,
             ItemTypes.HEALING_POTION, 0.2f,
-            ItemTypes.POISONBALL, 0.1f
+            ItemTypes.MAGICMISSILE, 0.1f
     );
 
     public static final float MANA_REGEN = 0.2f;
