@@ -322,7 +322,7 @@ public class PlayerCharacter implements Entity {
     public void regenerateMana() {
         if (mana < 100){
             // Add mana every tick so that one second regenerates around 5 mana
-            mana = (float) Math.min(mana + 0.1, 100f); // Mana can not be over 100
+            mana = (float) Math.min(mana + Constants.MANA_REGEN, 100f); // Mana can not be over 100
         }
     }
 

@@ -252,10 +252,10 @@ public class Mob implements Entity {
      */
     private List<Node> chooseRandomPath() {
         while (true) { // Try random X and Y values until pathing there is possible
-            int randomX = Game.random.nextInt((int) (sourceNodeX - Constants.TRIGGERING_RANGE_RADIUS / 8),
-                    (int) (sourceNodeX + (Constants.TRIGGERING_RANGE_RADIUS / 8) + 1));
-            int randomY = Game.random.nextInt((int) (sourceNodeY -  Constants.TRIGGERING_RANGE_RADIUS / 8),
-                    (int) (sourceNodeY +  (Constants.TRIGGERING_RANGE_RADIUS / 8) + 1));
+            int randomX = Game.random.nextInt((int) (sourceNodeX - Constants.TRIGGERING_RANGE_RADIUS * 4),
+                    (int) (sourceNodeX + (Constants.TRIGGERING_RANGE_RADIUS * 4) + 1));
+            int randomY = Game.random.nextInt((int) (sourceNodeY -  Constants.TRIGGERING_RANGE_RADIUS * 4),
+                    (int) (sourceNodeY +  (Constants.TRIGGERING_RANGE_RADIUS * 4) + 1));
 
             if (Grid.grid[randomY][randomX] == 0 && randomX != sourceNodeX && randomY != sourceNodeY) {
                 List<Node> path = aStar.findPath(sourceNodeX, sourceNodeY, randomX, randomY);

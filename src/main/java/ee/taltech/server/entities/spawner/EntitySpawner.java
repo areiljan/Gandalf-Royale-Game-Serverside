@@ -7,7 +7,6 @@ import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.entities.Item;
 import ee.taltech.server.entities.Mob;
 import ee.taltech.server.entities.PlayerCharacter;
-import ee.taltech.server.entities.Spell;
 
 import java.io.*;
 import java.util.*;
@@ -29,8 +28,8 @@ public class EntitySpawner {
     }
 
 
-    public enum ItemType {
-        MOB, SPELL, POTION
+    public enum EntityType {
+        MOB, ITEM
     }
 
     /**
@@ -40,7 +39,7 @@ public class EntitySpawner {
         // 2. Spawn items based on probabilities
         for (int[] coord : coordinates) {
             // Skip coordinates where players have already been spawned
-            ItemType itemType = getRandomItemType();
+            EntityType itemType = getRandomEntityType();
             if (itemType != null) {
                 spawnItem(coord, itemType);
             }
@@ -80,10 +79,10 @@ public class EntitySpawner {
     /**
      * @return Type of item, that is going to be spawned.
      */
-    private ItemType getRandomItemType() {
+    private EntityType getRandomEntityType() {
         float randomValue = MathUtils.random();
         float cumulativeProbability = 0.0f;
-        for (ItemType type : ItemType.values()) {
+        for (EntityType type : EntityType.values()) {
             cumulativeProbability += Constants.SPAWN_PROBABILITIES.getOrDefault(type, 0.0f);
             if (randomValue <= cumulativeProbability) {
                 return type;
@@ -93,20 +92,36 @@ public class EntitySpawner {
     }
 
     /**
+     * @return Type of item, that is going to be spawned.
+     */
+    private ItemTypes getRandomItemType() {
+        float randomValue = MathUtils.random();
+        float cumulativeProbability = 0.0f;
+        for (ItemTypes type : ItemTypes.values()) {
+            cumulativeProbability += Constants.SPAWN_PROBABILITIES_ITEMS.getOrDefault(type, 0.0f);
+            if (randomValue <= cumulativeProbability) {
+                return type;
+            }
+        }
+        return null; // No item spawned based on probability
+    }
+
+
+    /**
      * Actually add the items to the game.
      *
      * @param coord of spawn position
      * @param type of item/mob that will be spawned.
      */
-    private void spawnItem(int[] coord, ItemType type) {
+    private void spawnItem(int[] coord, EntityType type) {
         switch (type) {
             case MOB:
                 Mob mob = new Mob(coord[0], coord[1]);
                 game.addMob(mob);
                 System.out.println("Mob spawned");
                 break;
-            case SPELL:
-                Item item = new Item(ItemTypes.FIREBALL, coord[0], coord[1]);
+            case ITEM:
+                Item item = new Item(getRandomItemType(), coord[0], coord[1]);
                 game.addItem(item, null);
                 System.out.println("Spell spawned");
                 break;
