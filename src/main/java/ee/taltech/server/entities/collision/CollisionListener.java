@@ -6,8 +6,10 @@ import ee.taltech.server.components.ItemTypes;
 import ee.taltech.server.entities.*;
 import ee.taltech.server.components.Game;
 
+import javax.swing.plaf.SeparatorUI;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class CollisionListener implements ContactListener {
 
@@ -46,6 +48,12 @@ public class CollisionListener implements ContactListener {
                     && entityB instanceof PlayerCharacter
                     && typeB.equals(CollisionBodyTypes.HIT_BOX)) {
                 spellAndPlayerCollision(entityA, entityB);
+            }
+
+            // If two spells collide
+            if (entityA instanceof Spell
+                    && entityB instanceof Spell) {
+                twoSpellCollision(entityA, entityB);
             }
 
             // If player and coin collide
@@ -137,6 +145,36 @@ public class CollisionListener implements ContactListener {
         if (player != null && spell.getPlayerId() != player.getPlayerID()) {
             game.damagePlayer(player.playerID, spell.getSpellDamage());
             game.removeSpell(spell.getSpellId());
+        }
+    }
+
+    /**
+     * Apply logic that happens when two spells collide.
+     *
+     * @param entityA one collision body
+     * @param entityB second collision body
+     */
+    private void twoSpellCollision(Entity entityA, Entity entityB) {
+        Spell spellA = (Spell) entityA;
+        Spell spellB = (Spell) entityB;
+
+        if (spellA.getPlayerId() != spellB.getPlayerId()) {
+            // Break both spells if they are both meteor or neither are meteor
+            if (spellA.getType() == ItemTypes.METEOR && spellB.getType() == ItemTypes.METEOR
+                    || spellA.getType() != ItemTypes.METEOR && spellB.getType() != ItemTypes.METEOR) {
+                game.removeSpell(spellA.getSpellId());
+                game.removeSpell(spellB.getSpellId());//
+            }
+
+            // Spell A is meteor and Spell B is not
+            else if (spellA.getType() == ItemTypes.METEOR && spellB.getType() != ItemTypes.METEOR) {
+                game.removeSpell(spellB.getSpellId());
+            }
+
+            // Spell B is meteor and Spell A is not
+            else if (spellA.getType() != ItemTypes.METEOR && spellB.getType() == ItemTypes.METEOR) {
+                game.removeSpell(spellA.getSpellId());
+            }
         }
     }
 

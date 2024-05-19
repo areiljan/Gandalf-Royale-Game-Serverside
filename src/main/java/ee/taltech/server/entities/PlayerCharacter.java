@@ -136,6 +136,14 @@ public class PlayerCharacter implements Entity {
     }
 
     /**
+     * Stop player's healing.
+     * Used when player dies.
+     */
+    public void stopHealing() {
+        this.healingTicks = 0;
+    }
+
+    /**
      * Method sets the heading action for the player, but doesn't update the position coordinates.
      * Only use if's, because multiple buttons can be pressed simultaneously.
      *
@@ -263,6 +271,15 @@ public class PlayerCharacter implements Entity {
     }
 
     /**
+     * Get player's health.
+     *
+     * @return player's health
+     */
+    public float getHealth() {
+        return health;
+    }
+
+    /**
      * Create player's hit box.
      *
      * @param world world, where hit boxes are in
@@ -314,7 +331,6 @@ public class PlayerCharacter implements Entity {
             body = null;
         }
     }
-
 
     /**
      * Regenerate mana.

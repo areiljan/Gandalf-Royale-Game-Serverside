@@ -8,6 +8,8 @@ import ee.taltech.server.entities.spawner.EntitySpawner;
 import ee.taltech.server.network.messages.game.*;
 
 import ee.taltech.server.components.Game;
+import ee.taltech.server.network.messages.lobby.Leave;
+import ee.taltech.server.network.messages.lobby.LobbyDismantle;
 
 import java.util.Map;
 
@@ -77,6 +79,13 @@ public class TickRateLoop implements Runnable {
             Integer playerId = lobbyEntry.getKey();
             Lobby lobby = lobbyEntry.getValue();
             lobby.removePlayer(playerId);
+
+            if (lobby.players.isEmpty()) {
+                gameServer.lobbies.remove(lobby.lobbyId);
+                server.sendToAllTCP(new LobbyDismantle(lobby.lobbyId));
+            } else {
+                server.sendToAllTCP(new Leave(lobby.lobbyId, playerId));
+            }
         }
         gameServer.playersToRemoveFromLobbies.clear();
 
@@ -101,7 +110,7 @@ public class TickRateLoop implements Runnable {
             }
 
             for (PlayerCharacter player : game.gamePlayers.values()) {
-                if (!game.getDeadPlayers().containsValue(player)) {
+                if (!game.getDeadPlayers().contains(player)) {
                     player.updatePosition();
                 }
                 if (player.getCollidingWithMob()) {
@@ -114,7 +123,7 @@ public class TickRateLoop implements Runnable {
                     player.regenerateHealth();
                 }
                 if (!game.getPlayZone().areCoordinatesInZone((int) player.getXPosition(), (int) player.getYPosition())
-                        && !game.getDeadPlayers().containsValue(player)) {
+                        && !game.getDeadPlayers().contains(player)) {
                     game.damagePlayer(player.getPlayerID(), Constants.ZONE_DMG_PER_TIC);
                 }
                 for (Integer playerId : game.lobby.players) {
@@ -142,13 +151,19 @@ public class TickRateLoop implements Runnable {
             }
             for (Mob mob : game.mobs.values()) {
                 mob.updatePosition();
-                for (Integer playerId : game.lobby.players) {
-                    server.sendToUDP(playerId, new MobPosition(mob.getId(), mob.getXPosition(), mob.getYPosition()));
-                    server.sendToUDP(playerId, new UpdateMobHealth(mob.getId(), mob.getHealth()));
+
+                if (!game.getPlayZone().areCoordinatesInZone((int) mob.getXPosition(), (int) mob.getYPosition())
+                        && mob.getHealth() > 0) {
+                    game.damageMob(mob.getId(), Constants.ZONE_DMG_PER_TIC);
                 }
 
-                if (mob.getHealth() == 0) {
-                    game.mobsToRemove.add(mob);
+                for (Integer playerId : game.lobby.players) {
+                    server.sendToUDP(playerId, new MobPosition(mob.getId(), mob.getXPosition(), mob.getYPosition()));
+                    server.sendToUDP(playerId, new UpdateMobHealth(mob.getId(), (int) mob.getHealth()));
+                }
+
+                if (mob.getHealth() == 0) { // Check if mob is dead
+                    game.removeMob(mob);
                 }
             }
             game.update();

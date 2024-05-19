@@ -27,7 +27,6 @@ public class EntitySpawner {
 
     }
 
-
     public enum EntityType {
         MOB, ITEM
     }
@@ -75,7 +74,6 @@ public class EntitySpawner {
         }
     }
 
-
     /**
      * @return Type of item, that is going to be spawned.
      */
@@ -118,12 +116,10 @@ public class EntitySpawner {
             case MOB:
                 Mob mob = new Mob(coord[0], coord[1]);
                 game.addMob(mob);
-                System.out.println("Mob spawned");
                 break;
             case ITEM:
                 Item item = new Item(getRandomItemType(), coord[0], coord[1]);
                 game.addItem(item, null);
-                System.out.println("Spell spawned");
                 break;
         }
     }

@@ -79,21 +79,12 @@ public class ServerListener extends Listener {
                         player.setMouseControl(mouse.leftMouse, (int) mouse.mouseXPosition, (int) mouse.mouseYPosition, mouse.type);
 
                         // *------------- HEALING POTION -------------*
-                        if (mouse.type == ItemTypes.HEALING_POTION) {
+                        if (mouse.type == ItemTypes.HEALING_POTION && player.getHealth() != 0) {
                             game.healPlayer(player.playerID, mouse.extraField);
                         }
                         // *------------- SPELL -------------*
                         else if (mouse.type != ItemTypes.NOTHING && mouse.leftMouse) {
-                            Spell spell = null;
-                            if (mouse.type == ItemTypes.FIREBALL && player.mana >= 25) {
-                                spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
-                            } else if (mouse.type == ItemTypes.PLASMA && player.mana >= 15) {
-                                spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
-                            } else if (mouse.type == ItemTypes.METEOR && player.mana >= 33) {
-                                spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
-                            } else if (mouse.type == ItemTypes.KUNAI && player.mana >= 50) {
-                                spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
-                            }
+                            Spell spell = getSpell(mouse, player);
                             if (spell != null) {
                                 game.addSpell(spell);
                             }
@@ -108,6 +99,24 @@ public class ServerListener extends Listener {
                     break;
             }
         }
+    }
+
+    /**
+     * Get spell based of message.
+     *
+     * @param mouse given mouse click message
+     * @param player player that clicked the mouse
+     * @return spell that player cast or null if player clicked while on an empty slot
+     */
+    private Spell getSpell(MouseClicks mouse, PlayerCharacter player) {
+        Spell spell = null;
+        if (mouse.type == ItemTypes.FIREBALL && player.mana >= 25
+                || mouse.type == ItemTypes.PLASMA && player.mana >= 15
+                || mouse.type == ItemTypes.METEOR && player.mana >= 33
+                || mouse.type == ItemTypes.KUNAI && player.mana >= 50) {
+            spell = new Spell(player, mouse.mouseXPosition, mouse.mouseYPosition, mouse.type);
+        }
+        return spell;
     }
 
     /**
@@ -191,11 +200,6 @@ public class ServerListener extends Listener {
         for (Lobby lobby : server.lobbies.values()) {
             if (lobby.players.contains(connection.getID())) {
                 server.playersToRemoveFromLobbies.put(connection.getID(), lobby);
-                if (lobby.players.size() == 1) {
-                    server.server.sendToAllTCP(new LobbyDismantle(lobby.lobbyId));
-                } else {
-                    server.server.sendToAllTCP(new Leave(lobby.lobbyId, connection.getID()));
-                }
             }
         }
 
