@@ -491,6 +491,20 @@ public class Game {
      * End the current game, let the player's know who won and dispose everything.
      */
     public void endGame() {
+
+        // *-------- REMOVE EVERYTHING --------*
+        for (Mob mob : mobs.values()) {
+            mob.removeBody(world);
+        }
+        for (Item item : items.values()) {
+            item.removeBody(world);
+        }
+        for (PlayerCharacter playerCharacter : gamePlayers.values()) {
+            playerCharacter.removeBody(world);
+        }
+
+        world.dispose(); // Dispose world
+
         if (gamePlayers.size() - deadPlayers.size() == 1) {
             // *-------------- GETTING WINNER ID -------------*
             Set<Integer> difference = new HashSet<>(gamePlayers.keySet());

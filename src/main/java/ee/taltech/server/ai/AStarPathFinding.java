@@ -21,6 +21,9 @@ public class AStarPathFinding {
 
     private final ExecutorService service;
 
+    /**
+     * Construct A star path finding.
+     */
     public AStarPathFinding() {
         grid = Grid.grid;
         this.maxX = Constants.MAX_X_NODE;
@@ -28,6 +31,9 @@ public class AStarPathFinding {
         this.service = Executors.newSingleThreadExecutor();
     }
 
+    /**
+     * Put path finding on a different thread.
+     */
     public List<Node> findPath(int srcX, int srcY, int dstX, int dstY) {
         try {
             return service.submit(() -> findPathPrivate(srcX, srcY, dstX, dstY)).get();
@@ -40,6 +46,15 @@ public class AStarPathFinding {
         }
     }
 
+    /**
+     * Find path from source to destination.
+     *
+     * @param srcX source node's x
+     * @param srcY source node's y
+     * @param dstX destination node's x
+     * @param dstY destination node's y
+     * @return a path as list of nodes
+     */
     private List<Node> findPathPrivate(int srcX, int srcY, int dstX, int dstY) {
         List<Node> path = new ArrayList<>();
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingInt(Node::getFScore));
@@ -77,5 +92,12 @@ public class AStarPathFinding {
             }
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * Close path finding thead.
+     */
+    public void closePathFindingThread() {
+        service.close();
     }
 }
