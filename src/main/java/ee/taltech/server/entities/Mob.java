@@ -105,8 +105,12 @@ public class Mob implements Entity {
      * Remove body.
      */
     public void removeBody(World world) {
-        world.destroyBody(body); // Destroy the mob's body
-        body = null;
+        aStar.closePathFindingThread(); // Close path finding thread
+
+        if (body != null) {
+            world.destroyBody(body); // Destroy the mob's body
+            body = null;
+        }
     }
 
     /**

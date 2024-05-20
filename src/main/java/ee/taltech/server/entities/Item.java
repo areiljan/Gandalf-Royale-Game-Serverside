@@ -176,7 +176,9 @@ public class Item implements Entity {
      * Remove body.
      */
     public void removeBody(World world) {
-        world.destroyBody(body); // Destroy the item's body
-        body = null;
+        if (body != null) {
+            world.destroyBody(body); // Destroy the item's body
+            body = null;
+        }
     }
 }
