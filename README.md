@@ -5,6 +5,8 @@
 
 Players start empty handed spread around the map. Players have three inventory slots and they can collect different magic weapons and they can also switch between them or drop them. Different weapons have different purposes, some deal damage and some have other uses. The play area shrinks over time until only one player is alive, at which point the game ends. The player can be in the red zone, but will take damage over time.
 There are also AI pumpkins roaming around the map (randomized movement), they will follow the player when the player enters their proximity (players will take damage, when the pumpkin is close enough). Pumpkins drop gold coins when killed. These coins can be used to buy even better weapons and to restore health.
+![2d4b7b31-990d-459d-a32a-08854a935481](https://github.com/user-attachments/assets/4a9cd7e4-4e68-4f9e-9a12-2efcf5e2548c)
+
 
 Each player has three resources: **health**, **mana** and **gold**.
 
@@ -44,7 +46,8 @@ Have fun :P
 ![shoot](https://github.com/user-attachments/assets/ba39be0a-dcf0-4fb9-8c89-6d1b5ce48948)
 
 
-![Uploading zone-ezgif.com-optimize.gif…]()
+![zone-ezgif com-optimize](https://github.com/user-attachments/assets/a3a34b0c-b119-43c0-917c-d3569fb04e4f)
+
 
 ### How to play and game controls
 
