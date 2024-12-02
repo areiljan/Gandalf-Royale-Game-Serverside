@@ -45,7 +45,7 @@ Have fun :P
 
 ![shoot](https://github.com/user-attachments/assets/ba39be0a-dcf0-4fb9-8c89-6d1b5ce48948)
 
-
+And yes there are a total of 6 spells in the game, + 1 health potion. So a total of 7 different items that have different uses but the player only has 3 inventory slots. Much like in life, the character cannot have it all and has to make a sacrifice in inventory. 
 ![zone-ezgif com-optimize](https://github.com/user-attachments/assets/a3a34b0c-b119-43c0-917c-d3569fb04e4f)
 
 
