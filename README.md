@@ -1,6 +1,8 @@
 # iti0301-2024
 ## Gandalf Royale
 
+![fdb84c8d-b05d-4059-824d-cba983c7b465](https://github.com/user-attachments/assets/96fe3b59-90a5-4935-86d0-9bf408a43d94)
+
 Players start empty handed spread around the map. Players have three inventory slots and they can collect different magic weapons and they can also switch between them or drop them. Different weapons have different purposes, some deal damage and some have other uses. The play area shrinks over time until only one player is alive, at which point the game ends. The player can be in the red zone, but will take damage over time.
 There are also AI pumpkins roaming around the map (randomized movement), they will follow the player when the player enters their proximity (players will take damage, when the pumpkin is close enough). Pumpkins drop gold coins when killed. These coins can be used to buy even better weapons and to restore health.
 
