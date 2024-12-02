@@ -44,6 +44,8 @@ Have fun :P
 ![shoot](https://github.com/user-attachments/assets/ba39be0a-dcf0-4fb9-8c89-6d1b5ce48948)
 
 
+![Uploading zone-ezgif.com-optimize.gif…]()
+
 ### How to play and game controls
 
 Please note: This game is still under development, so you might encounter some bugs.
